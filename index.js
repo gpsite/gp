@@ -1,16 +1,15 @@
-function search() {
-    var input, filter, ul, li, a, i;
-    input = document.getElementById("mySearch");
-    filter = input.value.toUpperCase();
-    ul = document.getElementById("myMenu");
-    li = ul.getElementsByTagName("li");
-  
-    for (i = 0; i < li.length; i++) {
-      a = li[i].getElementsByTagName("a")[0];
-      if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-        li[i].style.display = "";
-      } else {
-        li[i].style.display = "none";
-      }
-    }
-  }
+const searchBar = document.getElementById('searchBar');
+        const buttons = document.querySelectorAll('.sidebar button');
+
+        searchBar.addEventListener('input', () => {
+            const searchText = searchBar.value.toLowerCase();
+
+            buttons.forEach(button => {
+                const buttonText = button.textContent.toLowerCase();
+                if (buttonText.includes(searchText)) {
+                    button.classList.remove('hidden');
+                } else {
+                    button.classList.add('hidden');
+                }
+            });
+        });
