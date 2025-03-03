@@ -1,6 +1,12 @@
 /* Style the search box */
 #mySearch {
-  width: 100%;
+  width: 160px;
+  height: 100%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  overflow: scroll;
   font-size: 18px;
   padding: 11px;
   border: 1px solid #ddd;
@@ -11,6 +17,7 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
+  margin-top: 30px;
 }
 
 /* Style the navigation links */
@@ -23,4 +30,24 @@
 
 #myMenu li button:hover {
   background-color: #eee;
+}
+/* Style Navbar */
+#navbar {
+overflow: hidden;
+position: fixed;
+top: 0;
+width: 100%;
+}
+
+#navbar button {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+#main {
+  margin-top: 30px;
 }
