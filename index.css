@@ -1,12 +1,6 @@
 /* Style the search box */
 #mySearch {
-  width: 160px;
-  height: 100%;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  overflow: scroll;
+  width: 100%;
   font-size: 18px;
   padding: 11px;
   border: 1px solid #ddd;
@@ -14,6 +8,13 @@
 
 /* Style the navigation menu */
 #myMenu {
+width: 160px;
+height: 100%;
+position: fixed;
+z-index: 1;
+top: 0;
+left: 0;
+overflow: scroll;
   list-style-type: none;
   padding: 0;
   margin: 0;
