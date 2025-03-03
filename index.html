@@ -1,46 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-<link rel="stylesheet" href="index.css">
-  </head>
+<head>
+  <link rel="stylesheet" href="index.css">
+</head>
 <body>
+  <div class="navbar" id="navbar">
+    <div class="dropdown">
+      <button class="dropbtn">Home</button>
+      <div class="dropdown-content">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn">About</button>
+      <div class="dropdown-content">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </div>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn">Contact</button>
+      <div class="dropdown-content">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar" id="sidebar">
+    <input type="text" id="search" onkeyup="search()" placeholder="Search.." title="Type in a category">
+    <ul id="menu">
+      <li>
+        <div class="dropdown">
+          <button class="dropbtn">Gambling</button>
+          <div class="dropdown-content">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="dropdown">
+          <button class="dropbtn">Browser Games</button>
+          <div class="dropdown-content">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+          </div>
+        </div>
+      </li>
+      <!-- Add more list items as needed -->
+    </ul>
+  </div>
+  <div class="main" id="main">
+    <h1>George Pickens</h1>
+    <p>text text text</p>
+  </div>
   <script src="index.js"></script>
-<div class="navbar">
-  <button>Home</button>
-  <button>About</button>
-  <button>Contact</button>
-</div>
-<div>
-<div class="sidebar">
-<input type="text" id="search" onkeyup="search()" placeholder="Search.." title="Type in a category">
-<ul id="menu">
-  <li><button class="dropbtn">Gambling</button></li>
-  <li><button class="dropbtn">Broswer Games</button></li>
-  <li><button class="dropbtn">Tower Defense</button></li>
-  <li><button class="dropbtn">Rythym</button></li>
-  <li><button class="dropbtn">Platformer</button></li>
-  <li><button class="dropbtn">Horror</button></li>
-  <li><button class="dropbtn">Crafting</button></li>
-  <li><button class="dropbtn">Runner</button></li>
-  <li><button class="dropbtn">Touchscreen</button></li>
-  <li><button class="dropbtn">Puzzle</button></li>
-  <li><button class="dropbtn">Tycoon</button></li>
-  <li><button class="dropbtn">Two Player</button></li>
-  <li><button class="dropbtn">Online</button></li>
-  <li><button class="dropbtn">Sports</button></li>
-  <li><button class="dropbtn">Shooter</button></li>
-  <li><button class="dropbtn">Retro</button></li>
-</ul>
-</div>
-<div class="dropdown-content">
-  <a href="#">Link 1</a>
-  <a href="#">Link 2</a>
-  <a href="#">Link 3</a>
-</div>
-</body></div>
-<div class="main">
-  <h1>George Pickens</h1>
-  <p>text text text</p>
-</div>
 </body>
 </html>

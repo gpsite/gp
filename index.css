@@ -1,9 +1,10 @@
 /* Style the search box */
 #search {
-  object-fit: 200px;
+  width: 180px;
   font-size: 18px;
   padding: 11px;
   border: 1px solid #ddd;
+  margin: 10px;
 }
 
 /* Style the navigation menu */
@@ -14,20 +15,28 @@
 }
 
 /* Style the navigation links */
-#menu li a {
+#menu li {
+  margin: 0;
+  padding: 0;
+}
+
+#menu li .dropbtn {
   padding: 12px;
   text-decoration: none;
   color: black;
-  display: block
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
-#menu li a:hover {
+#menu li .dropbtn:hover {
   background-color: #eee;
 }
-/*Style sidebar div*/
-#sidebar {
+
+/* Style sidebar div */
+.sidebar {
   margin: 0;
-  margin-top: 30px;
+  margin-top: 50px;
   padding: 0;
   width: 200px;
   background-color: #f1f1f1;
@@ -35,28 +44,40 @@
   height: 100%;
   overflow: auto;
 }
+
 /* Style Navbar */
-#navbar {
-overflow: hidden;
-position: fixed;
-top: 0;
-width: 100%;
+.navbar {
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #333;
+  z-index: 100;
 }
 
-#navbar button {
+.navbar .dropbtn {
   float: left;
   display: block;
   color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-#main {
-  margin-top: 30px;
+.navbar .dropbtn:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Style Main Content */
+.main {
+  margin-top: 50px;
   margin-left: 200px;
-  padding: 1px 16px;
-  height: 1000px
+  padding: 20px;
+  height: 1000px;
 }
 
 /* Style The Dropdown Button */
@@ -94,7 +115,9 @@ width: 100%;
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #f1f1f1}
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
 
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
