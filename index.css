@@ -14,13 +14,13 @@
 }
 
 /* Style the navigation links */
-#myMenu li a {
+#myMenu li button {
   padding: 12px;
   text-decoration: none;
   color: black;
   display: block
 }
 
-#myMenu li a:hover {
+#myMenu li button:hover {
   background-color: #eee;
 }
