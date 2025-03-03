@@ -104,6 +104,8 @@
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 99;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 /* Links inside the dropdown */
@@ -119,12 +121,13 @@
   background-color: #f1f1f1;
 }
 
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {
-  display: block;
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown .active {
+  background-color: #3e8e41;
 }
 
-/* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {
-  background-color: #3e8e41;
+/* Allow dropdown to expand beyond the navbar */
+.navbar .dropdown-content {
+  max-height: none;
+  overflow: visible;
 }

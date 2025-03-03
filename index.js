@@ -1,6 +1,6 @@
 function search() {
   // Declare variables
-  var input, filter, ul, li, button, i;
+  var input, filter, ul, li, button, i, a, txtValue;
   input = document.getElementById("search");
   filter = input.value.toUpperCase();
   ul = document.getElementById("menu");
@@ -14,5 +14,30 @@ function search() {
     } else {
       li[i].style.display = "none";
     }
+  }
+
+  // Loop through all dropdown items to filter them as well
+  var dropdowns = document.getElementsByClassName("dropdown-content");
+  for (i = 0; i < dropdowns.length; i++) {
+    a = dropdowns[i].getElementsByTagName("a");
+    for (var j = 0; j < a.length; j++) {
+      txtValue = a[j].textContent || a[j].innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        a[j].style.display = "";
+      } else {
+        a[j].style.display = "none";
+      }
+    }
+  }
+}
+
+function toggleDropdown(id) {
+  var element = document.getElementById(id);
+  if (element.classList.contains("active")) {
+    element.classList.remove("active");
+    element.style.display = "none";
+  } else {
+    element.classList.add("active");
+    element.style.display = "block";
   }
 }
