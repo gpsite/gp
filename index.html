@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
   <div class="navbar" id="navbar">
+    <a href="index.html">Home</a>
     <div class="dropdown">
-      <button class="dropbtn" onclick="window.open('index.html')">Home</button>
-    </div>
-    <div class="dropdown">
-      <button class="dropbtn" onclick="toggleDropdown('dropdown-games')">Games</button>
+      <button class="dropbtn">Games 
+        <i class="fa fa-caret-down"></i>
+      </button>
       <div class="dropdown-content" id="dropdown-games">
         <a href="games/index.html">Games</a>
         <a href="games/index.html">Search</a>
@@ -17,7 +18,9 @@
       </div>
     </div>
     <div class="dropdown">
-      <button class="dropbtn" onclick="toggleDropdown('dropdown-about')">About</button>
+      <button class="dropbtn">About 
+        <i class="fa fa-caret-down"></i>
+      </button>
       <div class="dropdown-content" id="dropdown-about">
         <a href="about/index.html">About</a>
         <a href="about/team.html">The Team</a>
@@ -25,7 +28,9 @@
       </div>
     </div>
     <div class="dropdown">
-      <button class="dropbtn" onclick="toggleDropdown('dropdown-contact')">Contact</button>
+      <button class="dropbtn">Contact 
+        <i class="fa fa-caret-down"></i>
+      </button>
       <div class="dropdown-content" id="dropdown-contact">
         <a href="contact/additions.html">Additions</a>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLScyqdWU0qhLUhCO1f4fUGua5mppmlluxRMACYZV7F5UPnoOaQ/viewform?usp=header">Bug Report</a>
