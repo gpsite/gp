@@ -6,27 +6,30 @@
 <body>
   <div class="navbar" id="navbar">
     <div class="dropdown">
-      <button class="dropbtn" onclick="toggleDropdown('dropdown-home')">Home</button>
-      <div class="dropdown-content" id="dropdown-home">
-        <a href="#">Link 1</a>
-        <a href="#">Link 2</a>
-        <a href="#">Link 3</a>
+      <button class="dropbtn" onclick="window.open('index.html')">Home</button>
+    </div>
+    <div class="dropdown">
+      <button class="dropbtn" onclick="toggleDropdown('dropdown-games')">Games</button>
+      <div class="dropdown-content" id="dropdown-games">
+        <a href="games/index.html">Games</a>
+        <a href="games/index.html">Search</a>
+        <a href="games/index.html">Random</a>
       </div>
     </div>
     <div class="dropdown">
       <button class="dropbtn" onclick="toggleDropdown('dropdown-about')">About</button>
       <div class="dropdown-content" id="dropdown-about">
-        <a href="#">Link 1</a>
-        <a href="#">Link 2</a>
-        <a href="#">Link 3</a>
+        <a href="about/index.html">About</a>
+        <a href="about/team.html">The Team</a>
+        <a href="about/changelog.html">Changelog</a>
       </div>
     </div>
     <div class="dropdown">
       <button class="dropbtn" onclick="toggleDropdown('dropdown-contact')">Contact</button>
       <div class="dropdown-content" id="dropdown-contact">
-        <a href="#">Link 1</a>
-        <a href="#">Link 2</a>
-        <a href="#">Link 3</a>
+        <a href="contact/additions.html">Additions</a>
+        <a href="contact/report.html">Bug Report</a>
+        <a href="contact/index.html">Contact Us</a>
       </div>
     </div>
   </div>
@@ -53,7 +56,16 @@
           </div>
         </div>
       </li>
-      <!-- Add more list items as needed -->
+      <li>
+        <div class="dropdown">
+          <button class="dropbtn" onclick="toggleDropdown('dropdown-runner')">Runner</button>
+          <div class="dropdown-content" id="dropdown-runner">
+            <a href="games/runner/Run3/index.html">Run 3</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+          </div>
+        </div>
+      </li> 
     </ul>
   </div>
   <div class="main" id="main">

@@ -36,7 +36,6 @@
 /* Style sidebar div */
 .sidebar {
   margin: 0;
-  margin-top: 50px;
   padding: 0;
   width: 200px;
   background-color: #f1f1f1;
@@ -53,6 +52,17 @@
   width: 100%;
   background-color: #333;
   z-index: 100;
+  margin-bottom: 0;
+}
+
+/* Ensure dropdown content is not clipped by navbar */
+.navbar .dropdown-content {
+  position: fixed;
+  top: 50px; /* Adjust based on navbar height */
+  left: 0;
+  width: 100%;
+  max-height: none;
+  overflow: visible;
 }
 
 .navbar .dropbtn {
@@ -74,7 +84,7 @@
 
 /* Style Main Content */
 .main {
-  margin-top: 50px;
+  margin-top: 50px; /* Adjust based on navbar height */
   margin-left: 200px;
   padding: 20px;
   height: 1000px;
@@ -124,10 +134,4 @@
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown .active {
   background-color: #3e8e41;
-}
-
-/* Allow dropdown to expand beyond the navbar */
-.navbar .dropdown-content {
-  max-height: none;
-  overflow: visible;
 }

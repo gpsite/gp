@@ -56,13 +56,31 @@
 <body style="overflow:hidden;">
 
 	<noscript>This webpage makes extensive use of JavaScript. Please enable JavaScript in your web browser to view this page.</noscript>
-
+	<div class="navbar" id="navbar">
+		<div class="dropdown">
+		  <button class="dropbtn" onclick="window.open('index.html')">Home</button>
+		</div>
+		<div class="dropdown">
+		  <button class="dropbtn" onclick="toggleDropdown('dropdown-about')">About</button>
+		  <div class="dropdown-content" id="dropdown-about">
+			<a href="#">Link 1</a>
+			<a href="#">Link 2</a>
+			<a href="#">Link 3</a>
+		  </div>
+		</div>
+		<div class="dropdown">
+		  <button class="dropbtn" onclick="toggleDropdown('dropdown-contact')">Contact</button>
+		  <div class="dropdown-content" id="dropdown-contact">
+			<a href="#">Link 1</a>
+			<a href="#">Link 2</a>
+			<a href="#">Link 3</a>
+		  </div>
+		</div>
+	  </div>
 	<div id="openfl-content"></div>
 	<script type="text/javascript">
 		lime.embed ("Run3", "openfl-content", 800, 600, { parameters: {} });
 	</script>
-  <script src="js/analytics_ubg_v1_4.js"></script>
-  <script src="js/ubg235_client_v1_2.js"></script>
-  <script src="js/ubg98.js"></script>
+
 </body>
 </html>
