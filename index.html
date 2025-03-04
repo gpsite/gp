@@ -1,82 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
-<body>
-  <div class="navbar" id="navbar">
-    <a href="index.html">Home</a>
-    <div class="dropdown">
-      <button onclick="toggleDropdown('dropdown-games')" class="dropbtn">Games 
-        <i class="fa fa-caret-down"></i>
-      </button>
-      <div class="dropdown-content" id="dropdown-games">
-        <a href="games/index.html">Games</a>
-        <a href="games/index.html">Search</a>
-        <a href="games/index.html">Random</a>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>George Pickens</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="navbar">
+      <a href="#home">Home</a>
+      <a href="#news">News</a>
+      <div class="dropdown">
+        <button class="dropbtn">Dropdown
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="#">Link 1</a>
+          <a href="#">Link 2</a>
+          <a href="#">Link 3</a>
+        </div>
       </div>
     </div>
-    <div class="dropdown">
-      <button onclick="toggleDropdown('dropdown-about')" class="dropbtn">About 
-        <i class="fa fa-caret-down"></i>
-      </button>
-      <div class="dropdown-content" id="dropdown-about">
-        <a href="about/index.html">About</a>
-        <a href="about/team.html">The Team</a>
-        <a href="about/changelog.html">Changelog</a>
-      </div>
-    </div>
-    <div class="dropdown">
-      <button onclick="toggleDropdown('dropdown-contact')" class="dropbtn">Contact 
-        <i class="fa fa-caret-down"></i>
-      </button>
-      <div class="dropdown-content" id="dropdown-contact">
-        <a href="contact/additions.html">Additions</a>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLScyqdWU0qhLUhCO1f4fUGua5mppmlluxRMACYZV7F5UPnoOaQ/viewform?usp=header">Bug Report</a>
-        <a href="contact/index.html">Contact Us</a>
-      </div>
-    </div>
-  </div>
-  <div class="sidebar" id="sidebar">
-    <input type="text" id="search" onkeyup="search()" placeholder="Search.." title="Type in a category">
-    <ul id="menu">
-      <li>
-        <div class="dropdown">
-          <button class="dropbtn" onclick="toggleDropdown('dropdown-gambling')">Gambling</button>
-          <div class="dropdown-content" id="dropdown-gambling">
-            <a href="#">Link 1</a>
-            <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="dropdown">
-          <button class="dropbtn" onclick="toggleDropdown('dropdown-browser-games')">Browser Games</button>
-          <div class="dropdown-content" id="dropdown-browser-games">
-            <a href="#">Link 1</a>
-            <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="dropdown">
-          <button class="dropbtn" onclick="toggleDropdown('dropdown-runner')">Runner</button>
-          <div class="dropdown-content" id="dropdown-runner">
-            <a href="games/runner/Run3/index.html">Run 3</a>
-            <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
-          </div>
-        </div>
-      </li> 
-    </ul>
-  </div>
-  <div class="main" id="main">
-    <h1>George Pickens</h1>
-    <p>text text text</p>
-  </div>
   <script src="index.js"></script>
-</body>
+  </body>
 </html>
