@@ -1,8 +1,13 @@
 /* Navbar container */
 .navbar {
   overflow: hidden;
-  background-color: #333;
+  background-color: #000;
   font-family: 'Open Sans', Arial, sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 /* Links inside the navbar */
@@ -43,7 +48,7 @@
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f9f9f9;
+  background-color: #333;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -52,7 +57,7 @@
 /* Links inside the dropdown */
 .dropdown-content a {
   float: none;
-  color: black;
+  color: gold;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
@@ -62,6 +67,7 @@
 /* Add a grey background color to dropdown links on hover */
 .dropdown-content a:hover {
   background-color: #ddd;
+  color: black;
 }
 
 /* Show the dropdown menu on hover */
@@ -69,25 +75,28 @@
   display: block;
 }
 
-/* Title card */
+/* Dark mode body */
 body {
-  background-color: #000000;
+  background-color: #121212;
+  color: #E0E0E0;
   font-family: 'Open Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding-top: 50px; /* Adjust for fixed navbar height */
+}
+
+/* Content area */
+.content {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFB612;
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  overflow: hidden;
+  height: calc(100vh - 50px); /* Adjust for fixed navbar height */
 }
 
+/* Title card */
 .wrapper {
   display: grid;
   place-content: center;
-  background-color: var(--background-color);
   min-height: 100vh;
   font-family: 'Open Sans', sans-serif;
   font-size: clamp(1.5rem, 1rem + 7vw, 15rem);
@@ -114,7 +123,7 @@ body {
 .bottom {
   clip-path: polygon(0% 60%, 100% 50%, 100% 100%, 0% 100%);
   color: transparent;
-  background: linear-gradient(135deg, #FFB612 20%, #000000 60%, #FFB612 80%);
+  background: linear-gradient(135deg, #FFB612 20%, #121212 60%, #FFB612 80%);
   background-size: 200% 200%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -123,7 +132,7 @@ body {
 }
 
 .top .letter {
-  background: linear-gradient(135deg, #FFB612 20%, #000000 60%, #FFB612 80%);
+  background: linear-gradient(135deg, #FFB612 20%, #121212 60%, #FFB612 80%);
   background-size: 200% 200%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -132,7 +141,7 @@ body {
 
 .bottom .letter {
   color: transparent;
-  background: linear-gradient(135deg, #FFB612 20%, #000000 60%, #FFB612 80%);
+  background: linear-gradient(135deg, #FFB612 20%, #121212 60%, #FFB612 80%);
   background-size: 200% 200%;
   background-clip: text;
   -webkit-background-clip: text;
