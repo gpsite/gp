@@ -64,6 +64,7 @@
   z-index: 99;
   max-height: 200px;
   overflow-y: auto;
+  transform: translateY(100%); /* Move dropdown content below the navbar */
 }
 
 .navbar .dropbtn {
