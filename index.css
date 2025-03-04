@@ -59,7 +59,7 @@
 .navbar .dropdown-content {
   position: absolute;
   background-color: #f9f9f9;
-  min-width: 160px;
+  min-width: 100%; /* Make dropdown content the same width as the button */
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 99;
   max-height: 200px;
@@ -83,12 +83,6 @@
 .navbar .dropbtn:hover, .dropbtn.active {
   background-color: #ddd;
   color: black;
-}
-
-/* Align dropdown content under the button */
-.navbar .dropdown-content {
-  left: auto;
-  right: auto;
 }
 
 /* Style Main Content */
@@ -120,11 +114,12 @@
   display: none;
   position: absolute;
   background-color: #f9f9f9;
-  min-width: 160px;
+  min-width: 100%; /* Ensure the dropdown content is the same width as the button */
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 99;
   max-height: 200px;
   overflow-y: auto;
+  transform: translateY(100%); /* Move dropdown content below the button */
 }
 
 /* Links inside the dropdown */
