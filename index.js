@@ -33,11 +33,14 @@ function search() {
 
 function toggleDropdown(id) {
   var element = document.getElementById(id);
+  var button = element.previousElementSibling;
   if (element.classList.contains("active")) {
     element.classList.remove("active");
+    button.classList.remove("active");
     element.style.display = "none";
   } else {
     element.classList.add("active");
+    button.classList.add("active");
     element.style.display = "block";
   }
 }

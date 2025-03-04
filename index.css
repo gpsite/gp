@@ -4,7 +4,8 @@
   font-size: 18px;
   padding: 11px;
   border: 1px solid #ddd;
-  margin: 10px;
+  margin: 10px auto;
+  display: block;
 }
 
 /* Style the navigation menu */
@@ -29,7 +30,7 @@
   text-align: left;
 }
 
-#menu li .dropbtn:hover {
+#menu li .dropbtn:hover, .dropbtn.active {
   background-color: #eee;
 }
 
@@ -52,17 +53,17 @@
   width: 100%;
   background-color: #333;
   z-index: 100;
-  margin-bottom: 0;
 }
 
 /* Ensure dropdown content is not clipped by navbar */
 .navbar .dropdown-content {
-  position: fixed;
-  top: 50px; /* Adjust based on navbar height */
-  left: 0;
-  width: 100%;
-  max-height: none;
-  overflow: visible;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 99;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .navbar .dropbtn {
@@ -75,11 +76,18 @@
   background: none;
   border: none;
   cursor: pointer;
+  width: 150px; /* Make the button wider */
 }
 
-.navbar .dropbtn:hover {
+.navbar .dropbtn:hover, .dropbtn.active {
   background-color: #ddd;
   color: black;
+}
+
+/* Align dropdown content under the button */
+.navbar .dropdown-content {
+  left: auto;
+  right: auto;
 }
 
 /* Style Main Content */
@@ -134,4 +142,9 @@
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown .active {
   background-color: #3e8e41;
+}
+
+/* Make sidebar dropdowns push buttons below them */
+#menu .dropdown-content {
+  position: relative;
 }
