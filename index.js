@@ -23,3 +23,12 @@ function shuffleGameCards() {
 }
 
 document.addEventListener('DOMContentLoaded', shuffleGameCards);
+
+fetch('dev/navbar.html')
+            .then(response => response.text())
+            .then(data => {
+                const template = document.createElement('template');
+                template.innerHTML = data;
+                const navbar = template.content.querySelector('#navbar-template').content;
+                document.getElementById('navbar').appendChild(navbar);
+            });
