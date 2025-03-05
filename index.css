@@ -222,7 +222,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
-  width: 80.5%;
+  width: 81.5%;
 }
 
 .gamecard {
@@ -246,6 +246,7 @@ body {
   font-weight: bold;
   margin-bottom: 5px;
   font-family: 'Open Sans', Arial, sans-serif;
+  color: #FFB612;
 }
 
 .gamecard .subtitle {
