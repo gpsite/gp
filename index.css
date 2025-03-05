@@ -15,7 +15,7 @@
 .navbar a {
   float: left;
   font-size: 16px;
-  color: gold;
+  color: #FFB612;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -33,7 +33,7 @@
   font-size: 16px;
   border: none;
   outline: none;
-  color: gold;
+  color: #FFB612;
   padding: 14px 16px;
   background-color: inherit;
   font-family: inherit; /* Important for vertical align on mobile phones */
@@ -46,7 +46,7 @@
 
 /* Add a gold background color to navbar links on hover */
 .navbar a:hover, .dropdown:hover .dropbtn {
-  background-color: gold;
+  background-color: #FFB612;
   color: black;
 }
 
@@ -62,7 +62,7 @@
 /* Links inside the dropdown */
 .dropdown-content a {
   float: none;
-  color: gold;
+  color: #FFB612;
   padding: 14px 16px;
   text-decoration: none;
   display: block;
@@ -201,10 +201,10 @@ body {
   width: 80%;
   padding: 10px;
   margin: 0 auto 20px;
-  border: 2px solid #ffd700;
+  border: 2px solid #FFB612;
   border-radius: 10px;
   background-color: #333;
-  color: #ffd700;
+  color: #FFB612;
   font-size: 16px;
   font-family: 'Open Sans', Arial, sans-serif;
   display: block;
@@ -222,12 +222,12 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
-  width: 80%;
+  width: 80.5%;
 }
 
 .gamecard {
   background-color: #333;
-  border: 2px solid #ffd700;
+  border: 2px solid #FFB612;
   border-radius: 10px;
   padding: 10px;
   font-family: 'Open Sans', Arial, sans-serif;
