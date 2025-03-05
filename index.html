@@ -17,8 +17,8 @@
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content">
-          <a href="#">Search</a>
-          <a href="#">Featured</a>
+          <a href="games/index.html">Search</a>
+          <a href="games/featured.html">Featured</a>
         </div>
       </div>
       <div class="dropdown">
@@ -26,9 +26,9 @@
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content">
-          <a href="#">About GP</a>
-          <a href="#">The Team</a>
-          <a href="#">Changelog</a>
+          <a href="about/index.html">About GP</a>
+          <a href="about/team.html">The Team</a>
+          <a href="about/changelog.html">Changelog</a>
         </div>
       </div>
       <div class="dropdown">
@@ -36,9 +36,9 @@
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content">
-          <a href="#">Additions</a>
-          <a href="#">Bug Report</a>
-          <a href="#">Contact Us</a>
+          <a href="contact/additions.html">Additions</a>
+          <a href="contact/additions.html">Bug Report</a>
+          <a href="index.html">Contact Us</a>
         </div>
       </div>
     </div>
@@ -79,7 +79,32 @@
         </div>
       </section>
     </div>
-  
+
+    <div class="gamesearch">
+      <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games...">
+      <div class="grid-container" id="gamecards-container">
+          <button class="gamecard" onclick="location.href='games/game1.html'">
+              <img src="game1.jpg" alt="Game 1">
+              <div class="title">Game 1</div>
+              <div class="subtitle">Category: Action, Adventure</div>
+          </button>
+          <button class="gamecard" onclick="location.href='games/game2.html'">
+              <img src="game2.jpg" alt="Game 2">
+              <div class="title">Game 2</div>
+              <div class="subtitle">Category: Puzzle, Strategy</div>
+          </button>
+          <button class="gamecard" onclick="location.href='games/game3.html'">
+              <img src="game3.jpg" alt="Game 3">
+              <div class="title">Game 3</div>
+              <div class="subtitle">Category: RPG, Fantasy</div>
+          </button>
+          <button class="gamecard" onclick="location.href='games/game4.html'">
+              <img src="game4.jpg" alt="Game 4">
+              <div class="title">Game 4</div>
+              <div class="subtitle">Category: Shooter, Multiplayer</div>
+          </button>
+      </div>
+    </div>
     <script src="index.js"></script>
   </body>
 </html>
