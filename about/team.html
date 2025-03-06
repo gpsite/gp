@@ -4,10 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HTML 5 Boilerplate</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Meet the Team</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <script src="index.js"></script>
+    <div id="navbar"></div>
+
+    <div class="content">
+      <section class="wrapper">
+        <div class="top">
+          <span class="letter" style="animation-delay: 0s;">M</span>
+          <span class="letter" style="animation-delay: 0.1s;">e</span>
+          <span class="letter" style="animation-delay: 0.2s;">e</span>
+          <span class="letter" style="animation-delay: 0.3s;">t</span>
+          <span class="letter" style="animation-delay: 0.4s;">&nbsp;</span>
+          <span class="letter" style="animation-delay: 0.5s;">t</span>
+          <span class="letter" style="animation-delay: 0.6s;">h</span>
+          <span class="letter" style="animation-delay: 0.7s;">e</span>
+          <span class="letter" style="animation-delay: 0.8s;">&nbsp;</span>
+          <span class="letter" style="animation-delay: 0.9s;">T</span>
+          <span class="letter" style="animation-delay: 1s;">e</span>
+          <span class="letter" style="animation-delay: 1.1s;">a</span>
+          <span class="letter" style="animation-delay: 1.2s;">m</span>
+        </div>
+        <div class="bottom" aria-hidden="true">
+          <span class="letter" style="animation-delay: 0s;">M</span>
+          <span class="letter" style="animation-delay: 0.1s;">e</span>
+          <span class="letter" style="animation-delay: 0.2s;">e</span>
+          <span class="letter" style="animation-delay: 0.3s;">t</span>
+          <span class="letter" style="animation-delay: 0.4s;">&nbsp;</span>
+          <span class="letter" style="animation-delay: 0.5s;">t</span>
+          <span class="letter" style="animation-delay: 0.6s;">h</span>
+          <span class="letter" style="animation-delay: 0.7s;">e</span>
+          <span class="letter" style="animation-delay: 0.8s;">&nbsp;</span>
+          <span class="letter" style="animation-delay: 0.9s;">T</span>
+          <span class="letter" style="animation-delay: 1s;">e</span>
+          <span class="letter" style="animation-delay: 1.1s;">a</span>
+          <span class="letter" style="animation-delay: 1.2s;">m</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="team-section">
+      <div class="team-member">
+        <img src="img/team/member1.jpg" alt="Member 1" class="team-photo">
+        <div class="team-info">
+          <h2>Member 1</h2>
+          <p>Role: Developer</p>
+          <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</p>
+        </div>
+      </div>
+      <div class="team-member">
+        <img src="img/team/member2.jpg" alt="Member 2" class="team-photo">
+        <div class="team-info">
+          <h2>Member 2</h2>
+          <p>Role: Designer</p>
+          <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</p>
+        </div>
+      </div>
+      <div class="team-member">
+        <img src="img/team/member3.jpg" alt="Member 3" class="team-photo">
+        <div class="team-info">
+          <h2>Member 3</h2>
+          <p>Role: Project Manager</p>
+          <p>Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      fetch('https://kinggeorgepickens2.github.io/georgepickens/dev/navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            const template = document.createElement('template');
+            template.innerHTML = data;
+            const navbar = template.content.querySelector('#navbar-template').content;
+            document.getElementById('navbar').appendChild(navbar);
+        });
+    </script>
   </body>
 </html>
