@@ -181,3 +181,31 @@ body {
   transform: scale(0.95);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+/* Featured and Updates section */
+.featuredupdates {
+  display: flex;
+  justify-content: space-between;
+  width: 81.5%;
+  margin: 20px auto;
+}
+
+.featured-gamecard {
+  width: 40%; /* Adjust as necessary */
+}
+
+.updates-info {
+  display: flex;
+  flex-direction: column;
+  width: 55%; /* Adjust as necessary */
+}
+
+.update-card {
+  background-color: #333;
+  border: 2px solid #FFB612;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  color: #E0E0E0;
+}
