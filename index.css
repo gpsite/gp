@@ -211,20 +211,9 @@ body {
   color: #E0E0E0;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.update-card button{
-  background-color: #333;
-  border: 2px solid #FFB612;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  font-family: 'Open Sans', Arial, sans-serif;
-  color: #E0E0E0;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+.update-card:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
