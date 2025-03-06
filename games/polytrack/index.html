@@ -17,11 +17,15 @@
             height: 100%;
             border: none;
         }
+
+        .navbar{
+            z-index: 999;
+        }
     </style>
 </head>
 <body>
   <script>
-    fetch('dev/navbar.html')
+    fetch('https://kinggeorgepickens2.github.io/georgepickens/dev/navbar.html')
             .then(response => response.text())
             .then(data => {
                 const template = document.createElement('template');
