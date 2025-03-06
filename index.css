@@ -139,7 +139,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
-  width: 81.5%;
+  width: 40%;
 }
 
 .gamecard {
@@ -192,8 +192,6 @@ body {
 
 .featured-gamecard {
   width: 40%; /* Adjust as necessary */
-  margin-left: 10px;
-  margin-right: 10px;
 }
 
 .updates-info {
