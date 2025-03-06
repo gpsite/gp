@@ -230,6 +230,7 @@ body {
   width: 40%; /* Adjust as necessary */
   border-radius: 10px;
   margin-right: 20px;
+  border-color: #FFB612;
 }
 
 .team-info {
