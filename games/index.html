@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GP Games</title>
+    <style>
+
+.search-bar {
+  width: 80%;
+  padding: 10px;
+  margin: 0 auto 20px;
+  border: 2px solid #FFB612;
+  border-radius: 10px;
+  background-color: #333;
+  color: #FFB612;
+  font-size: 16px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  display: block;
+}
+
+.gamesearch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  width: 81.5%;
+}
+
+.gamecard {
+  background-color: #333;
+  border: 2px solid #FFB612;
+  border-radius: 10px;
+  padding: 10px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gamecard img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.gamecard .title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  color: #FFB612;
+}
+
+.gamecard .subtitle {
+  font-size: 14px;
+  color: #bbb;
+  font-family: 'Open Sans', Arial, sans-serif;
+}
+
+.gamecard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gamecard:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+    </style>
+</head>
+<body>
+    <div class="gamesearch">
+        <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games...">
+        <div class="grid-container" id="gamecards-container">
+            <button class="gamecard" onclick="location.href='games/run3'">
+                <img src="img/thumbnail/run3.png" alt="Run3">
+                <div class="title">Run 3</div>
+                <div class="subtitle">Category: Runner, Platformer</div>
+            </button>
+            <button class="gamecard" onclick="location.href='games/2048'">
+                <img src="img/thumbnail/2048.png" alt="2048">
+                <div class="title">2048</div>
+                <div class="subtitle">Category: Puzzle, Strategy</div>
+            </button>
+            <button class="gamecard" onclick="location.href='games/pvz'">
+                <img src="img/thumbnail/pvz.png" alt="PvZ">
+                <div class="title">Plants vs. Zombies</div>
+                <div class="subtitle">Category: Tower Defense, Strategy</div>
+            </button>
+            <button class="gamecard" onclick="location.href='games/polytrack'">
+                <img src="img/thumbnail/polytrack.png" alt="Polytrack">
+                <div class="title">Polytrack</div>
+                <div class="subtitle">Category: Driver</div>
+            </button>
+            <button class="gamecard" onclick="location.href='games/index.html.html'">
+              <img src="game.jpg" alt="game">
+              <div class="title">example</div>
+              <div class="subtitle">Category: example</div>
+          </button>
+        </div>
+      </div>
+      <script>
+        function searchGameCards() {
+    const input = document.querySelector('.search-bar');
+    const filter = input.value.toLowerCase();
+    const gamecards = document.querySelectorAll('.gamecard');
+
+    gamecards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(filter)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function shuffleGameCards() {
+    const container = document.getElementById('gamecards-container');
+    const cards = Array.from(container.children);
+    for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        container.appendChild(cards[j]);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', shuffleGameCards);
+
+      </script>
+</body>
+</html>
