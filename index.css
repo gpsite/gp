@@ -139,7 +139,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
-  width: 40%;
+  width: 81.5%;
 }
 
 .gamecard {
@@ -192,7 +192,6 @@ body {
 
 .featured-gamecard {
   width: 40%; /* Adjust as necessary */
-
 }
 
 .updates-info {
@@ -209,10 +208,47 @@ body {
   margin-bottom: 20px;
   font-family: 'Open Sans', Arial, sans-serif;
   color: #E0E0E0;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.update-card a {
+/* Meet the Team section */
+.team-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 81.5%;
+  margin: 20px auto;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.team-photo {
+  width: 40%; /* Adjust as necessary */
+  border-radius: 10px;
+  margin-right: 20px;
+}
+
+.team-info {
+  background-color: #333;
+  border: 2px solid #FFB612;
+  border-radius: 10px;
+  padding: 20px;
+  width: 55%; /* Adjust as necessary */
+  color: #E0E0E0;
+}
+
+.team-info h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
   color: #FFB612;
+}
+
+.team-info p {
+  font-size: 14px;
+  color: #bbb;
 }
