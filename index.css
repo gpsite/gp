@@ -192,6 +192,8 @@ body {
 
 .featured-gamecard {
   width: 40%; /* Adjust as necessary */
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .updates-info {
