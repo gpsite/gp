@@ -18,14 +18,14 @@
             border: none;
         }
 
-        #navbar{
+        .navbar{
             z-index: 999;
         }
     </style>
 </head>
 <body>
   <script>
-    fetch('dev/navbar.html')
+    fetch('georgepickens/dev/navbar.html')
             .then(response => response.text())
             .then(data => {
                 const template = document.createElement('template');
@@ -34,7 +34,7 @@
                 document.getElementById('navbar').appendChild(navbar);
             });
   </script>
-  <div id="navbar"></div>
+  <div class="navbar" id="navbar"></div>
     <iframe class="embed" src="https://kinggeorgepickens2.github.io/Run3/"></iframe>
 </body>
 </html>
