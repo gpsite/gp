@@ -277,7 +277,7 @@
     </style>
     
     <div class="navbar">
-      <button class="menu-icon">&#9776;</button>
+      <button class="menu-icon" onclick="navopen()">&#9776;</button>
       <div class="navbar-content">
         <a href="https://georgepickenssite.github.io/georgepickens/"><i class="fa fa-home"></i> Home</a>
         <a href="https://georgepickenssite.github.io/georgepickens/games"><i class="fa fa-gamepad"></i> Games</a>
@@ -307,21 +307,21 @@
         <a href="https://x.com/georgepick12592"><i class="fa fa-twitter fa-lg"></i></a>
         <a href="https://www.instagram.com/georgepickenssite/"><i class="fa fa-instagram fa-lg"></i></a>
       </div>
-      <button class="close-icon">&times;</button>
+      <button class="close-icon" onclick="navclose()">&times;</button>
     </div>
     
     <script>
-      document.querySelector('.menu-icon').addEventListener('click', function() {
+     async function navclose() {
         document.querySelector('.navbar-content').style.display = 'flex';
         document.querySelector('.close-icon').style.display = 'block';
         document.querySelector('.menu-icon').style.display = 'none';
-      });
+      };
     
-      document.querySelector('.close-icon').addEventListener('click', function() {
+     async function navopen() {
         document.querySelector('.navbar-content').style.display = 'none';
         document.querySelector('.close-icon').style.display = 'none';
         document.querySelector('.menu-icon').style.display = 'block';
-      });
+      };
     
       // Initially hide the close icon
       document.querySelector('.close-icon').style.display = 'none';
