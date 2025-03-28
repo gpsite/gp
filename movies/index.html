@@ -231,7 +231,7 @@ body {
         function searchGameCards() {
     const input = document.querySelector('.search-bar');
     const filter = input.value.toLowerCase();
-    const gamecards = document.querySelectorAll('.gamecard');
+    const gamecards = document.querySelectorAll('.gamecard'); //:3
 
     gamecards.forEach(card => {
         const text = card.textContent.toLowerCase();
