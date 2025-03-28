@@ -1,0 +1,39 @@
+<video id="videoplayer" width="100%" type="video/mp4" style="--plyr-color-main: #FF2A60;" controls="">
+    <source id="vidsource" type="video/mp4">
+    <track kind="captions" label="English" src="/subs/tt0816692.vtt" srclang="en">
+</video>
+<script>
+const getURL = (link) => {
+const getFormattedDate = (date) => {
+  return date.toISOString().split('T')[0].replace(/-/g, '');
+};
+
+const getDateString = () => {
+  const currentDate = new Date();
+  
+  const yesterday = new Date(currentDate);
+  yesterday.setDate(currentDate.getDate() - 1);
+
+  const tomorrow = new Date(currentDate);
+  tomorrow.setDate(currentDate.getDate() + 1);
+
+  const formattedYesterday = getFormattedDate(yesterday);
+  const formattedToday = getFormattedDate(currentDate);
+  const formattedTomorrow = getFormattedDate(tomorrow);
+
+  return formattedYesterday + formattedToday + formattedTomorrow;
+};
+
+const longDateString = getDateString();
+console.log("Long Date String:", longDateString);
+const url = link+longDateString;
+console.log(url);
+const srcvp = document.getElementById('videoplayer');
+const srcvs = document.getElementById('vidsource');
+console.log(srcvp, srcvs);
+srcvp.src = url;
+srcvs.src = url;
+console.log(srcvp.src, srcvs.src);
+};
+getURL("https://vault.rips.cc/video/interstellar.2014?k=");
+</script>
