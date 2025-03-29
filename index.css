@@ -1,22 +1,27 @@
-/* Dark mode body */
 body {
-  background-color: #121212;
-  color: #E0E0E0;
-  font-family: 'Open Sans', sans-serif;
-  -webkit-font-smoothing: antialiased;
   margin: 0;
-  padding-top: 50px; /* Adjust for fixed navbar height */
+  padding: 0;
+  background-color: #1d1e22;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-position: 50% 30%;
+  background-size: 2.1rem 2.1rem;
+  overflow-x: hidden;
+  font-family: 'Open Sans', sans-serif;
+  color: #E0E0E0;
+  background-attachment: fixed; /* Ensure the background does not move */
 }
 
-/* Content area */
 .content {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - 50px); /* Adjust for fixed navbar height */
+  height: 100vh; /* Full viewport height */
+  position: relative; /* Allow it to scroll with the page */
+  z-index: 1; /* Ensure it appears below the wave */
+  transform-origin: center top; /* Set the origin for scaling */
+  transition: transform 0.1s linear; /* Smooth scaling effect */
 }
 
-/* Title card */
 .wrapper {
   display: grid;
   place-content: center;
@@ -26,6 +31,17 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   color: #FFB612;
+  position: relative;
+  z-index: 1; /* Ensure it appears below the wave */
+  pointer-events: none; /* Prevent interaction with the title */
+  opacity: 1; /* Ensure the title is visible */
+  transform: rotateX(0deg) scale(1); /* Ensure the title is not rotated or scaled down */
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out; /* Smooth transition */
+}
+
+.wrapper.visible {
+  opacity: 1; /* Make visible */
+  transform: rotateX(0deg) scale(1); /* Rotate to normal and scale up */
 }
 
 .wrapper > div {
@@ -41,6 +57,9 @@ body {
 
 .top {
   clip-path: polygon(0% 0%, 100% 0%, 100% 48%, 0% 58%);
+  position: relative;
+  z-index: 1;
+  transform: translateZ(15);
 }
 
 .bottom {
@@ -187,7 +206,7 @@ body {
   display: flex;
   justify-content: space-between;
   width: 81.5%;
-  margin: 20px auto;
+  margin: 10px auto; /* Reduce margin to move updates closer */
 }
 
 .featured-gamecard {
@@ -205,7 +224,7 @@ body {
   border: 2px solid #FFB612;
   border-radius: 10px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* Reduce spacing between update cards */
   font-family: 'Open Sans', Arial, sans-serif;
   color: #E0E0E0;
 }
@@ -252,4 +271,113 @@ body {
 .team-info p {
   font-size: 14px;
   color: #bbb;
+}
+
+.wave-container {
+  position: relative;
+  width: 100vw;
+  height: 200px; /* Increase height to make the wave bigger */
+  overflow: hidden;
+  background-color: transparent; /* Keep the container transparent */
+  z-index: 2; /* Ensure the wave is above the title */
+}
+
+.wave {
+  position: absolute; /* Attach the wave to the top of the container */
+  top: 0;
+  left: 50%; /* Center the wave horizontally */
+  transform: translateX(-50%) scale(1.5); /* Center and scale the wave */
+  width: 200%; /* Ensure the wave spans the entire width */
+  height: 100%;
+  transition: none; /* Disable any transition effect */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+.fade-in-delayed {
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.fade-in-object {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fade-in-object.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Apply fade-in to specific elements */
+.top, .bottom {
+  animation: fadeIn 2s ease-in-out;
+}
+
+.update-card {
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Game cards hover effect */
+.gamecard {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gamecard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Button hover effect */
+button {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button:hover {
+  background-color: #007acc;
+  color: #fff;
+}
+
+.below-wave {
+  background-color: #808080;
+  padding: 20px 20px; /* Further reduce padding to move content closer */
+  margin-top: -20px; /* Increase overlap with the wave */
+  position: relative;
+  z-index: 3; /* Ensure content below the wave is above the wave */
+}
+
+.logo {
+  position: absolute;
+  top: 80%; /* Start below the wave */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, 0) rotateX(90deg) scale(0.5); /* Start rotated and scaled down */
+  width: 75px; /* Adjust size */
+  opacity: 0; /* Initially hidden */
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out, z-index 0.5s ease-out; /* Smooth transition */
+  z-index: 1; /* Place it behind the wave */
+}
+
+.logo.visible {
+  opacity: 1; /* Make visible */
+  transform: translate(-50%, -150%) rotateX(0deg) scale(0.7); /* Rotate to normal, scale up, and move upward */
+  z-index: 3; /* Bring it in front of the wave */
 }
