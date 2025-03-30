@@ -85,13 +85,11 @@
       color: black;
     }
 
-    /* Show the dropdown menu on hover */
     .dropdown:hover .dropdown-content {
       display: block;
     }
 
-    /* Style for the menu icons */
-    .menu-icon, .close-icon {
+    .menu-icon, .hide-btn {
       font-size: 24px;
       color: #FFB612;
       cursor: pointer;
@@ -114,16 +112,12 @@
       }
     }
     
-    /* Hide button style */
     .hide-btn {
-      font-size: 24px;
-      color: #FFB612;
-      cursor: pointer;
-      padding: 14px 16px;
-      background: none;
-      border: none;
-      outline: none;
       float: right;
+    }
+
+    .navbar-hidden {
+      top: -60px;
     }
   </style>
 
@@ -167,11 +161,11 @@
 
   <script>
     function hideNavbar() {
-      document.getElementById("navbar").style.top = "-50px";
+      document.getElementById("navbar").classList.add("navbar-hidden");
     }
 
     document.getElementById("navbar").addEventListener("mouseover", function() {
-      document.getElementById("navbar").style.top = "0";
+      document.getElementById("navbar").classList.remove("navbar-hidden");
     });
   </script>
 </template>
