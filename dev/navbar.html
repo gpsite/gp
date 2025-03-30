@@ -85,6 +85,7 @@
       color: black;
     }
 
+    /* Show the dropdown menu on hover */
     .dropdown:hover .dropdown-content {
       display: block;
     }
@@ -117,7 +118,7 @@
     }
 
     .navbar-hidden {
-      top: -60px;
+      top: -60px; /* add morew if needed idk */
     }
   </style>
 
@@ -161,11 +162,11 @@
 
   <script>
     function hideNavbar() {
-      document.getElementById("navbar").classList.add("navbar-hidden");
+      document.querySelector(".navbar").classList.add("navbar-hidden");
     }
 
-    document.getElementById("navbar").addEventListener("mouseover", function() {
-      document.getElementById("navbar").classList.remove("navbar-hidden");
+    document.querySelector(".navbar").addEventListener("mouseover", function() {
+      document.querySelector(".navbar").classList.remove("navbar-hidden");
     });
   </script>
 </template>
