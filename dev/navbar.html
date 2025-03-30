@@ -90,6 +90,7 @@
       display: block;
     }
 
+    /* Style for the menu icons */
     .menu-icon, .hide-btn {
       font-size: 24px;
       color: #FFB612;
@@ -118,7 +119,7 @@
     }
 
     .navbar-hidden {
-      top: -60px; /* add morew if needed idk */
+      top: -60px; /* more or less idk */
     }
   </style>
 
@@ -162,11 +163,19 @@
 
   <script>
     function hideNavbar() {
+      console.log("Hiding navbar");
       document.querySelector(".navbar").classList.add("navbar-hidden");
     }
 
-    document.querySelector(".navbar").addEventListener("mouseover", function() {
-      document.querySelector(".navbar").classList.remove("navbar-hidden");
+    document.addEventListener("DOMContentLoaded", function() {
+      const navbar = document.querySelector(".navbar");
+      if (navbar) {
+        console.log("Navbar loaded");
+        navbar.addEventListener("mouseover", function() {
+          console.log("Showing navbar");
+          navbar.classList.remove("navbar-hidden");
+        });
+      }
     });
   </script>
 </template>
