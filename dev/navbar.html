@@ -13,8 +13,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: top 0.3s;
     }
-  
+
     /* Links inside the navbar */
     .navbar a {
       float: left;
@@ -25,17 +26,17 @@
       text-decoration: none;
       width: 110px;
     }
-  
+
     .navbar a-sm {
       margin: 0%;
     }
-  
+
     /* The dropdown container */
     .dropdown {
       float: left;
       overflow: hidden;
     }
-  
+
     /* Dropdown button */
     .dropdown .dropbtn {
       font-size: 16px;
@@ -51,13 +52,13 @@
       text-align: center;
       font-weight: 700;
     }
-  
+
     /* Add a gold background color to navbar links on hover */
     .navbar a:hover, .dropdown:hover .dropbtn {
       background-color: #FFB612;
       color: black;
     }
-  
+
     /* Dropdown content (hidden by default) */
     .dropdown-content {
       display: none;
@@ -66,7 +67,7 @@
       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); 
       z-index: 2000; /* Ensure dropdown content is above other elements */
     }
-  
+
     /* Links inside the dropdown */
     .dropdown-content a {
       float: none;
@@ -77,18 +78,18 @@
       text-align: center;
       width: 110px;
     }
-  
+
     /* Add a grey background color to dropdown links on hover */
     .dropdown-content a:hover {
       background-color: #ddd;
       color: black;
     }
-  
+
     /* Show the dropdown menu on hover */
     .dropdown:hover .dropdown-content {
       display: block;
     }
-  
+
     /* Style for the menu icons */
     .menu-icon, .close-icon {
       font-size: 24px;
@@ -99,11 +100,11 @@
       border: none;
       outline: none;
     }
-  
+
     .menu-icon {
       display: none;
     }
-  
+
     @media screen and (max-width: 768px) {
       .navbar a, .dropdown .dropbtn {
         display: none;
@@ -112,9 +113,21 @@
         display: block;
       }
     }
+    
+    /* Hide button style */
+    .hide-btn {
+      font-size: 24px;
+      color: #FFB612;
+      cursor: pointer;
+      padding: 14px 16px;
+      background: none;
+      border: none;
+      outline: none;
+      float: right;
+    }
   </style>
-  
-  <div class="navbar">
+
+  <div class="navbar" id="navbar">
     <div class="navbar-content">
       <a href="https://georgepickenssite.github.io/georgepickens/"><i class="fa fa-home"></i> Home</a>
       <a href="https://georgepickenssite.github.io/georgepickens/games"><i class="fa fa-gamepad"></i> Games</a>
@@ -148,6 +161,17 @@
         </div>
       </div>
       <a href="https://www.instagram.com/georgepickenssite/"><i class="fa fa-instagram fa-lg"></i></a>
+      <button class="hide-btn" onclick="hideNavbar()">☰</button>
     </div>
   </div>
+
+  <script>
+    function hideNavbar() {
+      document.getElementById("navbar").style.top = "-50px";
+    }
+
+    document.getElementById("navbar").addEventListener("mouseover", function() {
+      document.getElementById("navbar").style.top = "0";
+    });
+  </script>
 </template>
