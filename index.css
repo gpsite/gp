@@ -229,68 +229,6 @@ body {
   color: #E0E0E0;
 }
 
-/* Meet the Team section */
-.team-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 81.5%;
-  margin: 20px auto;
-}
-
-.team-member {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.team-photo {
-  width: 40%; /* Adjust as necessary */
-  border-radius: 10px;
-  margin-right: 20px;
-  border-color: #FFB612;
-}
-
-.team-info {
-  background-color: #333;
-  border: 2px solid #FFB612;
-  border-radius: 10px;
-  padding: 20px;
-  width: 55%; /* Adjust as necessary */
-  color: #E0E0E0;
-}
-
-.team-info h2 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #FFB612;
-}
-
-.team-info p {
-  font-size: 14px;
-  color: #bbb;
-}
-
-.wave-container {
-  position: relative;
-  width: 100vw;
-  height: 200px; /* Increase height to make the wave bigger */
-  overflow: hidden;
-  background-color: transparent; /* Keep the container transparent */
-  z-index: 2; /* Ensure the wave is above the title */
-}
-
-.wave {
-  position: absolute; /* Attach the wave to the top of the container */
-  top: 0;
-  left: 50%; /* Center the wave horizontally */
-  transform: translateX(-50%) scale(1.5); /* Center and scale the wave */
-  width: 200%; /* Ensure the wave spans the entire width */
-  height: 100%;
-  transition: none; /* Disable any transition effect */
-}
 
 /* Fade-in animation */
 @keyframes fadeIn {
