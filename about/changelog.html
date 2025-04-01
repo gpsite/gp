@@ -4,10 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HTML 5 Boilerplate</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Changelog - George Pickens</title>
+    <link rel="stylesheet" href="https://georgepickenssite.github.io/georgepickens/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      .changelog-container {
+        padding: 20px;
+        background-color: #1d1e22;
+        color: #E0E0E0;
+        border-radius: 10px;
+        max-width: 800px; 
+        margin: 50px auto;
+      }
+      .changelog-container h2 {
+        color: #FFB612;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .changelog-entry {
+        margin-bottom: 20px;
+      }
+      .changelog-date {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      .changelog-description {
+        margin-left: 20px;
+      }
+      .dropdown {
+        cursor: pointer;
+        margin: 10px 0;
+        color: #FFB612;
+      }
+      .dropdown-content {
+        display: none;
+        margin-left: 20px;
+      }
+      .dropdown-content ul {
+        padding-left: 20px;
+      }
+    </style>
+    <script>
+      function toggleDropdown(event) {
+        const dropdownContent = event.nextElementSibling;
+        if (dropdownContent.style.display === "none" || dropdownContent.style.display === "") {
+          dropdownContent.style.display = "block";
+        } else {
+          dropdownContent.style.display = "none";
+        }
+      }
+    </script>
   </head>
   <body>
-    <script src="index.js"></script>
+    <div id="navbar"></div>
+    
+    <div class="content">
+      <section class="wrapper">
+        <div class="top">
+          <span class="letter" style="animation-delay: 0s;">C</span>
+          <span class="letter" style="animation-delay: 0.1s;">h</span>
+          <span class="letter" style="animation-delay: 0.2s;">a</span>
+          <span class="letter" style="animation-delay: 0.3s;">n</span>
+          <span class="letter" style="animation-delay: 0.4s;">g</span>
+          <span class="letter" style="animation-delay: 0.5s;">e</span>
+          <span class="letter" style="animation-delay: 0.6s;">l</span>
+          <span class="letter" style="animation-delay: 0.7s;">o</span>
+          <span class="letter" style="animation-delay: 0.8s;">g</span>
+        </div>
+        <div class="bottom" aria-hidden="true">
+          <span class="letter" style="animation-delay: 0s;">C</span>
+          <span class="letter" style="animation-delay: 0.1s;">h</span>
+          <span class="letter" style="animation-delay: 0.2s;">a</span>
+          <span class="letter" style="animation-delay: 0.3s;">n</span>
+          <span class="letter" style="animation-delay: 0.4s;">g</span>
+          <span class="letter" style="animation-delay: 0.5s;">e</span>
+          <span class="letter" style="animation-delay: 0.6s;">l</span>
+          <span class="letter" style="animation-delay: 0.7s;">o</span>
+          <span class="letter" style="animation-delay: 0.8s;">g</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="changelog-container">
+      <h2>Changelog</h2>
+      <div class="changelog-entry">
+        <div class="changelog-date">2025-04-01</div>
+        <div class="changelog-description">
+          <p>Added new Contact page with buttons for Movies Addition, Games Addition, and Bug Report.</p>
+          <p>Implemented individual Google Forms for each contact option.</p>
+        </div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-date">2025-04-1</div>
+        <div class="changelog-description">
+          <div class="dropdown" onclick="toggleDropdown(this)">Added the following movies  <i class="fa fa-caret-down"></i></div>
+          <div class="dropdown-content">
+            <ul>
+              <li>Oceans 8</li>
+              <li>Hangover 2 and 3</li>
+              <li>How to Loose a Guy in 10 Days</li>
+              <li>10 Thing I Hate About You</li>
+              <li>Smile</li>
+              <li>Princess and the Frog</li>
+              <li>Shes the Man</li>
+              <li>Mean Girls</li>
+              <li>Batman: The Dark Knight</li>
+            </ul>
+          </div>
+          <p>Updated Movies page to include all images</p>
+          <p>Added Changelog to the navbar and site</p>
+        </div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-date">2025-03-31</div>
+        <div class="changelog-description">
+          <p>Initial release of George Pickens 2.0 Beta.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      fetch('dev/navbar.html')
+        .then(response => response.text())
+        .then(data => {
+          const template = document.createElement('template');
+          template.innerHTML = data;
+          const navbar = template.content.querySelector('#navbar-template').content;
+          document.getElementById('navbar').appendChild(navbar);
+
+          const script = navbar.querySelector('script');
+          if (script) {
+            eval(script.innerText);
+          }
+        });
+    </script>
   </body>
 </html>
