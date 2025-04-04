@@ -290,10 +290,6 @@ button {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-button:hover {
-  background-color: #007acc;
-  color: #fff;
-}
 
 .below-wave {
   background-color: #808080;
