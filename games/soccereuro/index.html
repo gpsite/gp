@@ -6,9 +6,8 @@
     <title>Soccer Skills Euro</title>
     <link rel="stylesheet" href="../shared/styles.css">
     <script src="../shared/scripts.js" defer></script>
-    <script src="../shared/share-modal.js" defer></script>
     <style>
-        /* Fallback styles in case shared CSS fails to load */
+        /* fallback stlyes in case shared css fails to load */
         body, html {
             margin: 0;
             padding: 0;
@@ -68,12 +67,20 @@
     <script>
         console.log('Shared scripts loaded successfully.');
 
-        // Debugging: Check if toggleFullscreen is defined
+        // mkae sure toggleFullscreen is defined
         if (typeof toggleFullscreen === 'undefined') {
             console.error('toggleFullscreen is not defined. Check shared/scripts.js.');
+            function toggleFullscreen() {
+                const gameContainer = document.querySelector('.game-container');
+                if (!document.fullscreenElement) {
+                    gameContainer.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
         }
 
-        // Debugging: Fetch navbar and log errors if any
+        // fetch navbar and log errors if any
         fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
             .then(response => {
                 if (!response.ok) {
