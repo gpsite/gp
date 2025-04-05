@@ -6,57 +6,6 @@
     <title>Soccer Skills Euro</title>
     <link rel="stylesheet" href="../shared/styles.css">
     <script src="../shared/scripts.js" defer></script>
-    <style>
-        /* fallback stlyes in case shared css fails to load */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            background-color: black;
-        }
-
-        .navbar {
-            z-index: 999;
-        }
-
-        .game-container {
-            position: relative;
-            width: 80%;
-            height: 80%;
-            margin: auto;
-            top: 10%;
-            background-color: #000;
-            border: 2px solid #FFB612;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .embed {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .fullscreen-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 15px;
-            background-color: #FFB612;
-            color: #000;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-            z-index: 1000;
-        }
-
-        .fullscreen-btn:hover {
-            background-color: #313135;
-        }
-    </style>
 </head>
 <body>
     <div id="navbar"></div>
@@ -64,43 +13,6 @@
         <iframe class="embed" src="https://ballinpanda.github.io/soccer-skills-euro/"></iframe>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
-    <script>
-        console.log('Shared scripts loaded successfully.');
-
-        // mkae sure toggleFullscreen is defined
-        if (typeof toggleFullscreen === 'undefined') {
-            console.error('toggleFullscreen is not defined. Check shared/scripts.js.');
-            function toggleFullscreen() {
-                const gameContainer = document.querySelector('.game-container');
-                if (!document.fullscreenElement) {
-                    gameContainer.requestFullscreen();
-                } else {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        // fetch navbar and log errors if any
-        fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to load navbar.html: ${response.statusText}`);
-                }
-                return response.text();
-            })
-            .then(data => {
-                console.log('Navbar HTML fetched successfully.');
-                const template = document.createElement('template');
-                template.innerHTML = data.trim();
-                const navbarTemplate = template.content.querySelector('#navbar-template');
-                if (!navbarTemplate) {
-                    throw new Error('No element with ID #navbar-template found in navbar.html.');
-                }
-                document.getElementById('navbar').appendChild(navbarTemplate.content.cloneNode(true));
-            })
-            .catch(error => {
-                console.error('Error loading navbar:', error);
-            });
-    </script>
+    <script src="../shared/navbar.js" defer></script>
 </body>
 </html>
