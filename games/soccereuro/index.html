@@ -11,32 +11,73 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden;
             background-color: black;
         }
+
+        .navbar {
+            z-index: 999;
+        }
+
+        .game-container {
+            position: relative;
+            width: 80%;
+            height: 80%;
+            margin: auto;
+            top: 10%;
+            background-color: #000;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
         .embed {
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        .navbar{
-            z-index: 999;
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 10px 15px;
+            background-color: #fff;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .fullscreen-btn:hover {
+            background-color: #ddd;
         }
     </style>
 </head>
 <body>
   <script>
     fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                const template = document.createElement('template');
-                template.innerHTML = data;
-                const navbar = template.content.querySelector('#navbar-template').content;
-                document.getElementById('navbar').appendChild(navbar);
-            });
+        .then(response => response.text())
+        .then(data => {
+            const template = document.createElement('template');
+            template.innerHTML = data;
+            const navbar = template.content.querySelector('#navbar-template').content;
+            document.getElementById('navbar').appendChild(navbar);
+        });
+
+    function toggleFullscreen() {
+        const gameContainer = document.querySelector('.game-container');
+        if (!document.fullscreenElement) {
+            gameContainer.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }
   </script>
   <div id="navbar"></div>
-    <iframe class="embed" src="https://ballinpanda.github.io/soccer-skills-euro/"></iframe>
+  <div class="game-container">
+      <iframe class="embed" src="https://ballinpanda.github.io/soccer-skills-euro/"></iframe>
+      <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
+  </div>
 </body>
 </html>
