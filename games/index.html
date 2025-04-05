@@ -22,17 +22,38 @@ body {
   background-attachment: fixed; /* Ensure the background does not move */
 }
 
-.search-bar {
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 80%;
-  padding: 10px;
   margin: 0 auto 20px;
   border: 2px solid #FFB612;
   border-radius: 10px;
   background-color: #333;
+  overflow: hidden;
+}
+
+.search-bar {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  background-color: #333;
   color: #FFB612;
   font-size: 16px;
   font-family: 'Open Sans', Arial, sans-serif;
-  display: block;
+}
+
+#category-dropdown {
+  padding: 10px;
+  border: none;
+  outline: none;
+  background-color: #444;
+  color: #FFB612;
+  font-size: 16px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  cursor: pointer;
 }
 
 .gamesearch {
@@ -223,9 +244,9 @@ body {
       </section>
     </div>
     <div class="gamesearch">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%;">
+        <div class="search-container">
             <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games...">
-            <select id="category-dropdown" onchange="filterByCategory()" style="padding: 10px; border: 2px solid #FFB612; border-radius: 10px; background-color: #333; color: #FFB612; font-size: 16px; font-family: 'Open Sans', Arial, sans-serif;">
+            <select id="category-dropdown" onchange="filterByCategory()">
                 <option value="">All Categories</option>
                 <option value="Runner">Runner</option>
                 <option value="Platformer">Platformer</option>
