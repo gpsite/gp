@@ -5,7 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soccer Skills Euro</title>
     <link rel="stylesheet" href="../shared/styles.css">
-  <script src="../shared/scripts.js" defer></script>
+    <script src="../shared/scripts.js" defer></script>
+    <style>
+        /* Fallback styles in case shared CSS fails to load */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: black;
+        }
+
+        .navbar {
+            z-index: 999;
+        }
+
+        .game-container {
+            position: relative;
+            width: 80%;
+            height: 80%;
+            margin: auto;
+            top: 10%;
+            background-color: #000;
+            border: 2px solid #FFB612;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 15px;
+            background-color: #FFB612;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .fullscreen-btn:hover {
+            background-color: #313135;
+        }
+    </style>
 </head>
 <body>
     <div id="navbar"></div>
@@ -13,5 +64,32 @@
         <iframe class="embed" src="https://ballinpanda.github.io/soccer-skills-euro/"></iframe>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
+    <script>
+        // Debugging: Log to confirm scripts are loaded
+        console.log('Shared scripts loaded successfully.');
+
+        // Fallback script in case shared JS fails to load
+        if (typeof toggleFullscreen === 'undefined') {
+            function toggleFullscreen() {
+                const gameContainer = document.querySelector('.game-container');
+                if (!document.fullscreenElement) {
+                    gameContainer.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        if (!document.getElementById('navbar').hasChildNodes()) {
+            fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    const template = document.createElement('template');
+                    template.innerHTML = data;
+                    const navbar = template.content.querySelector('#navbar-template').content;
+                    document.getElementById('navbar').appendChild(navbar);
+                });
+        }
+    </script>
 </body>
 </html>
