@@ -37,17 +37,18 @@
         }
 
         .fullscreen-btn {
-            display: block;
-            margin: 20px auto 0 auto;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             padding: 10px 15px;
             background-color: #FFB612;
             color: #000;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            z-index: 1000;
             text-align: center;
-        }
+            z-index: 1000; 
 
         .fullscreen-btn:hover {
             background-color: #313135;
@@ -78,8 +79,6 @@
   <div class="game-container">
       <iframe class="embed" src="https://ballinpanda.github.io/soccer-skills-euro/"></iframe>
   </div>
-  <div style="text-align: center; margin-top: 10px;">
-      <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
-  </div>
+  <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
 </body>
 </html>
