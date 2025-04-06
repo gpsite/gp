@@ -21,7 +21,7 @@
           <span class="letter" style="animation-delay: 0.3s;">r</span>
           <span class="letter" style="animation-delay: 0.4s;">g</span>
           <span class="letter" style="animation-delay: 0.5s;">e</span>
-          <span class="letter" style="animation-delay: 0.6s;">&nbsp;</span>
+          <span class="letter" style="animation-delay: 0.6s;"> </span>
           <span class="letter" style="animation-delay: 0.7s;">P</span>
           <span class="letter" style="animation-delay: 0.8s;">i</span>
           <span class="letter" style="animation-delay: 0.9s;">c</span>
@@ -37,7 +37,7 @@
           <span class="letter" style="animation-delay: 0.3s;">r</span>
           <span class="letter" style="animation-delay: 0.4s;">g</span>
           <span class="letter" style="animation-delay: 0.5s;">e</span>
-          <span class="letter" style="animation-delay: 0.6s;">&nbsp;</span>
+          <span class="letter" style="animation-delay: 0.6s;"> </span>
           <span class="letter" style="animation-delay: 0.7s;">P</span>
           <span class="letter" style="animation-delay: 0.8s;">i</span>
           <span class="letter" style="animation-delay: 0.9s;">c</span>
@@ -48,6 +48,7 @@
         </div>
       </section>
     </div>
+
     <div class="announcements">
       <div class="section-title">
         <h2>Announcements</h2>
@@ -61,33 +62,34 @@
         </div>
       </div>
     </div>
+
     <div class="featuredupdates">
-      <div class="grid-container">
+      <div class="grid-container" id="gamecards-container">
         <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/interstellar.2014?k=')">
           <img src="https://georgepickenssite.github.io/georgepickens/img/poster/interstellar.png" alt="Interstellar">
           <div class="title">Interstellar</div>
           <div class="subtitle">Rated PG-13</div>
-      </button>
-      <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/avengers.endgame.2019?k=')">
-        <img src="https://georgepickenssite.github.io/georgepickens/img/poster/endgame.png" alt="endgame">
-        <div class="title">Avengers: Endgame</div>
-        <div class="subtitle">Rated PG-13</div>
-      </button>
-      <button class="gamecard" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/blockblast'">
-        <img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/blockblast.png" alt="blockblast">
-        <div class="title">Block Blast</div>
-        <div class="subtitle">Category: Puzzle</div>
-      </button>
-      <button class="gamecard" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/snowrider'">
-        <img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/snowrider.png" alt="snowrider">
-        <div class="title">Snow Rider 3D</div>
-        <div class="subtitle">Category: Runner</div>
-    </button>
+        </button>
+        <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/avengers.endgame.2019?k=')">
+          <img src="https://georgepickenssite.github.io/georgepickens/img/poster/endgame.png" alt="endgame">
+          <div class="title">Avengers: Endgame</div>
+          <div class="subtitle">Rated PG-13</div>
+        </button>
+        <button class="gamecard" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/blockblast'">
+          <img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/blockblast.png" alt="blockblast">
+          <div class="title">Block Blast</div>
+          <div class="subtitle">Category: Puzzle</div>
+        </button>
+        <button class="gamecard" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/snowrider'">
+          <img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/snowrider.png" alt="snowrider">
+          <div class="title">Snow Rider 3D</div>
+          <div class="subtitle">Category: Runner</div>
+        </button>
       </div>
       <div class="updates-info">
         <div class="update-card">
           <h2><a style="text-decoration: none; color: #FFB612;" href="">George Pickens 2.0 Beta Release</a></h2>
-          <p>Welcome to GP 2.0 Beta. This site is the new home of all of George Pickens. This is a rushed job due to unexpected issues with our old site. Through the next week we will be updating this site with expansions to our catalog and new feautres. 2.0 full release on April 9th.</a></p>
+          <p>Welcome to GP 2.0 Beta. This site is the new home of all of George Pickens. This is a rushed job due to unexpected issues with our old site. Through the next week we will be updating this site with expansions to our catalog and new features. 2.0 full release on April 9th.</p>
         </div>
         <div class="update-card">
           <h2><a style="text-decoration: none; color: #FFB612;" href="games/">GP Games</a></h2>
@@ -95,51 +97,45 @@
         </div>
         <div class="update-card">
           <h2><a style="text-decoration: none; color: #FFB612;" href="movies/">GP Movies</a></h2>
-          <p>Database with links avaible to dozens of movies. Our catalog is consantly growing. Feel free to contact us to suggest any additions to our database.</p>
+          <p>Database with links available to dozens of movies. Our catalog is constantly growing. Feel free to contact us to suggest any additions to our database.</p>
         </div>
       </div>
     </div>
 
     <script>
       function searchGameCards() {
-    const input = document.querySelector('.search-bar');
-    const filter = input.value.toLowerCase();
-    const gamecards = document.querySelectorAll('.gamecard');
+        const input = document.querySelector('.search-bar');
+        const filter = input.value.toLowerCase();
+        const gamecards = document.querySelectorAll('.gamecard');
 
-    gamecards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        if (text.includes(filter)) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
+        gamecards.forEach(card => {
+          const text = card.textContent.toLowerCase();
+          card.style.display = text.includes(filter) ? 'block' : 'none';
+        });
+      }
+
+      function shuffleGameCards() {
+        const container = document.getElementById('gamecards-container');
+        const cards = Array.from(container.children);
+        for (let i = cards.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          container.appendChild(cards[j]);
         }
-    });
-}
+      }
 
-function shuffleGameCards() {
-    const container = document.getElementById('gamecards-container');
-    const cards = Array.from(container.children);
-    for (let i = cards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        container.appendChild(cards[j]);
-    }
-}
+      document.addEventListener('DOMContentLoaded', shuffleGameCards);
 
-document.addEventListener('DOMContentLoaded', shuffleGameCards);
+      fetch('dev/navbar.html')
+        .then(response => response.text())
+        .then(data => {
+          const template = document.createElement('template');
+          template.innerHTML = data;
+          const navbar = template.content.querySelector('#navbar-template').content;
+          document.getElementById('navbar').appendChild(navbar);
 
-    fetch('dev/navbar.html')
-      .then(response => response.text())
-      .then(data => {
-        const template = document.createElement('template');
-        template.innerHTML = data;
-        const navbar = template.content.querySelector('#navbar-template').content;
-        document.getElementById('navbar').appendChild(navbar);
-
-        const script = navbar.querySelector('script');
-        if (script) {
-          eval(script.innerText);
-        }
-      });
+          const script = navbar.querySelector('script');
+          if (script) eval(script.innerText);
+        });
     </script>
   </body>
 </html>
