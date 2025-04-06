@@ -12,57 +12,22 @@
   <body onload="shuffleGameCards()">
     <div id="navbar"></div>
 
+    <div class="header">
+      <div class="wave">
+        <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path fill="orange" d="M0,280L48,264.7C96,249,192,219,288,192.7C384,166,480,142,576,150C672,158,768,198,864,203.3C960,208,1056,176,1152,150C1248,124,1344,104,1392,96.7L1440,90L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
+          <path fill="#000" d="M0,300L48,284.7C96,269,192,239,288,212.7C384,186,480,162,576,170C672,178,768,218,864,223.3C960,228,1056,196,1152,170C1248,144,1344,124,1392,116.7L1440,110L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
+        </svg>
+      </div>
+      <div class="poster"></div>
+    </div>
     <div class="content">
-      <section class="wrapper">
-        <div class="top">
-          <span class="letter" style="animation-delay: 0s;">G</span>
-          <span class="letter" style="animation-delay: 0.1s;">e</span>
-          <span class="letter" style="animation-delay: 0.2s;">o</span>
-          <span class="letter" style="animation-delay: 0.3s;">r</span>
-          <span class="letter" style="animation-delay: 0.4s;">g</span>
-          <span class="letter" style="animation-delay: 0.5s;">e</span>
-          <span class="letter" style="animation-delay: 0.6s;"> </span>
-          <span class="letter" style="animation-delay: 0.7s;">P</span>
-          <span class="letter" style="animation-delay: 0.8s;">i</span>
-          <span class="letter" style="animation-delay: 0.9s;">c</span>
-          <span class="letter" style="animation-delay: 1s;">k</span>
-          <span class="letter" style="animation-delay: 1.1s;">e</span>
-          <span class="letter" style="animation-delay: 1.2s;">n</span>
-          <span class="letter" style="animation-delay: 1.3s;">s</span>
-        </div>
-        <div class="bottom" aria-hidden="true">
-          <span class="letter" style="animation-delay: 0s;">G</span>
-          <span class="letter" style="animation-delay: 0.1s;">e</span>
-          <span class="letter" style="animation-delay: 0.2s;">o</span>
-          <span class="letter" style="animation-delay: 0.3s;">r</span>
-          <span class="letter" style="animation-delay: 0.4s;">g</span>
-          <span class="letter" style="animation-delay: 0.5s;">e</span>
-          <span class="letter" style="animation-delay: 0.6s;"> </span>
-          <span class="letter" style="animation-delay: 0.7s;">P</span>
-          <span class="letter" style="animation-delay: 0.8s;">i</span>
-          <span class="letter" style="animation-delay: 0.9s;">c</span>
-          <span class="letter" style="animation-delay: 1s;">k</span>
-          <span class="letter" style="animation-delay: 1.1s;">e</span>
-          <span class="letter" style="animation-delay: 1.2s;">n</span>
-          <span class="letter" style="animation-delay: 1.3s;">s</span>
-        </div>
-      </section>
-    </div>
-
-    <div class="announcements">
-      <div class="section-title">
-        <h2>Announcements</h2>
-      </div>
-      <div class="announcement-list">
-        <div class="announcement-item">
-          <p>Broken Games: Several of our games run on a flash emulator, which is currently not working. We are actively working on a solution to the Cookie Clicker issues, this should be fixed within the coming weeks.</p>
-        </div>
-        <div class="announcement-item">
-          <p>We have launched a new page, the <a href="about/changelog.html" style="color: #FFB612; text-decoration: none;">Changelog.</a> Here, you can see all the changes that come with daily updates, such as which games and movies have been added, and which bugs have been fixed.</p>
-        </div>
+      <div class="announcements">
+        <h2>ANNOUNCEMENTS:</h2>
+        <p><span class="highlight">Broken Games</span>: Several of our games run on a flash emulator, which is currently not working. We are actively working on a solution to the Cookie Clicker issues, this should be fixed within the coming weeks.</p>
+        <p>We have launched a new page, the Changelog. Here, you can see all the changes that come with daily updates, such as which games and movies have been added, and which bugs have been fixed.</p>
       </div>
     </div>
-
     <div class="featuredupdates">
       <div class="grid-container" id="gamecards-container">
         <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/interstellar.2014?k=')">
@@ -85,20 +50,6 @@
           <div class="title">Snow Rider 3D</div>
           <div class="subtitle">Category: Runner</div>
         </button>
-      </div>
-      <div class="updates-info">
-        <div class="update-card">
-          <h2><a style="text-decoration: none; color: #FFB612;" href="">George Pickens 2.0 Beta Release</a></h2>
-          <p>Welcome to GP 2.0 Beta. This site is the new home of all of George Pickens. This is a rushed job due to unexpected issues with our old site. Through the next week we will be updating this site with expansions to our catalog and new features. 2.0 full release on April 9th.</p>
-        </div>
-        <div class="update-card">
-          <h2><a style="text-decoration: none; color: #FFB612;" href="games/">GP Games</a></h2>
-          <p>Play 150+ high quality browser games across many categories. Our selection is almost identical to the 1.0 version of the site. If a game has any issues, or is missing, please contact us.</p>
-        </div>
-        <div class="update-card">
-          <h2><a style="text-decoration: none; color: #FFB612;" href="movies/">GP Movies</a></h2>
-          <p>Database with links available to dozens of movies. Our catalog is constantly growing. Feel free to contact us to suggest any additions to our database.</p>
-        </div>
       </div>
     </div>
 
