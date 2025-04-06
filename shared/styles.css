@@ -41,6 +41,7 @@ body, html {
     cursor: pointer;
     text-align: center;
     z-index: 1000;
+    display: block;
 }
 
 .fullscreen-btn:hover {
