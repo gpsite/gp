@@ -7,7 +7,7 @@ body {
 
 .header {
   position: relative;
-  height: 300px;
+  height:400px;
   background-color: transparent;
   background-image: url('img/home/banner.gif');
   background-size: cover;
@@ -31,13 +31,15 @@ body {
 
 .poster {
   position: absolute;
-  top: 40px;
-  right: 40px;
-  width: 120px;
-  height: 200px;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 250px;
+  height: 400px;
   background-image: url('img/home/pickens-fullbody.png');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   z-index: 3;
 }
 
