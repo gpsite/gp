@@ -31,7 +31,7 @@ body {
 
 .poster {
   position: absolute;
-  top: 50%;
+  top: 10%;
   right: 20px;
   transform: translateY(-50%);
   width: 250px;
