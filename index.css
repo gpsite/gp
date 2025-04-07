@@ -8,7 +8,11 @@ body {
 .header {
   position: relative;
   height: 300px;
-  background-color: #636363;
+  background-color: transparent;
+  background-image: url('img/home/banner.gif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
@@ -31,7 +35,7 @@ body {
   right: 40px;
   width: 120px;
   height: 200px;
-  background-image: url('https://placehold.co/120x200');
+  background-image: url('img/home/pickens-fullbody.png');
   background-size: cover;
   background-position: center;
   z-index: 3;
@@ -55,7 +59,7 @@ body {
 }
 
 .announcements p {
-  color: #ffb347;
+  color: #FFB612;
   font-size: 14px;
 }
 
@@ -74,7 +78,7 @@ body {
 
 .game-card {
   background-color: #111;
-  border: 2px solid orange;
+  border: 2px solid #FFB612;
   border-radius: 15px;
   text-align: center;
   padding: 10px;
