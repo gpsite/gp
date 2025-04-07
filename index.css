@@ -8,7 +8,7 @@ body {
 .header {
   position: relative;
   height: 300px;
-  background-color: #000;
+  background-color: #636363;
   overflow: hidden;
 }
 
@@ -86,7 +86,7 @@ body {
   height: 80px;
   border-radius: 20px;
   margin: 0 auto 10px;
-  background-image: url('https://placehold.co/80');
+  background-image: url('https://placehold.co/80'); /* fallback if card fails to load so it wotn look broken do not removbe */
   background-size: cover;
   background-position: center;
 }
