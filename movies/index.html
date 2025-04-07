@@ -5,580 +5,221 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GP Movies</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="index.js"></script>
     <style>
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #1d1e22;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  background-position: 50% 30%;
-  background-size: 2.1rem 2.1rem;
-  overflow-x: hidden;
-  font-family: 'Open Sans', sans-serif;
-  color: #E0E0E0;
-  background-attachment: fixed; /* Ensure the background does not move */
-}
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1d1e22;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-position: 50% 30%;
+            background-size: 2.1rem 2.1rem;
+            overflow-x: hidden;
+            font-family: 'Open Sans', sans-serif;
+            color: #E0E0E0;
+            background-attachment: fixed;
+        }
 
-.search-bar {
-  width: 80%;
-  padding: 10px;
-  margin: 0 auto 20px;
-  border: 2px solid #FFB612;
-  border-radius: 10px;
-  background-color: #333;
-  color: #FFB612;
-  font-size: 16px;
-  font-family: 'Open Sans', Arial, sans-serif;
-  display: block;
-}
+        .search-bar {
+            width: 80%;
+            padding: 10px;
+            margin: 0 auto 20px;
+            border: 2px solid #FFB612;
+            border-radius: 10px;
+            background-color: #333;
+            color: #FFB612;
+            font-size: 16px;
+            display: block;
+        }
 
-.gamesearch {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  margin-top: 20px;
-}
+        .gamesearch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+        }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  width: 81.5%;
-}
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            width: 81.5%;
+        }
 
-.gamecard {
-  background-color: #333;
-  border: 2px solid #FFB612;
-  border-radius: 10px;
-  padding: 10px;
-  font-family: 'Open Sans', Arial, sans-serif;
+        .gamecard {
+            background-color: #333;
+            border: 2px solid #FFB612;
+            border-radius: 10px;
+            padding: 10px;
+            font-family: 'Open Sans', Arial, sans-serif;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .gamecard strong {
+            color: #FFB612;
+        }
+
+        .gamecard img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .gamecard .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #FFB612;
+        }
+
+        .gamecard .subtitle {
+            font-size: 14px;
+            color: #bbb;
+        }
+
+        .gamecard:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .gamecard:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 50px);
+        }
+        .expand-btn {
+  background-color: #FFB612;
+  border: none;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.gamecard img {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.gamecard .title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 5px;
+  margin-top: 10px;
   font-family: 'Open Sans', Arial, sans-serif;
-  color: #FFB612;
+width: 100%;
 }
 
-.gamecard .subtitle {
-  font-size: 14px;
-  color: #bbb;
+.expand-btn:hover {
+  background-color: #e0a50c;
+}
+.gamecard .description {
+  display: none;
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 10px;
   font-family: 'Open Sans', Arial, sans-serif;
-}
-
-.gamecard:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.gamecard:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-/* Content area */
-.content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - 50px); /* Adjust for fixed navbar height */
 }
     </style>
 </head>
-<body onload="shuffleGameCards()">
+<body onload="loadMovies()">
     <div id="navbar"></div>
     <div>
-        <video id="videoplayer" width="100%" type="video/mp4" style="--plyr-color-main: #FF2A60;" controls="">
+        <video id="videoplayer" width="100%" controls>
             <source id="vidsource" type="video/mp4">
             <track id="subs" kind="captions" label="English" srclang="en">
         </video>
     </div>
     <div class="gamesearch">
         <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for movies...">
-        <div class="grid-container" id="gamecards-container">
-            <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/interstellar.2014?k=')">
-                <img src="https://georgepickenssite.github.io/georgepickens/img/poster/interstellar.png" alt="Interstellar">
-                <div class="title">Interstellar</div>
-                <div class="subtitle">Rated PG-13</div>
-            </button>
-            <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/superbad.2007?k=')">
-              <img src="https://georgepickenssite.github.io/georgepickens/img/poster/superbad.png" alt="Superbad">
-              <div class="title">Superbad</div>
-              <div class="subtitle">Rated R</div>
-          </button>
-          <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/step.brothers.2008?k=')">
-            <img src="https://georgepickenssite.github.io/georgepickens/img/poster/stepbrothers.png" alt="Step Brothers">
-            <div class="title">Step Brothers</div>
-            <div class="subtitle">Rated R</div>
-        </button>
-        <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/431954b1cf2a5206?k=')">
-          <img src="https://georgepickenssite.github.io/georgepickens/img/poster/projectx.png" alt="Project X">
-          <div class="title">Project X</div>
-          <div class="subtitle">Rated R</div>
-      </button>
-      <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.hangover.2009.unrated?k=')">
-        <img src="https://georgepickenssite.github.io/georgepickens/img/poster/hangover.png" alt="Hangover">
-        <div class="title">Hangover</div>
-        <div class="subtitle">Rated R</div>
-    </button>
-    <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/inception.2010?k=')">
-      <img src="https://georgepickenssite.github.io/georgepickens/img/poster/inception.png" alt="Inception">
-      <div class="title">Inception</div>
-      <div class="subtitle">Rated R</div>
-  </button>
-  <button class="gamecard" onclick="getURL('https://vault.rips.cc/video/949e1deb802d5ff0?k=')">
-    <img src="https://georgepickenssite.github.io/georgepickens/img/poster/dune.png" alt="Dune">
-    <div class="title">Dune</div>
-    <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/368415454ade5540?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/dune2.png" alt="Dune2">
-  <div class="title">Dune Part 2</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/walle.2008.tt0910970.tt0910970?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/walle.png" alt="walle">
-  <div class="title">Wall-E</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.martian.2015?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/themartian.png" alt="themartian">
-  <div class="title">The Martain</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.i..the.phantom.menace.1999?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars1.png" alt="starwars1">
-  <div class="title">Star Wars Ep I</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.ii.attack.of.the.clones.2002?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars2.png" alt="starwars2">
-  <div class="title">Star Wars Ep II</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.iii..revenge.of.the.sith.2005?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars3.png" alt="starwars3">
-  <div class="title">Star Wars Ep III</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.iv..a.new.hope.1977?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars4.png" alt="starwars4">
-  <div class="title">Star Wars Ep IV</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.v..the.empire.strikes.back.1980?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars5.png" alt="starwars5">
-  <div class="title">Star Wars Ep V</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.vi..return.of.the.jedi.1983?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars6.png" alt="starwars6">
-  <div class="title">Star Wars Ep VI</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.vii..the.force.awakens.2015?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars7.png" alt="starwars7">
-  <div class="title">Star Wars Ep VII</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.the.last.jedi.2017?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars8.png" alt="starwars8">
-  <div class="title">Star Wars Ep VIII</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/star.wars.episode.ix..the.rise.of.skywalker.2019.tt2527338?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/starwars9.png" alt="starwars9">
-  <div class="title">Star Wars Ep IX</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/rogue.one.2016?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/rogueone.png" alt="rogueone">
-  <div class="title">Rogue One: A Star Wars Story</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/solo.a.star.wars.story.2018?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/solo.png" alt="Solo">
-  <div class="title">Solo: A Star Wars Story</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/f4e62f214350ce46?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/swtcl.png" alt="swtcl">
-  <div class="title">Star Wars: The Clone Wars</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/75ce71b641d0c13b?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/nowayhome.png" alt="nowayhome">
-  <div class="title">Spider-Man: No Way Home</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.dark.knight.rises.2012?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/tdkrises.png" alt="tdkrises">
-  <div class="title">Batman: The Dark Knight Rises</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/2d25692bf0788b20?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/atsv.png" alt="atsv">
-  <div class="title">Spider-Man: Across the Spider-Verse</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/a973ecb362f4e582?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/legobatman.png" alt="legobatman">
-  <div class="title">The Lego Batman Movie</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/8caa72ffaf80a623?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/venomltbc.png" alt="venomltbc">
-  <div class="title">Venom: Let There be Carnage</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/6faa94fb021605b7?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/pacificrim.png" alt="pacificrim">
-  <div class="title">Pacific Rim</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/a5763f615100e768?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/deadpoolwolverine.png" alt="deadpoolwolverine">
-  <div class="title">Deadpool & Wolverine</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/spiderman.into.the.spiderverse.2018?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/smitsv.png" alt="smitsv">
-  <div class="title">Spider-Man: Into the Spider-Verse</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/avengers.endgame.2019?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/endgame.png" alt="endgame">
-  <div class="title">Avengers: Endgame</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/5caa668b505770b7?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/se7en.png" alt="se7en">
-  <div class="title">Se7en</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/c5c970539ef7a789?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/oppenheimer.png" alt="oppenheimer">
-  <div class="title">Oppenheimer</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/b00adaf32232bb1f?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/allquiet.png" alt="allquiet">
-  <div class="title">All Quiet on the Western Front</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/bf38d1bd03ed4c1c?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/longlegs.png" alt="longlegs">
-  <div class="title">Longlegs</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/a437307109d33489?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/smile.png" alt="smile">
-  <div class="title">Smile</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/e53e1b21fbd3e58b?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/htlagi10d.png" alt="htlagi10d">
-  <div class="title">How to Lose a Guy in 10 Days</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/10.things.i.hate.about.you.1999.tt0147800?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/10tihay.png" alt="10tihay">
-  <div class="title">10 Things I Hate About You</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/95b36d3a4db9b9a5?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/frog.png" alt="frog">
-  <div class="title">Princess and the Frog</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/875aa661a8ee85f7?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/shestheman.png" alt="shestheman">
-  <div class="title">She's the Man</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/4b8f0d762137ec09?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/meangirls.png" alt="meangirls">
-  <div class="title">Mean Girls (2004)</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.dark.knight.2008?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/darkknight.png" alt="darkknight">
-  <div class="title">The Dark Knight</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/oceans.eight.2018.tt5164214?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/oceans8.png" alt="oceans8">
-  <div class="title">Oceans 8</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/oceans.eleven.2001.tt0240772?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/oceans11.png" alt="oceans11">
-  <div class="title">Oceans 11</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.hangover.part.ii.2011.tt1411697.tt1411697?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/hangover2.png" alt="hangover2">
-  <div class="title">Hangover 2</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.hangover.part.iii.2013.tt1951261?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/hangover3.png" alt="hangover3">
-  <div class="title">Hangover 3</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/2614054fd4c705cd?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/twilight.png" alt="twilight">
-  <div class="title">Twilight</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/30079cb229748aee?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/fantasic4.png" alt="fantasic4">
-  <div class="title">Fantasic 4</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/2077ef9482179786?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/fantastic42.png" alt="fantasic42">
-  <div class="title">Fantasic 4: Rise of the Silver Surfer</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/390f91b18289f4c8?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/absolutelyanything.png" alt="absolutelyanything">
-  <div class="title">Absolutely Anything</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/186a80a2ba7ae44d?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/passengers.png" alt="passengers">
-  <div class="title">Passengers</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/a8e4372c4d5d83e7?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/realsteel.png" alt="realsteel">
-  <div class="title">Real Steel</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/53d2ada9261e5bee?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/mononoke.png" alt="mononoke">
-  <div class="title">Princess Mononoke</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/bb90276524aec520?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/fnl.png" alt="fnl">
-  <div class="title">Friday Night Lights</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/gladiator.extended.remastered.2000?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/gladiator.png" alt="gladiator">
-  <div class="title">Gladiator</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/1f9723e3eb2ff949?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/legomovie.png" alt="legomovie">
-  <div class="title">The Lego Movie</div>
-  <div class="subtitle">Rated PG</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/b273ae8a18b061e0?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/ironman.png" alt="ironman">
-  <div class="title">Iron Man</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/iron.man.ii.x264?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/ironman2.png" alt="ironman2">
-  <div class="title">Iron Man 2</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/iron.man.3.2013?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/ironman3.png" alt="ironman3">
-  <div class="title">Iron Man 3</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the_incredible_hulk_2008?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/hulk.png" alt="hulk">
-  <div class="title">The Incredible Hulk</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/thor.2011?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/thor.png" alt="thor">
-  <div class="title">Thor</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/thor.the.dark.world.2013?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/thor2.png" alt="thor2">
-  <div class="title">Thor: The Dark World</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/thor.ragnarok.2017?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/thor3.png" alt="thor3">
-  <div class="title">Thor: Ragnorok</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/captain.america.2011?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/captainamerica.png" alt="captainamerica">
-  <div class="title">Captian America</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/captain.america.the.winter.soldier.2014?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/captainamerica2.png" alt="captainamerica2">
-  <div class="title">Captian America: The Winter Soldier</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/captain.america.civil.war.2016?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/captainamerica3.png" alt="captainamerica3">
-  <div class="title">Captian America: Civil War</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/captain.america.civil.war.2016?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/captainamerica3.png" alt="captainamerica3">
-  <div class="title">Captian America: Civil War</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.avengers.2012?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/avengers.png" alt="avengers">
-  <div class="title">Avengers</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/avengers.age.of.ultron.2015.tt2395427.tt2395427?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/avengersultron.png" alt="avengersultron">
-  <div class="title">Avengers: Ultron</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/avengers.infinity.war.2018?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/infinitywar.png" alt="infinitywar">
-  <div class="title">Avengers: Infinity War</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/guardians.of.the.galaxy.2014?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/gotg.png" alt="gotg">
-  <div class="title">Guardians of the Galaxy</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/guardians.of.the.galaxy.vol..2.2017?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/gotg2.png" alt="gotg2">
-  <div class="title">Guardians of the Galaxy Vol. 2</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/antman.2015?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/antman.png" alt="antman">
-  <div class="title">Ant-Man</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/doctor.strange.2016?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/doctorstrange.png" alt="doctorstrange">
-  <div class="title">Doctor Strange</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/spiderman.homecoming.2017.tt2250912?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/spidermanhomecoming.png" alt="spidermanhomecoming">
-  <div class="title">Spider-Man: Homecoming</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/black.panther.2018?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/blackpanther.png" alt="blackpanther">
-  <div class="title">Black Panther</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/antman.and.the.wasp.2018?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/antman.png" alt="antman">
-  <div class="title">Ant-Man and the Wasp</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/captain.marvel.2019.tt4154664?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/cptmarvel.png" alt="cptmarvel">
-  <div class="title">Captain Marvel</div>
-  <div class="subtitle">Rated PG-13</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/the.godfather.1972?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/godfather.png" alt="godfather">
-  <div class="title">The Godfather</div>
-  <div class="subtitle">Rated R</div>
-</button>
-<button class="gamecard" onclick="getURL('https://vault.rips.cc/video/414360ca2cfab167?k=')">
-  <img src="https://georgepickenssite.github.io/georgepickens/img/poster/anyonebutyou.png" alt="anyonebutyou">
-  <div class="title">Anyone but You</div>
-  <div class="subtitle">Rated R</div>
-</button>
+        <div class="grid-container" id="gamecards-container"></div>
     </div>
-    <script>
-        function searchGameCards() {
-            const input = document.querySelector('.search-bar');
-            const filter = input.value.toLowerCase();
-            const gamecards = document.querySelectorAll('.gamecard'); //:3
-
-            gamecards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                if (text.includes(filter)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        function shuffleGameCards() {
-            const container = document.getElementById('gamecards-container');
-            const cards = Array.from(container.children);
-            for (let i = cards.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                container.appendChild(cards[j]);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', shuffleGameCards);
-
-        fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                const template = document.createElement('template');
-                template.innerHTML = data;
-                const navbar = template.content.querySelector('#navbar-template').content;
-                document.getElementById('navbar').appendChild(navbar);
-            });
-
-        const getURL = (link, tt) => {
-            const getFormattedDate = (date) => {
-                return date.toISOString().split('T')[0].replace(/-/g, '');
-            };
-
-            const getDateString = () => {
-                const currentDate = new Date();
-
-                const yesterday = new Date(currentDate);
-                yesterday.setDate(currentDate.getDate() - 1);
-
-                const tomorrow = new Date(currentDate);
-                tomorrow.setDate(currentDate.getDate() + 1);
-
-                const formattedYesterday = getFormattedDate(yesterday);
-                const formattedToday = getFormattedDate(currentDate);
-                const formattedTomorrow = getFormattedDate(tomorrow);
-
-                return formattedYesterday + formattedToday + formattedTomorrow;
-            };
-
-            const longDateString = getDateString();
-            console.log("Long Date String:", longDateString);
-            const url = link + longDateString;
-            console.log(url);
-            const srcvp = document.getElementById('videoplayer');
-            const srcvs = document.getElementById('vidsource');
-            console.log(srcvp, srcvs);
-            srcvp.src = url;
-            srcvs.src = url;
-            console.log(srcvp.src, srcvs.src);
-            const subs = document.getElementById('subs');
-            subs.src = "https://rips.cc/subs/" + tt + ".vtt";
-            console.log(subs.src);
-            window.scrollTo(0,0);
-        };
-    </script>
+<script>
+function loadMovies(){
+    createMovie('https://vault.rips.cc/video/interstellar.2014?k=', 'tt0816692');
+    createMovie('https://vault.rips.cc/video/the_shawshank_redemption_1994?k=', 'tt0111161');
+    createMovie('https://vault.rips.cc/video/the.godfather.1972?k=', 'tt0068646');
+    createMovie('https://vault.rips.cc/video/superbad.2007?k=', 'tt0829482');
+    createMovie('https://vault.rips.cc/video/step.brothers.2008?k=','tt0838283');
+    createMovie('https://vault.rips.cc/video/431954b1cf2a5206?k=','tt1636826');
+    createMovie('https://vault.rips.cc/video/the.hangover.2009.unrated?k=','tt1119646');
+    createMovie('https://vault.rips.cc/video/the.hangover.part.ii.2011.tt1411697.tt1411697?k=','tt1411697');
+    createMovie('https://vault.rips.cc/video/the.hangover.part.iii.2013.tt1951261?k=','tt1951261');
+    createMovie('https://vault.rips.cc/video/inception.2010?k=','tt1375666');
+    createMovie('https://vault.rips.cc/video/949e1deb802d5ff0?k=','tt1160419');
+    createMovie('https://vault.rips.cc/video/368415454ade5540?k=','tt15239678');
+    createMovie('https://vault.rips.cc/video/walle.2008.tt0910970.tt0910970?k=','tt0910970');
+    createMovie('https://vault.rips.cc/video/the.martian.2015?k=','tt3659388');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.i..the.phantom.menace.1999?k=','tt0120915');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.ii.attack.of.the.clones.2002?k=','tt0121765');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.iii..revenge.of.the.sith.2005?k=','tt0121766');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.iv..a.new.hope.1977?k=','tt0076759');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.v..the.empire.strikes.back.1980?k=','tt0080684');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.vi..return.of.the.jedi.1983?k=','tt0086190');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.vii..the.force.awakens.2015?k=','tt2488496');
+    createMovie('https://vault.rips.cc/video/star.wars.the.last.jedi.2017?k=','tt2527336');
+    createMovie('https://vault.rips.cc/video/star.wars.episode.ix..the.rise.of.skywalker.2019.tt2527338?k=','tt2527338');
+    createMovie('https://vault.rips.cc/video/rogue.one.2016?k=','tt3748528');
+    createMovie('https://vault.rips.cc/video/solo.a.star.wars.story.2018?k=','tt3778644');
+    createMovie('https://vault.rips.cc/video/f4e62f214350ce46?k=','tt1185834');
+    createMovie('https://vault.rips.cc/video/75ce71b641d0c13b?k=','tt10872600');
+    createMovie('https://vault.rips.cc/video/the.dark.knight.rises.2012?k=','tt1345836');
+    createMovie('https://vault.rips.cc/video/2d25692bf0788b20?k=','tt9362722');
+    createMovie('https://vault.rips.cc/video/a973ecb362f4e582?k=','tt4116284');
+    createMovie('https://vault.rips.cc/video/8caa72ffaf80a623?k=','tt7097896');
+    createMovie('https://vault.rips.cc/video/6faa94fb021605b7?k=','tt1663662');
+    createMovie('https://vault.rips.cc/video/a5763f615100e768?k=','tt6263850');
+    createMovie('https://vault.rips.cc/video/spiderman.into.the.spiderverse.2018?k=','tt4633694');
+    createMovie('https://vault.rips.cc/video/avengers.endgame.2019?k=','tt4154796');
+    createMovie('https://vault.rips.cc/video/5caa668b505770b7?k=','tt0114369');
+    createMovie('https://vault.rips.cc/video/c5c970539ef7a789?k=','tt15398776');
+    createMovie('https://vault.rips.cc/video/b00adaf32232bb1f?k=','tt1016150');
+    createMovie('https://vault.rips.cc/video/bf38d1bd03ed4c1c?k=','tt23468450');
+    createMovie('https://vault.rips.cc/video/a437307109d33489?k=','tt15474916');
+    createMovie('https://vault.rips.cc/video/e53e1b21fbd3e58b?k=','tt0251127');
+    createMovie('https://vault.rips.cc/video/10.things.i.hate.about.you.1999.tt0147800?k=','tt0147800');
+    createMovie('https://vault.rips.cc/video/95b36d3a4db9b9a5?k=','tt0780521');
+    createMovie('https://vault.rips.cc/video/875aa661a8ee85f7?k=','tt0454945');
+    createMovie('https://vault.rips.cc/video/4b8f0d762137ec09?k=','tt0377092');
+    createMovie('https://vault.rips.cc/video/the.dark.knight.2008?k=','tt0468569');
+    createMovie('https://vault.rips.cc/video/oceans.eight.2018.tt5164214?k=','tt5164214');
+    createMovie('https://vault.rips.cc/video/oceans.eleven.2001.tt0240772?k=','tt0054135');
+    createMovie('https://vault.rips.cc/video/2614054fd4c705cd?k=','tt1099212');
+    createMovie('https://vault.rips.cc/video/30079cb229748aee?k=','tt0120667');
+    createMovie('https://vault.rips.cc/video/2077ef9482179786?k=','tt0486576');
+    createMovie('https://vault.rips.cc/video/390f91b18289f4c8?k=','tt1727770');
+    createMovie('https://vault.rips.cc/video/186a80a2ba7ae44d?k=','tt1355644');
+    createMovie('https://vault.rips.cc/video/a8e4372c4d5d83e7?k=','tt0433035');
+    createMovie('https://vault.rips.cc/video/53d2ada9261e5bee?k=','tt0119698');
+    createMovie('https://vault.rips.cc/video/bb90276524aec520?k=','tt0758745');
+    createMovie('https://vault.rips.cc/video/gladiator.extended.remastered.2000?k=','tt0172495');
+    createMovie('https://vault.rips.cc/video/1f9723e3eb2ff949?k=','tt1490017');
+    createMovie('https://vault.rips.cc/video/b273ae8a18b061e0?k=','tt0371746');
+    createMovie('https://vault.rips.cc/video/iron.man.ii.x264?k=','tt1228705');
+    createMovie('https://vault.rips.cc/video/iron.man.3.2013?k=','tt1300854');
+    createMovie('https://vault.rips.cc/video/the_incredible_hulk_2008?k=','tt0800080');
+    createMovie('https://vault.rips.cc/video/thor.2011?k=','tt0800369');
+    createMovie('https://vault.rips.cc/video/thor.the.dark.world.2013?k=','tt1981115');
+    createMovie('https://vault.rips.cc/video/thor.ragnarok.2017?k=','tt3501632');
+    createMovie('https://vault.rips.cc/video/captain.america.2011?k=','tt0458339');
+    createMovie('https://vault.rips.cc/video/captain.america.civil.war.2016?k=','tt3498820');
+    createMovie('https://vault.rips.cc/video/captain.america.the.winter.soldier.2014?k=','tt1843866');
+    createMovie('https://vault.rips.cc/video/the.avengers.2012?k=','tt0848228');
+    createMovie('https://vault.rips.cc/video/avengers.age.of.ultron.2015.tt2395427.tt2395427?k=','tt2395427');
+    createMovie('https://vault.rips.cc/video/avengers.infinity.war.2018?k=','tt4154756');
+    createMovie('https://vault.rips.cc/video/guardians.of.the.galaxy.2014?k=','tt2015381');
+    createMovie('https://vault.rips.cc/video/guardians.of.the.galaxy.vol..2.2017?k=','tt3896198');
+    createMovie('https://vault.rips.cc/video/antman.2015?k=','tt0478970');
+    createMovie('https://vault.rips.cc/video/doctor.strange.2016?k=','tt1211837');
+    createMovie('https://vault.rips.cc/video/spiderman.homecoming.2017.tt2250912?k=','tt2250912');
+    createMovie('https://vault.rips.cc/video/black.panther.2018?k=','tt1825683');
+    createMovie('https://vault.rips.cc/video/antman.and.the.wasp.2018?k=','tt5095030');
+    createMovie('https://vault.rips.cc/video/captain.marvel.2019.tt4154664?k=','tt4154664');
+    createMovie('https://vault.rips.cc/video/414360ca2cfab167?k=','tt26047818');
+    createMovie('https://vault.rips.cc/video/efdfb4781ebcc1d5?k=','tt3480822');
+    createMovie('https://vault.rips.cc/video/b2fc9be0ce45495f?k=','tt9376612');
+    createMovie('https://vault.rips.cc/video/6b43a906523c57cc?k=','tt9032400');
+    createMovie('https://vault.rips.cc/video/6875ec8bad0c495f?k=','tt9419884');
+    createMovie('','');
+};
+</script>
 </body>
 </html>
