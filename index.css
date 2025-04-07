@@ -64,50 +64,34 @@ body {
   color: white;
 }
 
-.game-card {
+.game-grid {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  width: 200px;
-  height: 300px;
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.game-card:hover {
-  transform: scale(1.05);
-}
-
-.game-card img {
-  width: 100%;
-  height: auto;
-  max-height: 70%;
-  object-fit: cover;
-  border-radius: 4px;
-}
-
-.game-card .title {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin: 5px 0;
-  text-align: center;
-}
-
-.game-card .subtitle {
-  font-size: 0.9em;
-  color: #666;
-  text-align: center;
-}
-
-.grid-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-around;
+  margin-top: 60px;
+  padding: 20px;
   gap: 20px;
+}
+
+.game-card {
+  background-color: #111;
+  border: 2px solid orange;
+  border-radius: 15px;
+  text-align: center;
+  padding: 10px;
+  width: 120px;
+}
+
+.game-card .thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  margin: 0 auto 10px;
+  background-image: url('https://placehold.co/80'); /* fallback if card fails to load so it wotn look broken do not removbe */
+  background-size: cover;
+  background-position: center;
+}
+
+.game-card p {
+  margin: 0;
+  font-size: 13px;
 }
