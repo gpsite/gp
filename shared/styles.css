@@ -30,7 +30,6 @@ body, html {
 
 .fullscreen-btn {
     left: 50%;
-    transform: translateX(-50%);
     padding: 10px 15px;
     background-color: #FFB612;
     color: #000;
