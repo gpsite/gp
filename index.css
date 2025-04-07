@@ -31,7 +31,7 @@ body {
   right: 40px;
   width: 120px;
   height: 200px;
-  background-image: url('https://via.placeholder.com/120x200');
+  background-image: url('https://placehold.co/120x200');
   background-size: cover;
   background-position: center;
   z-index: 3;
@@ -86,52 +86,12 @@ body {
   height: 80px;
   border-radius: 20px;
   margin: 0 auto 10px;
-  background-image: url('https://via.placeholder.com/80');
+  background-image: url('https://placehold.co/80');
   background-size: cover;
   background-position: center;
 }
 
-.gamecard p {
+.game-card p {
   margin: 0;
   font-size: 13px;
-}
-
-.gamecard {
-  background-color: #333;
-  border: 2px solid #FFB612;
-  border-radius: 10px;
-  padding: 10px;
-  font-family: 'Open Sans', Arial, sans-serif;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.gamecard img {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.gamecard .title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  font-family: 'Open Sans', Arial, sans-serif;
-  color: #FFB612;
-}
-
-.gamecard .subtitle {
-  font-size: 14px;
-  color: #bbb;
-  font-family: 'Open Sans', Arial, sans-serif;
-}
-
-.gamecard:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.gamecard:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
