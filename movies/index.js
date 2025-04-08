@@ -76,7 +76,7 @@ function createMovie(link, imdbID) {
             <p><strong>Rated:</strong> ${movieInfo.rated}</p>
             <p><strong><i class="fa fa-star"></i></strong> ${movieInfo.ratings}</p>
         </div>
-        <button class="expand-btn" onclick="toggleDescription(event)">Expand</button>
+        <button class="expand-btn" onclick="toggleDescription(event)">Details</button>
         `;
         card.onclick = () => getURL(link, imdbID);
         container.appendChild(card);
@@ -126,7 +126,7 @@ fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
     const description = button.previousElementSibling;
     if (description.style.display === 'none' || description.style.display === '') {
         description.style.display = 'block';
-        button.textContent = 'Collapse';
+        button.textContent = 'Close';
     } else {
         description.style.display = 'none';
         button.textContent = 'Expand';
