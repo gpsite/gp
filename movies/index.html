@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="index.js"></script>
+    <link rel="stylesheet" href="../../shared/styles.css">
+    <script src="../../shared/scripts.js" defer></script>
+    <script src="../../shared/navbar.js" defer></script>
     <style>
         body {
             margin: 0;
@@ -123,10 +126,9 @@ width: 100%;
 <body onload="loadMovies()">
     <div id="navbar"></div>
     <div>
-        <video id="videoplayer" width="100%" controls>
-            <source id="vidsource" type="video/mp4">
-            <track id="subs" kind="captions" label="English" srclang="en">
-        </video>
+        <div class="game-container">
+            <iframe id="videoplayer" class="embed" src></iframe>
+        </div>
     </div>
     <div class="gamesearch">
         <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for movies...">
