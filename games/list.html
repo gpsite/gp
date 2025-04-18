@@ -119,7 +119,10 @@
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}?key=${apiKey}`;
       const response = await fetch(url);
       const data = await response.json();
+      console.log(data); // Log the API response
+
       const rows = data.values;
+      console.log(rows); // Log the rows
 
       const slider = document.getElementById('slider');
       slider.innerHTML = ''; // Clear existing items
