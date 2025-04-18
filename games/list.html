@@ -38,13 +38,14 @@
 
     .background-circle {
       position: absolute;
-      left: 0;
+      left: -200px; /* Move it to the side of the screen */
       top: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at left, #000000 20%, #5a594f 45%);
+      width: 500px; /* Adjust size as needed */
+      height: 500px;
+      background: radial-gradient(circle at center, #000000 20%, #5a594f 45%);
       z-index: 0;
       pointer-events: none;
+      transition: transform 0.1s linear; /* Smooth movement */
     }
 
     .slider {
@@ -103,12 +104,22 @@
         document.body.style.backgroundImage = `url('${closest.dataset.bg}')`;
       }
     }
+
+    const backgroundCircle = document.querySelector('.background-circle');
+
+    function updateBackgroundCirclePosition() {
+      const scrollTop = sliderContainer.scrollTop;
+      backgroundCircle.style.transform = `translateY(${scrollTop}px)`; // Move with scroll
+    }
+
+    sliderContainer.addEventListener('scroll', updateBackgroundCirclePosition);
+    window.addEventListener('load', updateBackgroundCirclePosition);
   </script>
 
   <script>
-    const spreadsheetId = '1vu58WKxPz6vAFOoRvZipvokngubqXRgeHJjGnEsba64'; // Replace with your spreadsheet ID
-    const apiKey = 'AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M'; // Replace with your Google Sheets API key
-    const sheetName = 'games'; // Replace with your sheet name
+    const spreadsheetId = '1vu58WKxPz6vAFOoRvZipvokngubqXRgeHJjGnEsba64'; // spreadsheet ID
+    const apiKey = 'AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M'; // Google Sheets API key
+    const sheetName = 'games'; // sheet name
 
     async function fetchGames() {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}?key=${apiKey}`;
