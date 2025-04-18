@@ -38,13 +38,14 @@
 
     .background-circle {
       position: absolute;
-      left: -200px;
+      left: -250px; /* Adjust to position the half-circle */
       top: 0;
-      width: 35%; 
-      height: 100%;
-      background: radial-gradient(circle at center, #000000 20%, #5a594f 45%);
+      width: 500px; /* Width of the half-circle */
+      height: 100%; /* Full height of the viewport */
+      background: radial-gradient(circle at right, #000000 50%, transparent 50%);
       z-index: 0;
       pointer-events: none;
+      transition: transform 0.1s linear; /* Smooth movement */
     }
 
     .slider {
