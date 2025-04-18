@@ -78,9 +78,8 @@
 
   <script>
     const sliderContainer = document.getElementById('sliderContainer');
-    const items = document.querySelectorAll('.slider .item');
 
-    function scaleItems() {
+    function scaleItems(items) {
       const centerY = sliderContainer.scrollTop + sliderContainer.clientHeight / 2;
 
       let closest = null;
@@ -104,10 +103,6 @@
         document.body.style.backgroundImage = `url('${closest.dataset.bg}')`;
       }
     }
-
-    sliderContainer.addEventListener('scroll', scaleItems);
-    window.addEventListener('load', scaleItems);
-    window.addEventListener('resize', scaleItems);
   </script>
 
   <script>
@@ -117,33 +112,49 @@
 
     async function fetchGames() {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}?key=${apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      console.log(data); // Log the API response
+      try {
+        const response = await fetch(url);
+        console.log(response); // Log the raw response
+        if (!response.ok) {
+          console.error('Error response:', await response.text());
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(data); // Log the parsed data
 
-      const rows = data.values;
-      console.log(rows); // Log the rows
+        const rows = data.values || [];
+        if (rows.length === 0) {
+          console.error('No data found in the spreadsheet.');
+          return;
+        }
 
-      const slider = document.getElementById('slider');
-      slider.innerHTML = ''; // Clear existing items
+        const slider = document.getElementById('slider');
+        slider.innerHTML = ''; // Clear existing items
 
-      rows.slice(1).forEach(row => {
-        const [title, location, categories, imageUrl] = row;
+        rows.slice(1).forEach(row => {
+          const [title, location, categories, imageUrl] = row;
 
-        const item = document.createElement('div');
-        item.className = 'item';
-        item.dataset.bg = imageUrl;
-        item.onclick = () => location.href = location;
+          const item = document.createElement('div');
+          item.className = 'item';
+          item.dataset.bg = imageUrl;
+          item.onclick = () => location.href = location;
 
-        item.innerHTML = `
-          <div class="title">${title}</div>
-          <div class="subtitle">Category: ${categories}</div>
-        `;
+          item.innerHTML = `
+            <div class="title">${title}</div>
+            <div class="subtitle">Category: ${categories}</div>
+          `;
 
-        slider.appendChild(item);
-      });
+          slider.appendChild(item);
+        });
 
-      scaleItems(); // Reapply scaling logic
+        // Re-select items and reapply scaling logic
+        const items = document.querySelectorAll('.slider .item');
+        sliderContainer.addEventListener('scroll', () => scaleItems(items));
+        window.addEventListener('resize', () => scaleItems(items));
+        scaleItems(items); // Initial scaling
+      } catch (error) {
+        console.error('Error fetching games:', error);
+      }
     }
 
     window.addEventListener('load', fetchGames);
