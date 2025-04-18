@@ -66,27 +66,14 @@
       transition: transform 0.3s, z-index 0.3s;
       cursor: pointer;
       text-align: center;
-      margin: 40px 0; /* replaces gap to allow room for scale */
+      margin: 40px 0;
     }
   </style>
 </head>
 <body>
   <div class="slider-container" id="sliderContainer">
     <div class="background-circle"></div>
-    <div class="slider" id="slider">
-      <div class="item" data-bg="https://georgepickenssite.github.io/georgepickens/img/thumbnail/run3.png" onclick="location.href='run3'">
-        <div class="title">Run 3</div>
-        <div class="subtitle">Category: Runner, Platformer</div>
-      </div>
-      <div class="item" data-bg="https://georgepickenssite.github.io/georgepickens/img/thumbnail/2048.png" onclick="location.href='2048'">
-        <div class="title">2048</div>
-        <div class="subtitle">Category: Puzzle, Strategy</div>
-      </div>
-      <div class="item" data-bg="https://georgepickenssite.github.io/georgepickens/img/thumbnail/baldisbasics.png" onclick="location.href='baldisbasics'">
-        <div class="title">Baldi's Basics</div>
-        <div class="subtitle">Category: Horror</div>
-      </div>
-    </div>
+    <div class="slider" id="slider"></div>
   </div>
 
   <script>
@@ -121,6 +108,42 @@
     sliderContainer.addEventListener('scroll', scaleItems);
     window.addEventListener('load', scaleItems);
     window.addEventListener('resize', scaleItems);
+  </script>
+
+  <script>
+    const spreadsheetId = '1vu58WKxPz6vAFOoRvZipvokngubqXRgeHJjGnEsba64'; // Replace with your spreadsheet ID
+    const apiKey = 'AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M'; // Replace with your Google Sheets API key
+    const sheetName = 'games'; // Replace with your sheet name
+
+    async function fetchGames() {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}?key=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const rows = data.values;
+
+      const slider = document.getElementById('slider');
+      slider.innerHTML = ''; // Clear existing items
+
+      rows.slice(1).forEach(row => {
+        const [title, location, categories, imageUrl] = row;
+
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.dataset.bg = imageUrl;
+        item.onclick = () => location.href = location;
+
+        item.innerHTML = `
+          <div class="title">${title}</div>
+          <div class="subtitle">Category: ${categories}</div>
+        `;
+
+        slider.appendChild(item);
+      });
+
+      scaleItems(); // Reapply scaling logic
+    }
+
+    window.addEventListener('load', fetchGames);
   </script>
 </body>
 </html>
