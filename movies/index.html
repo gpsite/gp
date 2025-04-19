@@ -13,6 +13,16 @@
     <script src="../../shared/scripts.js" defer></script>
     <script src="../../shared/navbar.js" defer></script>
     <style>
+        #category-dropdown {
+  padding: 10px;
+  border: none;
+  outline: none;
+  background-color: #444;
+  color: #FFB612;
+  font-size: 16px;
+  font-family: 'Open Sans', Arial, sans-serif;
+  cursor: pointer;
+}
         body {
             margin: 0;
             padding: 0;
@@ -27,16 +37,26 @@
         }
 
         .search-bar {
-            width: 80%;
-            padding: 10px;
-            margin: 0 auto 20px;
-            border: 2px solid #FFB612;
-            border-radius: 10px;
-            background-color: #333;
-            color: #FFB612;
-            font-size: 16px;
-            display: block;
-        }
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  background-color: #333;
+  color: #FFB612;
+  font-size: 16px;
+  font-family: 'Open Sans', Arial, sans-serif;
+}
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  margin: 0 auto 20px;
+  border: 2px solid #FFB612;
+  border-radius: 10px;
+  background-color: #333;
+  overflow: hidden;
+}
 
         .gamesearch {
             display: flex;
@@ -134,7 +154,33 @@ width: 100%;
         </video>
     </div>
     <div class="gamesearch">
+        <div class="search-container">
         <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for movies...">
+        <select id="category-dropdown" onchange="filterByCategory()">
+            <option value="">All Categories</option>
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Animation">Animation</option>
+            <option value="Anime">Anime</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Crime">Crime</option>
+            <option value="Documentary">Documentary</option>
+            <option value="Drama">Drama</option>
+            <option value="Family">Family</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Horror">Horror</option>
+            <option value="Music">Music</option>
+            <option value="Musical">Musical</option>
+            <option value="Mystery">Mystery</option>
+            <option value="Romance">Romance</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Seasonal">Seasonal</option>
+            <option value="Short">Short</option>
+            <option value="Sport">Sport</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Western">Western</option>
+        </select>
+        </div>
         <div class="grid-container" id="gamecards-container"></div>
     </div>
 <script>
