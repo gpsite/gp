@@ -67,7 +67,7 @@ function createMovie(link, imdbID) {
         const card = document.createElement('button');
         card.classList.add('gamecard');
         card.innerHTML = `
-            <img src="${movieInfo.imageUrl}" alt="${movieInfo.title}">
+            <img src="https://georgepickens.github.io/georgepickens/img/poster/${imdbID}.png" alt="${movieInfo.title}">
             <div class="title">${movieInfo.title}</div>
             <div class="subtitle"><strong>Genre</strong>: ${movieInfo.genre}</div>
             <div class="description">
