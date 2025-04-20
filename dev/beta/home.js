@@ -8,6 +8,8 @@ import {
 
 const $carousel = document.querySelector('.carousel'); // Ensure the selector matches the HTML
 if ($carousel) {
+    console.log('Carousel element found:', $carousel);
+
     $carousel.innerHTML += $carousel.innerHTML; // Clone the children for creating the illusion of infinity
     const carouselItems = Array.from($carousel.children); // Use children to get all items
 
@@ -18,6 +20,7 @@ if ($carousel) {
     };
 
     const carousel = { width: carouselItems.reduce(getTotalWidth, 0), speedX: 2, wheelX: 0, wheelY: 0 };
+    console.log('Carousel total width:', carousel.width);
 
     const animatable = createAnimatable($carousel, {
         x: 0,
@@ -29,9 +32,18 @@ if ($carousel) {
     const draggable = createDraggable(carousel, {
         trigger: '#infinite-carousel',
         y: false,
-        onGrab: () => animate(carousel, { speedX: 0, duration: 500 }),
-        onRelease: () => animate(carousel, { speedX: 2, duration: 500 }),
-        onResize: () => (carousel.width = carouselItems.reduce(getTotalWidth, 0)),
+        onGrab: () => {
+            console.log('Carousel grabbed');
+            animate(carousel, { speedX: 0, duration: 500 });
+        },
+        onRelease: () => {
+            console.log('Carousel released');
+            animate(carousel, { speedX: 2, duration: 500 });
+        },
+        onResize: () => {
+            carousel.width = carouselItems.reduce(getTotalWidth, 0);
+            console.log('Carousel resized, new width:', carousel.width);
+        },
         releaseStiffness: 20,
     });
 
