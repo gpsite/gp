@@ -82,7 +82,7 @@ body
 
 .folio-btn-dot:before
 {
-  background: #F68338;
+  background: #ffe000;
 }
 
 .folio-btn:hover .folio-btn-dot:first-child:before, .folio-btn:hover .folio-btn-dot:nth-child(3):before, .folio-btn:hover .folio-btn-dot:nth-child(4):before, .folio-btn:hover .folio-btn-dot:nth-child(8):before {
@@ -129,8 +129,8 @@ body
 }
 
 .header-social li a:hover {
-    color: #F68338; 
-    border-color: #F68338; 
+    color: #ffe000; 
+    border-color: #ffe000; 
 }
 
 ul, li
