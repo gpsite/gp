@@ -263,6 +263,15 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         });
     };
 
+    $(document).ready(function () {
+        $('.mm-parallax').tilt({
+            maxTilt: 4,
+            speed: 400,
+            glare: true,
+            maxGlare: 0.5,
+        });
+    });
+
     /**
      * Auto load
      */
