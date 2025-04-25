@@ -87,7 +87,7 @@ function createMovie(link, imdbID) {
 
 function searchGameCards() {
     const input = document.querySelector('.search-bar');
-    const filter = input.value.toLowerCase();
+    const filter = input.value.toLowerCase('category-dropdown-movies');
     const gamecards = document.querySelectorAll('.gamecard');
 
     gamecards.forEach(card => {
