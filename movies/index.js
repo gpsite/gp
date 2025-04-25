@@ -100,7 +100,7 @@ function searchGameCards() {
         } else {
             card.style.display = 'none';
         }
-    });
+        });
 }
 
 function shuffleGameCards() {
