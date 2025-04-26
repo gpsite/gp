@@ -296,11 +296,14 @@ body {
                 const url = row[urlIndex];
                 const thumbnail = row[thumbnailIndex];
         
-                // Create a game card
+                // Create teh card
                 const card = document.createElement('button');
                 card.className = 'gamecard';
-                card.onclick = () => location.href = url;
-        
+                card.onclick = () => {
+
+                location.href = `games-frame/index.html?gameUrl=${encodeURIComponent(url)}`;
+                };
+
                 card.innerHTML = `
                   <img src="${thumbnail}" alt="${title}">
                   <div class="title">${title}</div>

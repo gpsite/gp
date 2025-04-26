@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baldi's Basics</title>
+    <title>Game Frame</title>
     <link rel="stylesheet" href="../../shared/styles.css">
     <script src="../../shared/scripts.js" defer></script>
 </head>
 <body>
     <div id="navbar"></div>
     <div class="game-container">
-        <iframe class="embed" src="https://ballinpanda.github.io/baldis-basics/"></iframe>
+        <iframe class="embed" id="game-iframe" src=""></iframe>
     </div>
     <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const gameUrl = params.get('gameUrl');
+
+      if (gameUrl) {
+        document.getElementById('game-iframe').src = decodeURIComponent(gameUrl);
+      } else {
+        console.error('No game URL provided');
+      }
+    </script>
     <script src="../../shared/navbar.js" defer></script>
 </body>
 </html>
