@@ -22,10 +22,10 @@
 
         if (gameUrl) {
             if (gameUrl.endsWith('.swf')) {
-                //Render flash games
+                //render flash games
                 container.innerHTML = `
                     <p align="center">
-                        <object type="application/x-shockwave-flash" data="${gameUrl}" width="800" height="600">
+                        <object id="game-object" type="application/x-shockwave-flash" data="${gameUrl}" width="800" height="600">
                             <param name="movie" value="${gameUrl}">
                             <param name="quality" value="high">
                             <param name="wmode" value="transparent">
@@ -33,9 +33,9 @@
                     </p>
                 `;
             } else {
-                //Render iframe for the non Flash games
+                //render iframe for non flash games
                 container.innerHTML = `
-                    <iframe class="embed" src="${decodeURIComponent(gameUrl)}"></iframe>
+                    <iframe id="game-iframe" class="embed" src="${decodeURIComponent(gameUrl)}"></iframe>
                 `;
             }
         } else {
