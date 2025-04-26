@@ -4,31 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Frame</title>
+    <link rel="stylesheet" href="../../shared/styles.css">
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
-    <style>
+    <style> 
+        /* Temp styles for testing, add style sheet after*/
         body {
             margin: 0;
             padding: 0;
             background-color: #1d1e22;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
+        }
+        .game-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
         .embed, .flash-container {
             width: 100%;
             height: 100%;
             border: none;
         }
+        .fullscreen-btn {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #ffb612;
+            color: #121212;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .fullscreen-btn:hover {
+            background-color: #e0a50f;
+        }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <!-- Content will be dynamically injected here -->
+    <div id="navbar"></div>
+    <div class="game-container" id="game-container">
+        <!-- Games are injected here -->
     </div>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
 
     <script>
-        // Get the game URL from the query parameter
         const params = new URLSearchParams(window.location.search);
         const gameUrl = params.get('gameUrl');
 
@@ -36,7 +60,7 @@
 
         if (gameUrl) {
             if (gameUrl.endsWith('.swf')) {
-                // Render Flash game embed code
+                //Render flash games
                 container.innerHTML = `
                     <p align="center">
                         <object type="application/x-shockwave-flash" data="${gameUrl}" width="800" height="600">
@@ -47,7 +71,7 @@
                     </p>
                 `;
             } else {
-                // Render iframe for non-Flash games
+                //Render iframe for the non Flash games
                 container.innerHTML = `
                     <iframe class="embed" src="${decodeURIComponent(gameUrl)}"></iframe>
                 `;
@@ -56,6 +80,19 @@
             container.innerHTML = '<p style="color: white;">No game URL provided.</p>';
             console.error('No game URL provided');
         }
+
+        // Fullscreen toggle functionality
+        function toggleFullscreen() {
+            const elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
     </script>
+    <script src="../../shared/navbar.js" defer></script>
 </body>
 </html>
