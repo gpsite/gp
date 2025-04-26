@@ -45,13 +45,17 @@
 
         // Fullscreen toggle functionality
         function toggleFullscreen() {
-            const elem = document.documentElement;
-            if (!document.fullscreenElement) {
-                elem.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
-                });
+            const gameElement = document.querySelector('#game-iframe') || document.querySelector('#game-object');
+            if (gameElement) {
+                if (!document.fullscreenElement) {
+                    gameElement.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
             } else {
-                document.exitFullscreen();
+                console.error('No game element found to toggle fullscreen.');
             }
         }
     </script>
