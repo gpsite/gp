@@ -3,26 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game</title>
-    <link rel="stylesheet" href="../../shared/styles.css">
-    <script src="../../shared/scripts.js" defer></script>
+    <title>Game Frame</title>
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1d1e22;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .embed, .flash-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="navbar"></div>
-    <div class="game-container">
-        <iframe class="embed" id="game-iframe" src=""></iframe>
+    <div id="game-container">
+        <!-- Content will be dynamically injected here -->
     </div>
-    <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const gameUrl = params.get('gameUrl');
 
-      if (gameUrl) {
-        document.getElementById('game-iframe').src = decodeURIComponent(gameUrl);
-      } else {
-        console.error('No game URL provided');
-      }
+    <script>
+        // Get the game URL from the query parameter
+        const params = new URLSearchParams(window.location.search);
+        const gameUrl = params.get('gameUrl');
+
+        const container = document.getElementById('game-container');
+
+        if (gameUrl) {
+            if (gameUrl.endsWith('.swf')) {
+                // Render Flash game embed code
+                container.innerHTML = `
+                    <p align="center">
+                        <object type="application/x-shockwave-flash" data="${gameUrl}" width="800" height="600">
+                            <param name="movie" value="${gameUrl}">
+                            <param name="quality" value="high">
+                            <param name="wmode" value="transparent">
+                        </object>
+                    </p>
+                `;
+            } else {
+                // Render iframe for non-Flash games
+                container.innerHTML = `
+                    <iframe class="embed" src="${decodeURIComponent(gameUrl)}"></iframe>
+                `;
+            }
+        } else {
+            container.innerHTML = '<p style="color: white;">No game URL provided.</p>';
+            console.error('No game URL provided');
+        }
     </script>
-    <script src="../../shared/navbar.js" defer></script>
 </body>
 </html>
