@@ -2,8 +2,8 @@
     width: 100%;
     height: auto;
     position: relative;
-    z-index: 10; /* Ensure it stays above the background */
-    background-color: #121212; /* Adjust as needed */
+    z-index: 10;
+    background-color: #121212;
     padding: 10px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   }
