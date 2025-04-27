@@ -1,3 +1,13 @@
+#navbar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 10; /* Ensure it stays above the background */
+    background-color: #121212; /* Adjust as needed */
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wdth,wght@62.5..100,100..900&display=swap');
 
 .bgGridWrapper.horizontal {
@@ -63,15 +73,10 @@
   }
 
 body {
-    /*light*/
     --borderColor: hsl(0, 0%, 64%);
     --bgColor: hsl(0, 0%, 96%);
-    /*dark*/
-    --bgColor: hsl(229, 84%, 5%);
-    --borderColor: hsl(233, 60%, 40%);
-    /*matrix*/
-  /*   --bgColor: black;
-    --borderColor: hsl(120 100% 20%); */
+    --bgColor: hsl(54, 64%, 10%);
+    --borderColor: hsl(50, 60%, 40%);
     background-color: var(--bgColor);
     background-attachment: fixed; /* Ensure the background does not move */
   }
