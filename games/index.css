@@ -78,13 +78,13 @@ body {
 }
 
 .category-container {
-  display: flex;
+  display: fixed;
   overflow-x: auto;
   gap: 10px;
   scroll-behavior: smooth;
   padding: 10px 0;
   position: relative;
-  max-width: 50%;
+  max-width: 100%;
   box-sizing: border-box;
   white-space: nowrap;
 }
