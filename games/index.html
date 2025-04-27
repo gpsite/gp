@@ -180,7 +180,17 @@ document.addEventListener('DOMContentLoaded', fetchGameData);
 }
 
 function filterByCategory() {
-    searchGameCards(); // Reuse the search logic to handle dropdown filtering
+    const selectedCategory = document.getElementById('category-dropdown').value.toLowerCase();
+    const categoryRows = document.querySelectorAll('.category-row');
+
+    categoryRows.forEach(row => {
+        const categoryTitle = row.querySelector('.category-title').textContent.toLowerCase();
+        if (selectedCategory === "" || categoryTitle === selectedCategory) {
+            row.style.display = 'block';
+        } else {
+            row.style.display = 'none';
+        }
+    });
 }
 
 function shuffleGameCards() {
