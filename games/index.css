@@ -140,12 +140,23 @@ body {
   padding: 10px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
 }
 
 .gamecard img {
   width: 100%;
+  height: 200px;
+  object-fit: cover;
   border-radius: 10px;
   margin-bottom: 10px;
+}
+.gamecard .title {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .gamecard:hover {
