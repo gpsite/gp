@@ -59,6 +59,7 @@
                 <option value="Online">Online</option>
                 <option value="Retro">Retro</option>
                 <option value="Luck">Luck</option>
+                <option value="Luck">Driving</option>
                 <option value="Broswer Games">Browser Games</option>
             </select>
         </div>
@@ -128,7 +129,7 @@
 
             const leftArrow = document.createElement('button');
             leftArrow.className = 'scroll-arrow left';
-            leftArrow.innerHTML = '&#9664;';
+            leftArrow.innerHTML = '&#9664;'; 
             leftArrow.onclick = () => {
                 categoryContainer.scrollBy({ left: -300, behavior: 'smooth' });
             };
@@ -139,14 +140,14 @@
             rightArrow.onclick = () => {
                 categoryContainer.scrollBy({ left: 300, behavior: 'smooth' });
             };
-
+            
             categoryRow.appendChild(leftArrow);
             categoryRow.appendChild(categoryTitle);
             categoryRow.appendChild(categoryContainer);
             categoryRow.appendChild(rightArrow);
-
+            
             container.appendChild(categoryRow);
-        });
+            });
     } catch (error) {
         console.error('Error fetching game data:', error);
     }
