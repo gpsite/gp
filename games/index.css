@@ -63,9 +63,10 @@ body {
 .category-row {
   position: relative;
   margin: 20px auto;
-  max-width: 90%;
+  max-width: 1200px;
   overflow: hidden;
   padding: 0 20px;
+  box-sizing: border-box;
 }
 
 
@@ -83,8 +84,9 @@ body {
   scroll-behavior: smooth;
   padding: 10px 0;
   position: relative;
-  width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .category-container::-webkit-scrollbar {
