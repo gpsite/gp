@@ -14,8 +14,6 @@
 </head>
 <body onload="shuffleGameCards()">
     <div id="navbar"></div>
-    <div class="bgGridWrapper horizontal"></div>
-    <div class="bgGridWrapper vertical"></div>
     <div class="content">
       <section class="wrapper">
         <div class="top">
@@ -64,7 +62,9 @@
                 <option value="Broswer Games">Browser Games</option>
             </select>
         </div>
-        <div class="grid-container" id="gamecards-container">
+        <div id="gamecards-container">
+          <!-- Categories ar dynamically added here -->
+      </div>
         </div>
         
         <script>
@@ -90,30 +90,51 @@
                 const category = row[categoryIndex];
                 const url = row[urlIndex];
                 const thumbnail = row[thumbnailIndex];
+
+                if (!categories[category]) {
+                categories[category] = [];
+            }
+
+            categories[category].push({ title, url, thumbnail });
+        });
         
-                // Create teh card
+        Object.keys(categories).forEach(category => {
+            const categoryRow = document.createElement('div');
+            categoryRow.className = 'category-row';
+
+            const categoryTitle = document.createElement('div');
+            categoryTitle.className = 'category-title';
+            categoryTitle.textContent = category;
+
+            const categoryContainer = document.createElement('div');
+            categoryContainer.className = 'category-container';
+
+            categories[category].forEach(game => {
                 const card = document.createElement('button');
                 card.className = 'gamecard';
                 card.onclick = () => {
-
-                location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(url)}`;
+                    location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
                 };
 
                 card.innerHTML = `
-                  <img src="${thumbnail}" alt="${title}">
-                  <div class="title">${title}</div>
-                  <div class="subtitle">Category: ${category}</div>
+                    <img src="${game.thumbnail}" alt="${game.title}">
+                    <div class="title">${game.title}</div>
                 `;
-        
-                container.appendChild(card);
-              });
-            } catch (error) {
-              console.error('Error fetching game data:', error);
-            }
-          }
-        
-          // Fetch game data on page load
-          document.addEventListener('DOMContentLoaded', fetchGameData);
+
+                categoryContainer.appendChild(card);
+            });
+
+            categoryRow.appendChild(categoryTitle);
+            categoryRow.appendChild(categoryContainer);
+            container.appendChild(categoryRow);
+        });
+    } catch (error) {
+        console.error('Error fetching game data:', error);
+    }
+}
+
+// Fetch game data on page load
+document.addEventListener('DOMContentLoaded', fetchGameData);
         </script>
       </div>
       <script>
