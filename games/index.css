@@ -84,7 +84,7 @@ body {
   scroll-behavior: smooth;
   padding: 10px 0;
   position: relative;
-  max-width: 100%;
+  max-width: 50%;
   box-sizing: border-box;
   white-space: nowrap;
 }
