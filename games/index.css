@@ -42,19 +42,25 @@
   animation: gridMaskMove 12s linear infinite;
 }
 .bgGridWrapper {
-  --blockSize: 32px;
-  --borderWidth: 2px;
+    --blockSize: 32px;
+    --borderWidth: 2px;
   
-  width: 100%;
-  height: 100%;
-  background-image:
-    linear-gradient(var(--bgColor),transparent 25% 75%,var(--bgColor)),
-    linear-gradient(
-      var(--direction),
-      transparent calc(var(--blockSize) - var(--borderWidth)),
-      var(--borderColor) calc(var(--blockSize) - var(--borderWidth)));
-  background-size: 100%,var(--blockSize) var(--blockSize);
-}
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Push to the background */
+  
+    background-image:
+      linear-gradient(var(--bgColor), transparent 25% 75%, var(--bgColor)),
+      linear-gradient(
+        var(--direction),
+        transparent calc(var(--blockSize) - var(--borderWidth)),
+        var(--borderColor) calc(var(--blockSize) - var(--borderWidth))
+      );
+    background-size: 100%, var(--blockSize) var(--blockSize);
+  }
 
 body {
     /*light*/
