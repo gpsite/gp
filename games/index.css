@@ -65,6 +65,7 @@ body {
   margin: 20px auto;
   max-width: 90%;
   overflow: hidden;
+  padding: 0 20px;
 }
 
 
@@ -79,9 +80,11 @@ body {
   display: flex;
   overflow-x: auto;
   gap: 10px;
-  padding: 10px 0;
   scroll-behavior: smooth;
+  padding: 10px 0;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .category-container::-webkit-scrollbar {
