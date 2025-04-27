@@ -90,15 +90,17 @@
 
         rows.forEach(row => {
             const title = row[titleIndex];
-            const category = row[categoryIndex];
+            const categoryList = row[categoryIndex].split(',');
             const url = row[urlIndex];
             const thumbnail = row[thumbnailIndex];
 
-            if (!categories[category]) {
-                categories[category] = [];
-            }
-
-            categories[category].push({ title, url, thumbnail });
+            categoryList.forEach(category => {
+                category = category.trim(); 
+                if (!categories[category]) {
+                    categories[category] = [];
+                }
+                categories[category].push({ title, url, thumbnail });
+            });
         });
 
         Object.keys(categories).forEach(category => {
