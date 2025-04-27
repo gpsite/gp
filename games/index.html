@@ -71,33 +71,35 @@
           const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
         
           async function fetchGameData() {
-            try {
-              const response = await fetch(SHEET_URL);
-              const data = await response.json();
-              const rows = data.values;
-        
-              const headers = rows.shift();
-              const titleIndex = headers.indexOf('Title');
-              const categoryIndex = headers.indexOf('Category');
-              const urlIndex = headers.indexOf('URL');
-              const thumbnailIndex = headers.indexOf('Thumbnail');
-        
-              const container = document.getElementById('gamecards-container');
-              container.innerHTML = ''; // Clear existing content
-        
-              rows.forEach(row => {
-                const title = row[titleIndex];
-                const category = row[categoryIndex];
-                const url = row[urlIndex];
-                const thumbnail = row[thumbnailIndex];
+    try {
+        const response = await fetch(SHEET_URL);
+        const data = await response.json();
+        const rows = data.values;
 
-                if (!categories[category]) {
+        const headers = rows.shift();
+        const titleIndex = headers.indexOf('Title');
+        const categoryIndex = headers.indexOf('Category');
+        const urlIndex = headers.indexOf('URL');
+        const thumbnailIndex = headers.indexOf('Thumbnail');
+
+        const container = document.getElementById('gamecards-container');
+        container.innerHTML = ''; // Clear existing content
+
+        const categories = {}; // Define the categories object
+
+        rows.forEach(row => {
+            const title = row[titleIndex];
+            const category = row[categoryIndex];
+            const url = row[urlIndex];
+            const thumbnail = row[thumbnailIndex];
+
+            if (!categories[category]) {
                 categories[category] = [];
             }
 
             categories[category].push({ title, url, thumbnail });
         });
-        
+
         Object.keys(categories).forEach(category => {
             const categoryRow = document.createElement('div');
             categoryRow.className = 'category-row';
@@ -135,6 +137,7 @@
 
 // Fetch game data on page load
 document.addEventListener('DOMContentLoaded', fetchGameData);
+</script>
         </script>
       </div>
       <script>
