@@ -55,12 +55,13 @@
     --blockSize: 32px;
     --borderWidth: 2px;
   
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: -1; /* Push to the background */
+    pointer-events: none;
   
     background-image:
       linear-gradient(var(--bgColor), transparent 25% 75%, var(--bgColor)),
@@ -75,8 +76,8 @@
 body {
     --borderColor: hsl(0, 0%, 64%);
     --bgColor: hsl(0, 0%, 96%);
-    --bgColor: hsl(54, 64%, 10%);
-    --borderColor: hsl(50, 60%, 40%);
+    --bgColor: hsl(0, 0%, 0%);
+    --borderColor: hsl(49, 61%, 7%);
     background-color: var(--bgColor);
     background-attachment: fixed; /* Ensure the background does not move */
   }
