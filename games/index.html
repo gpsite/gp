@@ -85,7 +85,7 @@
         const container = document.getElementById('gamecards-container');
         container.innerHTML = ''; // Clear existing content
 
-        const categories = {}; // Define the categories object
+        const categories = {};
 
         rows.forEach(row => {
             const title = row[titleIndex];
@@ -126,8 +126,25 @@
                 categoryContainer.appendChild(card);
             });
 
+            const leftArrow = document.createElement('button');
+            leftArrow.className = 'scroll-arrow left';
+            leftArrow.innerHTML = '&#9664;';
+            leftArrow.onclick = () => {
+                categoryContainer.scrollBy({ left: -300, behavior: 'smooth' });
+            };
+
+            const rightArrow = document.createElement('button');
+            rightArrow.className = 'scroll-arrow right';
+            rightArrow.innerHTML = '&#9654;';
+            rightArrow.onclick = () => {
+                categoryContainer.scrollBy({ left: 300, behavior: 'smooth' });
+            };
+
+            categoryRow.appendChild(leftArrow);
             categoryRow.appendChild(categoryTitle);
             categoryRow.appendChild(categoryContainer);
+            categoryRow.appendChild(rightArrow);
+
             container.appendChild(categoryRow);
         });
     } catch (error) {

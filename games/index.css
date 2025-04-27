@@ -61,6 +61,7 @@ body {
 }
 
 .category-row {
+  position: relative;
   margin: 20px 0;
 }
 
@@ -80,7 +81,37 @@ body {
 }
 
 .category-container::-webkit-scrollbar {
-  height: 8px;
+  display: none; /* Hide default scrollbar */
+}
+
+/* Navigation arrows */
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #FFB612;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.scroll-arrow.left {
+  left: -20px;
+}
+
+.scroll-arrow.right {
+  right: -20px;
+}
+
+.scroll-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .category-container::-webkit-scrollbar-thumb {
