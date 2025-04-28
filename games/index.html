@@ -12,7 +12,7 @@
     <script src="index.js" defer></script>
 
 </head>
-<body onload="shuffleGameCards()">
+<body onload="shuffleGameCards()"> //nolonger works, fix later
     <div id="navbar"></div>
     <div class="content">
       <section class="wrapper">
@@ -39,9 +39,9 @@
       </section>
     </div>
     <div class="gamesearch">
-        <div class="search-container">
+        <div class="search-container"> // fix generic search, not compatable with new ui
             <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games...">
-            <select id="category-dropdown" onchange="filterByCategory()">
+            <select id="category-dropdown" onchange="filterByCategory()"> // fixed category dropdown
                 <option value="">All Categories</option>
                 <option value="Runner">Runner</option>
                 <option value="Platformer">Platformer</option>
@@ -60,7 +60,7 @@
                 <option value="Retro">Retro</option>
                 <option value="Luck">Luck</option>
                 <option value="Driving">Driving</option>
-                <option value="Broswer Games">Browser Games</option>
+                <option value="Browser Games">Browser Games</option>
             </select>
         </div>
         <div id="gamecards-container">
@@ -68,7 +68,7 @@
       </div>
         </div>
         
-        <script>
+        <script> //Future me move this to index.js, also move gamecard data
           const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
         
           async function fetchGameData() {
@@ -84,7 +84,7 @@
         const thumbnailIndex = headers.indexOf('Thumbnail');
 
         const container = document.getElementById('gamecards-container');
-        container.innerHTML = ''; // Clear existing content
+        container.innerHTML = ''; // Clear existing content do not remove
 
         const categories = {};
 
