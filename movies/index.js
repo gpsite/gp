@@ -87,20 +87,28 @@ function createMovie(link, imdbID) {
 
 function searchGameCards() {
     const input = document.querySelector('.search-bar');
-    const filter = input.value.toLowerCase('category-dropdown-movies');
-    const gamecards = document.querySelectorAll('.gamecard');
+const dropdown = document.querySelector('.category-dropdown-movies');
+const gamecards = document.querySelectorAll('.gamecard');
+
+input.addEventListener('input', filterCards);
+dropdown.addEventListener('change', filterCards);
+
+function filterCards() {
+    const inputValue = input.value.toLowerCase();
+    const dropdownValue = dropdown.value.toLowerCase();
 
     gamecards.forEach(card => {
         const text = card.textContent.toLowerCase();
-        const matchesInput = text.includes(input);
-        const matchesDropdown = dropdown === "" || text.includes(dropdown);
+        const matchesInput = inputValue === "" || text.includes(inputValue);
+        const matchesDropdown = dropdownValue === "" || text.includes(dropdownValue);
 
         if (matchesInput && matchesDropdown) {
             card.style.display = 'block';
         } else {
             card.style.display = 'none';
         }
-        });
+    });
+}
 }
 
 function shuffleGameCards() {
