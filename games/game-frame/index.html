@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="title-id"></title>
+    <title id="title-id">Games</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="../../shared/styles.css">
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
@@ -16,9 +16,6 @@
     <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
 
     <script>
-        const gameTitle = headers.indexOf('Title');
-        const pageTitle = getElementById('title-id');
-        pageTitle.innerHTML = gameTitle;
         const params = new URLSearchParams(window.location.search);
         const gameUrl = params.get('gameUrl');
 
