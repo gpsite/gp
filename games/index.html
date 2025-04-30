@@ -39,9 +39,9 @@
       </section>
     </div>
     <div class="gamesearch">
-        <div class="search-container"> Search is currently a little buggy, use ctrl + f temporarily
+        <div class="search-container">
             <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games...">
-            <select id="category-dropdown" onchange="filterByCategory()"> // fixed category dropdown
+            <select id="category-dropdown" onchange="filterByCategory()">
                 <option value="">All Categories</option>
                 <option value="Runner">Runner</option>
                 <option value="Platformer">Platformer</option>
@@ -89,10 +89,8 @@
                 requestAnimationFrame(animateScroll);
             }
         }
-
         requestAnimationFrame(animateScroll);
     }
-
           const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
         
           async function fetchGameData() {
@@ -181,21 +179,40 @@ document.addEventListener('DOMContentLoaded', fetchGameData);
         </script>
       </div>
       <script>
-        function searchGameCards() {
+function searchGameCards() {
     const input = document.querySelector('.search-bar').value.toLowerCase();
     const dropdown = document.getElementById('category-dropdown').value.toLowerCase();
-    const gamecards = document.querySelectorAll('.gamecard');
+    const categoryRows = document.querySelectorAll('.category-row');
+    const container = document.getElementById('gamecards-container');
 
-    gamecards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const matchesInput = text.includes(input);
-        const matchesDropdown = dropdown === "" || text.includes(dropdown);
+    if (input.trim() === "") {
 
-        if (matchesInput && matchesDropdown) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
+        categoryRows.forEach(row => {
+            row.style.display = 'block';
+        });
+        return;
+    }
+    categoryRows.forEach(row => {
+        row.style.display = 'none';
+    });
+
+    container.innerHTML = "";
+
+    const allGames = [];
+    categoryRows.forEach(row => {
+        const cards = row.querySelectorAll('.gamecard');
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            const matchesInput = text.includes(input);
+            const matchesDropdown = dropdown === "" || text.includes(dropdown);
+
+            if (matchesInput && matchesDropdown) {
+                allGames.push(card.cloneNode(true));
+            }
+        });
+    });
+    allGames.forEach(game => {
+        container.appendChild(game);
     });
 }
 
