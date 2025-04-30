@@ -69,6 +69,30 @@
         </div>
         
         <script> //Future me move this to index.js, also move gamecard data
+
+    function scrollCategory(container, direction) {
+        const scrollAmount = 300;
+        const currentScroll = container.scrollLeft;
+        const targetScroll = direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount;
+
+        const startTime = performance.now();
+        const duration = 300;
+
+        function animateScroll(currentTime) {
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
+            const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress; // EASING FUNCTION
+
+            container.scrollLeft = currentScroll + (targetScroll - currentScroll) * ease;
+
+            if (progress < 1) {
+                requestAnimationFrame(animateScroll);
+            }
+        }
+
+        requestAnimationFrame(animateScroll);
+    }
+
           const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
         
           async function fetchGameData() {
@@ -130,25 +154,21 @@
             });
 
             const leftArrow = document.createElement('button');
-            leftArrow.className = 'scroll-arrow left';
-            leftArrow.innerHTML = '&#9664;'; 
-            leftArrow.onclick = () => {
-                categoryContainer.scrollBy({ left: -300, behavior: 'smooth' });
-            };
+                leftArrow.className = 'scroll-arrow left';
+                leftArrow.innerHTML = '&#9664;'; 
+                leftArrow.onclick = () => scrollCategory(categoryContainer, 'left');
 
-            const rightArrow = document.createElement('button');
-            rightArrow.className = 'scroll-arrow right';
-            rightArrow.innerHTML = '&#9654;';
-            rightArrow.onclick = () => {
-                categoryContainer.scrollBy({ left: 300, behavior: 'smooth' });
-            };
-            
-            categoryRow.appendChild(leftArrow);
-            categoryRow.appendChild(categoryTitle);
-            categoryRow.appendChild(categoryContainer);
-            categoryRow.appendChild(rightArrow);
-            
-            container.appendChild(categoryRow);
+                const rightArrow = document.createElement('button');
+                rightArrow.className = 'scroll-arrow right';
+                rightArrow.innerHTML = '&#9654;';
+                rightArrow.onclick = () => scrollCategory(categoryContainer, 'right');
+
+                categoryRow.appendChild(leftArrow);
+                categoryRow.appendChild(categoryTitle);
+                categoryRow.appendChild(categoryContainer);
+                categoryRow.appendChild(rightArrow);
+
+                container.appendChild(categoryRow);
             });
     } catch (error) {
         console.error('Error fetching game data:', error);
