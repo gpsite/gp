@@ -68,32 +68,13 @@
       </div>
         </div>
         
-        <script> //Future me move this to index.js, also move gamecard data
+<script> //Future me move this to index.js, also move gamecard data
 
-    function scrollCategory(container, direction) {
-        const scrollAmount = 300;
-        const currentScroll = container.scrollLeft;
-        const targetScroll = direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount;
+let allGameData = [];
 
-        const startTime = performance.now();
-        const duration = 10;
+const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
 
-        function animateScroll(currentTime) {
-            const elapsedTime = currentTime - startTime;
-            const progress = Math.min(elapsedTime / duration, 1);
-            const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress; // EASING FUNCTION
-
-            container.scrollLeft = currentScroll + (targetScroll - currentScroll) * ease;
-
-            if (progress < 1) {
-                requestAnimationFrame(animateScroll);
-            }
-        }
-        requestAnimationFrame(animateScroll);
-    }
-          const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
-        
-          async function fetchGameData() {
+async function fetchGameData() {
     try {
         const response = await fetch(SHEET_URL);
         const data = await response.json();
@@ -105,162 +86,136 @@
         const urlIndex = headers.indexOf('URL');
         const thumbnailIndex = headers.indexOf('Thumbnail');
 
-        const container = document.getElementById('gamecards-container');
-        container.innerHTML = ''; // Clear existing content do not remove
-
-        const categories = {};
-
-        rows.forEach(row => {
-            const title = row[titleIndex];
-            const categoryList = row[categoryIndex].split(',');
-            const url = row[urlIndex];
-            const thumbnail = row[thumbnailIndex];
-
-            categoryList.forEach(category => {
-                category = category.trim(); 
-                if (!categories[category]) {
-                    categories[category] = [];
-                }
-                categories[category].push({ title, url, thumbnail });
-            });
+        allGameData = rows.map(row => {
+            return {
+                title: row[titleIndex],
+                categories: row[categoryIndex].split(',').map(c => c.trim().toLowerCase()),
+                url: row[urlIndex],
+                thumbnail: row[thumbnailIndex]
+            };
         });
 
-        Object.keys(categories).forEach(category => {
-            const categoryRow = document.createElement('div');
-            categoryRow.className = 'category-row';
-
-            const categoryTitle = document.createElement('div');
-            categoryTitle.className = 'category-title';
-            categoryTitle.textContent = category;
-
-            const categoryContainer = document.createElement('div');
-            categoryContainer.className = 'category-container';
-
-            categories[category].forEach(game => {
-                const card = document.createElement('button');
-                card.className = 'gamecard';
-                card.onclick = () => {
-                    location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
-                };
-
-                card.innerHTML = `
-                    <img src="${game.thumbnail}" alt="${game.title}">
-                    <div class="title">${game.title}</div>
-                `;
-
-                categoryContainer.appendChild(card);
-            });
-
-            const leftArrow = document.createElement('button');
-                leftArrow.className = 'scroll-arrow left';
-                leftArrow.innerHTML = '&#9664;'; 
-                leftArrow.onclick = () => scrollCategory(categoryContainer, 'left');
-
-                const rightArrow = document.createElement('button');
-                rightArrow.className = 'scroll-arrow right';
-                rightArrow.innerHTML = '&#9654;';
-                rightArrow.onclick = () => scrollCategory(categoryContainer, 'right');
-
-                categoryRow.appendChild(leftArrow);
-                categoryRow.appendChild(categoryTitle);
-                categoryRow.appendChild(categoryContainer);
-                categoryRow.appendChild(rightArrow);
-
-                container.appendChild(categoryRow);
-            });
+        displayGames(allGameData);
     } catch (error) {
         console.error('Error fetching game data:', error);
     }
 }
 
-// Fetch game data on page load
-document.addEventListener('DOMContentLoaded', fetchGameData);
-</script>
-        </script>
-      </div>
-      <script>
+function displayGames(games) {
+    const container = document.getElementById('gamecards-container');
+    container.innerHTML = '';
+
+    if (games.length === 0) {
+        container.innerHTML = '<p style="color: white; text-align: center;">Game not found.</p>';
+        return;
+    }
+
+    const categories = {};
+
+    games.forEach(game => {
+        game.categories.forEach(category => {
+            if (!categories[category]) categories[category] = [];
+            categories[category].push(game);
+        });
+    });
+
+    Object.keys(categories).forEach(category => {
+        const categoryRow = document.createElement('div');
+        categoryRow.className = 'category-row';
+
+        const categoryTitle = document.createElement('div');
+        categoryTitle.className = 'category-title';
+        categoryTitle.textContent = category;
+
+        const categoryContainer = document.createElement('div');
+        categoryContainer.className = 'category-container';
+
+        categories[category].forEach(game => {
+            const card = document.createElement('button');
+            card.className = 'gamecard';
+            card.onclick = () => {
+                location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
+            };
+
+            card.innerHTML = `
+                <img src="${game.thumbnail}" alt="${game.title}">
+                <div class="title">${game.title}</div>
+            `;
+
+            categoryContainer.appendChild(card);
+        });
+
+        const leftArrow = document.createElement('button');
+        leftArrow.className = 'scroll-arrow left';
+        leftArrow.innerHTML = '&#9664;';
+        leftArrow.onclick = () => scrollCategory(categoryContainer, 'left');
+
+        const rightArrow = document.createElement('button');
+        rightArrow.className = 'scroll-arrow right';
+        rightArrow.innerHTML = '&#9654;';
+        rightArrow.onclick = () => scrollCategory(categoryContainer, 'right');
+
+        categoryRow.appendChild(leftArrow);
+        categoryRow.appendChild(categoryTitle);
+        categoryRow.appendChild(categoryContainer);
+        categoryRow.appendChild(rightArrow);
+
+        container.appendChild(categoryRow);
+    });
+}
 
 function searchGameCards() {
     const input = document.querySelector('.search-bar').value.toLowerCase().trim();
     const dropdown = document.getElementById('category-dropdown').value.toLowerCase();
-    const categoryRows = document.querySelectorAll('.category-row');
-    const container = document.getElementById('gamecards-container');
 
-    if (input === "" && dropdown === "") {
-
-        categoryRows.forEach(row => {
-            row.style.display = 'block';
-        });
-        return;
-    }
-
-
-    categoryRows.forEach(row => {
-        row.style.display = 'none';
+    const filtered = allGameData.filter(game => {
+        const matchesTitle = input === "" || game.title.toLowerCase().includes(input);
+        const matchesCategory = dropdown === "" || game.categories.includes(dropdown);
+        return matchesTitle && matchesCategory;
     });
 
-    container.innerHTML = "";
-
-
-    const allGames = [];
-    categoryRows.forEach(row => {
-        const cards = row.querySelectorAll('.gamecard');
-        cards.forEach(card => {
-            const titleElement = card.querySelector('.title');
-            const titleText = titleElement ? titleElement.textContent.toLowerCase() : ""; 
-            const matchesInput = input === "" || titleText.includes(input);
-            const matchesDropdown = dropdown === "" || titleText.includes(dropdown);
-
-            if (matchesInput && matchesDropdown) {
-                allGames.push(card.cloneNode(true)); 
-            }
-        });
-    });
-
-
-    if (allGames.length > 0) {
-        allGames.forEach(game => {
-            container.appendChild(game);
-        });
-    } else {
-
-        container.innerHTML = '<p style="color: white; text-align: center;">Game not found.</p>';
-    }
+    displayGames(filtered);
 }
 
-function filterByCategory() {
-    const selectedCategory = document.getElementById('category-dropdown').value.toLowerCase();
-    const categoryRows = document.querySelectorAll('.category-row');
+function scrollCategory(container, direction) {
+    const scrollAmount = 300;
+    const currentScroll = container.scrollLeft;
+    const targetScroll = direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount;
 
-    categoryRows.forEach(row => {
-        const categoryTitle = row.querySelector('.category-title').textContent.toLowerCase();
-        if (selectedCategory === "" || categoryTitle === selectedCategory) {
-            row.style.display = 'block';
-        } else {
-            row.style.display = 'none';
+    const startTime = performance.now();
+    const duration = 10;
+
+    function animateScroll(currentTime) {
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(elapsedTime / duration, 1);
+        const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+
+        container.scrollLeft = currentScroll + (targetScroll - currentScroll) * ease;
+
+        if (progress < 1) {
+            requestAnimationFrame(animateScroll);
         }
-    });
+    }
+
+    requestAnimationFrame(animateScroll);
 }
 
 function shuffleGameCards() {
-    const container = document.getElementById('gamecards-container');
-    const cards = Array.from(container.children);
-    for (let i = cards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        container.appendChild(cards[j]);
-    }
 }
 
-document.addEventListener('DOMContentLoaded', shuffleGameCards);
+// Load navbar
+document.addEventListener('DOMContentLoaded', () => {
+    fetchGameData();
 
-fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
-            .then(response => response.text())
-            .then(data => {
-                const template = document.createElement('template');
-                template.innerHTML = data;
-                const navbar = template.content.querySelector('#navbar-template').content;
-                document.getElementById('navbar').appendChild(navbar);
-            });
-      </script>
+    fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            const template = document.createElement('template');
+            template.innerHTML = data;
+            const navbar = template.content.querySelector('#navbar-template').content;
+            document.getElementById('navbar').appendChild(navbar);
+        });
+});
+</script>
 </body>
 </html>
