@@ -41,7 +41,7 @@
     <div class="gamesearch">
         <div class="search-container">
             <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games...">
-            <select id="category-dropdown" onchange="filterByCategory()">
+            <select id="category-dropdown" onchange="searchGameCards()">
                 <option value="">All Categories</option>
                 <option value="Runner">Runner</option>
                 <option value="Platformer">Platformer</option>
@@ -170,7 +170,7 @@ function searchGameCards() {
 
     const filtered = allGameData.filter(game => {
         const matchesTitle = input === "" || game.title.toLowerCase().includes(input);
-        const matchesCategory = dropdown === "" || game.categories.includes(dropdown);
+        const matchesCategory = dropdown === "" || game.categories.some(cat => cat.toLowerCase() === dropdown);
         return matchesTitle && matchesCategory;
     });
 
