@@ -86,14 +86,33 @@ async function fetchGameData() {
         const urlIndex = headers.indexOf('URL');
         const thumbnailIndex = headers.indexOf('Thumbnail');
 
-        allGameData = rows.map(row => {
-            return {
-                title: row[titleIndex],
-                categories: row[categoryIndex].split(',').map(c => c.trim().toLowerCase()),
-                url: row[urlIndex],
-                thumbnail: row[thumbnailIndex]
-            };
+        const gameMap = new Map();
+
+        rows.forEach(row => {
+            const title = row[titleIndex];
+            const url = row[urlIndex];
+            const thumbnail = row[thumbnailIndex];
+            const rawCategories = row[categoryIndex];
+            const categoryList = rawCategories ? rawCategories.split(',').map(c => c.trim().toLowerCase()) : [];
+
+            const key = title.toLowerCase();
+
+            if (!gameMap.has(key)) {
+                gameMap.set(key, {
+                    title,
+                    url,
+                    thumbnail,
+                    categories: new Set(categoryList)
+                });
+            } else {
+                categoryList.forEach(cat => gameMap.get(key).categories.add(cat));
+            }
         });
+
+        allGameData = Array.from(gameMap.values()).map(game => ({
+            ...game,
+            categories: Array.from(game.categories)
+        }));
 
         displayGames(allGameData);
     } catch (error) {
