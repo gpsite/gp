@@ -12,7 +12,7 @@
     <script src="index.js" defer></script>
 
 </head>
-<body onload="shuffleGameCards()"> <!--COLIN THIS IS HOW YOU COMMENT IN HTML YOU TARD-->
+<body onload="shuffleGameCards()"> <!--COLIN THIS IS HOW YOU COMMENT IN HTML YOU TARD whoops gay ah html-->
     <div id="navbar"></div>
     <div class="content">
       <section class="wrapper">
@@ -168,11 +168,18 @@ function searchGameCards() {
     const input = document.querySelector('.search-bar').value.toLowerCase().trim();
     const dropdown = document.getElementById('category-dropdown').value.toLowerCase();
 
-    const filtered = allGameData.filter(game => {
-        const matchesTitle = input === "" || game.title.toLowerCase().includes(input);
-        const matchesCategory = dropdown === "" || game.categories.some(cat => cat.toLowerCase() === dropdown);
-        return matchesTitle && matchesCategory;
-    });
+    const seen = new Set();
+const filtered = allGameData.filter(game => {
+    const matchesTitle = input === "" || game.title.toLowerCase().includes(input);
+    const matchesCategory = dropdown === "" || game.categories.some(cat => cat.toLowerCase() === dropdown);
+    const key = game.title.toLowerCase();
+
+    if (matchesTitle && matchesCategory && !seen.has(key)) {
+        seen.add(key);
+        return true;
+    }
+    return false;
+});
 
     displayGames(filtered);
 }
