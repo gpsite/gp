@@ -188,6 +188,11 @@ function searchGameCards() {
     const dropdown = document.getElementById('category-dropdown').value.toLowerCase();
     const container = document.getElementById('gamecards-container');
 
+    if (input === "" && dropdown === "") {
+        displayGames(allGameData);
+        return;
+    }
+
     container.innerHTML = "";
 
     const filteredGames = allGameData.filter(game => {
