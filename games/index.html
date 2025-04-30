@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', fetchGameData);
         </script>
       </div>
       <script>
-        
+
 function searchGameCards() {
     const input = document.querySelector('.search-bar').value.toLowerCase().trim();
     const dropdown = document.getElementById('category-dropdown').value.toLowerCase();
@@ -194,31 +194,36 @@ function searchGameCards() {
         return;
     }
 
+
     categoryRows.forEach(row => {
         row.style.display = 'none';
     });
 
     container.innerHTML = "";
 
+
     const allGames = [];
     categoryRows.forEach(row => {
         const cards = row.querySelectorAll('.gamecard');
         cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            const matchesInput = input === "" || text.includes(input);
-            const matchesDropdown = dropdown === "" || text.includes(dropdown);
+            const titleElement = card.querySelector('.title');
+            const titleText = titleElement ? titleElement.textContent.toLowerCase() : ""; 
+            const matchesInput = input === "" || titleText.includes(input);
+            const matchesDropdown = dropdown === "" || titleText.includes(dropdown);
 
             if (matchesInput && matchesDropdown) {
-                allGames.push(card.cloneNode(true));
+                allGames.push(card.cloneNode(true)); 
             }
         });
     });
+
 
     if (allGames.length > 0) {
         allGames.forEach(game => {
             container.appendChild(game);
         });
     } else {
+
         container.innerHTML = '<p style="color: white; text-align: center;">Game not found.</p>';
     }
 }
