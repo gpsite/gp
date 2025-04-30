@@ -186,21 +186,35 @@ function displayGames(games) {
 function searchGameCards() {
     const input = document.querySelector('.search-bar').value.toLowerCase().trim();
     const dropdown = document.getElementById('category-dropdown').value.toLowerCase();
+    const container = document.getElementById('gamecards-container');
 
-    const seen = new Set();
-const filtered = allGameData.filter(game => {
-    const matchesTitle = input === "" || game.title.toLowerCase().includes(input);
-    const matchesCategory = dropdown === "" || game.categories.some(cat => cat.toLowerCase() === dropdown);
-    const key = game.title.toLowerCase();
+    container.innerHTML = "";
 
-    if (matchesTitle && matchesCategory && !seen.has(key)) {
-        seen.add(key);
-        return true;
+    const filteredGames = allGameData.filter(game => {
+        const titleMatch = input === "" || game.title.toLowerCase().includes(input);
+        const categoryMatch = dropdown === "" || game.categories.some(cat => cat.toLowerCase() === dropdown);
+        return titleMatch && categoryMatch;
+    });
+
+    if (filteredGames.length === 0) {
+        container.innerHTML = '<p style="color: white; text-align: center;">Game not found.</p>';
+        return;
     }
-    return false;
-});
 
-    displayGames(filtered);
+    filteredGames.forEach(game => {
+        const card = document.createElement('button');
+        card.className = 'gamecard';
+        card.onclick = () => {
+            location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
+        };
+
+        card.innerHTML = `
+            <img src="${game.thumbnail}" alt="${game.title}">
+            <div class="title">${game.title}</div>
+        `;
+
+        container.appendChild(card);
+    });
 }
 
 function scrollCategory(container, direction) {
