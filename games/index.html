@@ -179,19 +179,21 @@ document.addEventListener('DOMContentLoaded', fetchGameData);
         </script>
       </div>
       <script>
+        
 function searchGameCards() {
-    const input = document.querySelector('.search-bar').value.toLowerCase();
+    const input = document.querySelector('.search-bar').value.toLowerCase().trim();
     const dropdown = document.getElementById('category-dropdown').value.toLowerCase();
     const categoryRows = document.querySelectorAll('.category-row');
     const container = document.getElementById('gamecards-container');
 
-    if (input.trim() === "") {
+    if (input === "" && dropdown === "") {
 
         categoryRows.forEach(row => {
             row.style.display = 'block';
         });
         return;
     }
+
     categoryRows.forEach(row => {
         row.style.display = 'none';
     });
@@ -203,7 +205,7 @@ function searchGameCards() {
         const cards = row.querySelectorAll('.gamecard');
         cards.forEach(card => {
             const text = card.textContent.toLowerCase();
-            const matchesInput = text.includes(input);
+            const matchesInput = input === "" || text.includes(input);
             const matchesDropdown = dropdown === "" || text.includes(dropdown);
 
             if (matchesInput && matchesDropdown) {
@@ -211,9 +213,14 @@ function searchGameCards() {
             }
         });
     });
-    allGames.forEach(game => {
-        container.appendChild(game);
-    });
+
+    if (allGames.length > 0) {
+        allGames.forEach(game => {
+            container.appendChild(game);
+        });
+    } else {
+        container.innerHTML = '<p style="color: white; text-align: center;">Game not found.</p>';
+    }
 }
 
 function filterByCategory() {
