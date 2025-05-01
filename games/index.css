@@ -21,6 +21,7 @@ body {
   border-radius: 10px;
   background-color: #333;
   overflow: hidden;
+  padding-top: 15%;
 }
 
 .search-bar {
