@@ -138,6 +138,7 @@ body {
   border: 2px solid #FFB612;
   border-radius: 10px;
   cursor: pointer;
+  padding:5px;
   transition: transform 0.2s, box-shadow 0.2s;
   text-align: center;
 }
