@@ -82,7 +82,7 @@ body {
   overflow-x: auto;
   gap: 10px;
   scroll-behavior: smooth;
-  padding: 10px 0;
+  padding: 10px 0px 0px 10px;
   position: relative;
   max-width: 100%;
   box-sizing: border-box;
