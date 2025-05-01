@@ -1,15 +1,5 @@
 <template id="navbar-template">
   <style>
-    .abutton {
-      color: #fff;
-      background-color: #141414;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-weight: bold;
-      z-index: 998;
-    }
-
     .navbar {
       background-color: #141414;
       font-family: Arial, sans-serif;
@@ -23,10 +13,17 @@
       padding: 10px 50px;
     }
 
+    .navbar .brand {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+    }
+
     .navbar-content {
       display: flex;
       align-items: center;
       gap: 15px;
+      margin-left: auto;
     }
 
     .navbar a, .navbar button, .dropbtn {
@@ -44,7 +41,7 @@
     .navbar a:hover,
     .navbar button:hover,
     .dropdown:hover .dropbtn {
-      background-color: #fffb00;
+      background-color: #5a5a5a;
       color: #fff;
     }
 
@@ -72,20 +69,12 @@
     }
 
     .dropdown-content a:hover {
-      background-color: #fffb00;
+      background-color: #5a5a5a;
       color: #fff;
     }
 
     .dropdown:hover .dropdown-content {
       display: block;
-    }
-
-    .close-icon {
-      font-size: 16px;
-      color: #fff;
-      background: none;
-      border: none;
-      cursor: pointer;
     }
 
     .menu-icon {
@@ -99,8 +88,7 @@
 
     @media screen and (max-width: 768px) {
       .navbar-content a,
-      .navbar-content .dropdown,
-      .navbar-content button:not(.menu-icon) {
+      .navbar-content .dropdown {
         display: none;
       }
       .menu-icon {
@@ -109,12 +97,10 @@
     }
   </style>
 
-  <button class="abutton" onclick="navbar1.removeAttribute('hidden')">Show Nav Bar</button>
-
-  <nav id="navbar1" hidden>
+  <nav id="navbar1">
     <div class="navbar">
+      <div class="brand">GEORGE PICKENS</div>
       <div class="navbar-content">
-        <button class="close-icon" onclick="navbar1.setAttribute('hidden', 'hidden')">X</button>
         <a href="https://georgepickenssite.github.io/georgepickens/"><i class="fa fa-home"></i> Home</a>
         <a href="https://georgepickenssite.github.io/georgepickens/games"><i class="fa fa-gamepad"></i> Games</a>
         <a href="https://georgepickenssite.github.io/georgepickens/movies"><i class="fa fa-film"></i> Movies</a>
@@ -129,11 +115,6 @@
         </div>
         <a href="https://www.instagram.com/georgepickenssite/"><i class="fa fa-instagram fa-lg"></i></a>
       </div>
-      <button class="menu-icon">&#9776;</button>
     </div>
   </nav>
-
-  <script>
-    let navbar1 = document.getElementById('navbar1');
-  </script>
 </template>
