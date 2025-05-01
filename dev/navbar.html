@@ -1,163 +1,139 @@
 <template id="navbar-template">
   <style>
-    .abutton{
+    .abutton {
       color: #fff;
-      background-color: #000;
-      border: 0;
+      background-color: #141414;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
       z-index: 998;
     }
-  .navbar {
-    overflow: hidden;
-    background-color: #000;
-    font-family: 'Open Sans', Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    font-weight: 700;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  /* Links inside the navbar */
-  .navbar a {
-    float: left;
-    font-size: 16px;
-    color: #FFB612; 
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    width: 110px;
-  }
-  
-  .navbar button {
-    float: left;
-    font-size: 16px;
-    color: #FFB612; 
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    background-color: #000;
-    border: 0;
-    width: 18px;
-  }
-  
-  .navbar a-sm {
-    margin: 0%;
-  }
-  
-  /* The dropdown container */
-  .dropdown {
-    float: left;
-    overflow: hidden;
-  }
-  
-  /* Dropdown button */
-  .dropdown .dropbtn {
-    font-size: 16px;
-    border: none;
-    outline: none;
-    color: #FFB612;
-    padding: 14px 16px;
-    background-color: inherit;
-    font-family: inherit; /* Important for vertical align on mobile phones */
-    margin: 0; /* Important for vertical align on mobile phones */
-    position: static;
-    width: 142px;
-    text-align: center;
-    font-weight: 700;
-  }
-  
-  
-  /* Add a gold background color to navbar links on hover */
-  .navbar a:hover, .dropdown:hover .dropbtn, .navbar button:hover {
-    background-color: #FFB612;
-    color: black;
-  }
-  
-  /* Dropdown content (hidden by default) */
-  .dropdown-content {
-    display: none;
-    position: static;
-    background-color: #333;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); 
-    z-index: 2000; /* Ensure dropdown content is above other elements */
-  }
-  
-  /* Links inside the dropdown */
-  .dropdown-content a {
-    float: none;
-    color: #FFB612;
-    padding: 14px 16px;
-    text-decoration: none;
-    display: block;
-    text-align: center;
-    width: 110px;
-  }
-  
-  /* Add a grey background color to dropdown links on hover */
-  .dropdown-content a:hover {
-    background-color: #ddd;
-    color: black;
-  }
-  
-  /* Show the dropdown menu on hover */
-  .dropdown:hover .dropdown-content {
-    display: block;
-  }
-  
-  /* Style for the menu icons */
-  .menu-icon, .close-icon {
-    font-size: 24px;
-    color: #FFB612;
-    cursor: pointer;
-    padding: 14px 16px;
-    background: none;
-    border: none;
-    outline: none;
-  }
-  
-  .menu-icon {
-    display: none;
-  }
-  
-  @media screen and (max-width: 768px) {
-    .navbar a, .dropdown .dropbtn {
-      display: none;
+
+    .navbar {
+      background-color: #141414;
+      font-family: Arial, sans-serif;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 50px;
     }
-    .menu-icon {
+
+    .navbar-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .navbar a, .navbar button, .dropbtn {
+      font-size: 14px;
+      color: #fff;
+      background: none;
+      border: none;
+      padding: 10px 16px;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .navbar a:hover,
+    .navbar button:hover,
+    .dropdown:hover .dropbtn {
+      background-color: #fffb00;
+      color: #fff;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #333;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
+      top: 100%;
+      z-index: 1001;
+    }
+
+    .dropdown-content a {
+      color: #fff;
+      padding: 10px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #fffb00;
+      color: #fff;
+    }
+
+    .dropdown:hover .dropdown-content {
       display: block;
     }
-  }
+
+    .close-icon {
+      font-size: 16px;
+      color: #fff;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .menu-icon {
+      display: none;
+      font-size: 24px;
+      color: #fff;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+      .navbar-content a,
+      .navbar-content .dropdown,
+      .navbar-content button:not(.menu-icon) {
+        display: none;
+      }
+      .menu-icon {
+        display: block;
+      }
+    }
   </style>
+
   <button class="abutton" onclick="navbar1.removeAttribute('hidden')">Show Nav Bar</button>
-  <nav id="navbar1">
-  <div class="navbar">
-  <div class="navbar-content">
-    <button onclick="navbar1.setAttribute('hidden', 'hidden')">X</button>
-    <a href="https://georgepickenssite.github.io/georgepickens/"><i class="fa fa-home"></i> Home</a>
-    <a href="https://georgepickenssite.github.io/georgepickens/games"><i class="fa fa-gamepad"></i> Games</a>
-    <a href="https://georgepickenssite.github.io/georgepickens/movies"><i class="fa fa-film"></i> Movies</a>
-    <a href="https://georgepickenssite.github.io/georgepickens/about/changelog.html"><i class="fa fa-info"></i> Changelog</a>
-    <div class="dropdown">
-      <button class="dropbtn"><i class="fa fa-envelope"></i> Contact
-        <i class="fa fa-caret-down"></i>
-      </button>
-      <div class="dropdown-content">
-        <a href="https://forms.gle/u5SA63EqKNpPr1ZA8">Add a Movie</a>
-        <a href="https://forms.gle/sS1kHqbRWAMw8BpFA">Add a Game</a>
-        <a href="https://forms.gle/xrtxUaJ7uWvWS3yTA">Bug Report</a>
+
+  <nav id="navbar1" hidden>
+    <div class="navbar">
+      <div class="navbar-content">
+        <button class="close-icon" onclick="navbar1.setAttribute('hidden', 'hidden')">X</button>
+        <a href="https://georgepickenssite.github.io/georgepickens/"><i class="fa fa-home"></i> Home</a>
+        <a href="https://georgepickenssite.github.io/georgepickens/games"><i class="fa fa-gamepad"></i> Games</a>
+        <a href="https://georgepickenssite.github.io/georgepickens/movies"><i class="fa fa-film"></i> Movies</a>
+        <a href="https://georgepickenssite.github.io/georgepickens/about/changelog.html"><i class="fa fa-info"></i> Changelog</a>
+        <div class="dropdown">
+          <button class="dropbtn"><i class="fa fa-envelope"></i> Contact <i class="fa fa-caret-down"></i></button>
+          <div class="dropdown-content">
+            <a href="https://forms.gle/u5SA63EqKNpPr1ZA8">Add a Movie</a>
+            <a href="https://forms.gle/sS1kHqbRWAMw8BpFA">Add a Game</a>
+            <a href="https://forms.gle/xrtxUaJ7uWvWS3yTA">Bug Report</a>
+          </div>
+        </div>
+        <a href="https://www.instagram.com/georgepickenssite/"><i class="fa fa-instagram fa-lg"></i></a>
       </div>
+      <button class="menu-icon">&#9776;</button>
     </div>
-    <a href="https://www.instagram.com/georgepickenssite/"><i class="fa fa-instagram fa-lg"></i></a>
-  </div>
-  </div>
   </nav>
+
   <script>
     let navbar1 = document.getElementById('navbar1');
   </script>
-  
-  
 </template>
