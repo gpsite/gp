@@ -173,5 +173,5 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - 50px); /* Adjust for fixed navbar height */
+  height: calc(20vh - 50px); /* Adjust for fixed navbar height */
 }
