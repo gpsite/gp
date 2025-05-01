@@ -16,7 +16,7 @@ body {
   justify-content: center;
   align-items: center;
   width: 80%;
-  margin: 0 auto 20px;
+  margin: 15% auto 20px;
   border: 2px solid #FFB612;
   border-radius: 10px;
   background-color: #333;
@@ -32,7 +32,6 @@ body {
   color: #FFB612;
   font-size: 16px;
   font-family: 'Open Sans', Arial, sans-serif;
-  padding-top: 15%;
 }
 
 #category-dropdown {
