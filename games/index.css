@@ -157,7 +157,7 @@ body {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
-  padding-left: 10px;
+  padding-left: 30px;
 }
 
 .gamecard:hover {
