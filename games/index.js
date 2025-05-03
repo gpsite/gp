@@ -91,10 +91,21 @@ function displayGames(games) {
                 location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
             };
 
-            card.innerHTML = `
-                <img src="${game.thumbnail}" alt="${game.title}">
-                <div class="title">${game.title}</div>
-            `;
+            const img = document.createElement('img');
+            img.src = game.thumbnail;
+            img.alt = game.title;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'title';
+            titleSpan.textContent = game.title;
+
+            overlay.appendChild(titleSpan);
+
+            card.appendChild(img);
+            card.appendChild(overlay);
 
             categoryContainer.appendChild(card);
         });

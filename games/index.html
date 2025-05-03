@@ -10,15 +10,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="./index.css">
     <script src="index.js" defer></script>
-
 </head>
-<body onload="shuffleGameCards()">
-    <div id="navbar"></div>
-    <div class="content">
-    </div>
-    <div class="gamesearch">
+<body>
+    <header>
+        <div class="popular-game-slider">
+            <img src="/img/banners/monkeymart.png" class="poster" alt="Monkey Mart Banner">
+            
+            <div class="popular-game-slider-content">
+              <p class="trending">TRENDING</p>
+              <h2 class="game-name">Monkey Mart</h2>
+              <ul class="category">
+                <li>Tycoon</li>
+                <li>Touchscreen</li>
+              </ul>
+              <p class="desc">Monkey Mart is an exciting and captivating mobile game that takes you on a whimsical journey into a world where monkeys run their very own supermarket. Prepare to be immersed in a vibrant and bustling environment where these adorable primates cultivate and sell a wide array of items to their fellow animal customers. As a player, you step into the role of a diligent monkey entrepreneur, responsible for managing and expanding Monkey Mart. Your primary objective is to help the monkeys grow their business, ensuring that the supermarket thrives and becomes the go-to destination...</p>
+              
+              <div class="game-info">
+                <i class="fa fa-download"> &nbsp;&nbsp;&nbsp;<span>Downloads: 1M+</span></i> 
+                <i class="fa fa-thumbs-up"> &nbsp;&nbsp;&nbsp;<span>Pickens Approved</span></i>
+                <i class="fa fa-circle"> &nbsp;&nbsp;&nbsp;<span>Rating: <b>4.8/5</b></span></i>
+              </div>
+              
+              <div class="game-btns">
+                <button><i class="fa fa-play"></i> &nbsp; Play Now</button>
+              </div>
+            </div>
+        </div>
+    </header>
+    <div class="image-footer">
+      <div class="gamesearch">
         <div class="search-container">
-            <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games...">
+          <i class="fa fa-search"></i>
+            <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for games by name or category...">
             <select id="category-dropdown" onchange="searchGameCards()">
                 <option value="">All Categories</option>
                 <option value="Runner">Runner</option>
@@ -41,9 +64,18 @@
                 <option value="Browser Games">Browser Games</option>
             </select>
         </div>
-        <div id="gamecards-container">
-          <!-- Categories ar dynamically added here -->
       </div>
-        </div>
+      <div class="divider">
+        <div class="bar"></div>
+      </div>
+    </div>
+    <nav id="navbar"></nav>
+    <main class="content">
+    </main>
+    <div id="gamecards-container">
+      <div class="overlay"></div>
+
+        <!-- Categories are dynamically added here -->
+    </div>
 </body>
 </html>

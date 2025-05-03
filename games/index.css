@@ -2,13 +2,136 @@ body {
   margin: 0;
   padding: 0;
   background-color: #1d1e22;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-position: 50% 30%;
   background-size: 2.1rem 2.1rem;
   overflow-x: hidden;
   font-family: 'Open Sans', sans-serif;
   color: #E0E0E0;
-  background-attachment: fixed; /* Ensure the background does not move */
+}
+
+/*start of popular game banner section*/
+header{
+  background:url('/img/banners/game-banner.png');
+  background-size:cover;
+  background-position:center;
+  width:100%;
+  height:550px;
+  position:relative;
+  padding-top:70px;
+}
+
+header .popular-game\-slider{
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:start;
+  gap:35px;
+  padding:10px 100px;
+  position:relative;
+  padding-top: 70px;
+}
+
+header .popular-game-slider .poster{
+  width:300px;
+  height:400px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+
+header .popular-game-slider .popular-game-slider-content{
+  line-height:25px;
+}
+
+header .popular-game-slider .popular-game-slider-content .game-name{
+  font-size:1.8em;
+}
+
+
+header .popular-game-slider .popular-game-slider-content .category{
+  display:flex;
+  gap:30px;
+  text-transform:capitalize;
+  margin:10px 0;
+}
+
+header .popular-game\-slider .popular-game\-slider-content .desc{
+  font-size:.90em;
+}
+
+header .popular-game\-slider .popular-game\-slider-content .game\-info{
+  display:flex;
+  gap:30px;
+  margin:25px 0;
+}
+
+header .popular-game\-slider .popular-game\-slider-content .game\-info .fa-circle{
+  color:#e4b417; 
+  font-size:.85em;
+}
+
+header .popular-game\-slider .popular-game\-slider-content .game\-info .fa span{
+  font-family: 'Roboto', sans-serif;
+  color:#fff;
+  font-size:15px;
+}
+
+
+header .popular-game\-slider .popular-game\-slider-content .game\-btns{
+  display:flex;
+  gap:10px;
+}
+
+
+header .popular-game\-slider .popular-game\-slider-content .game\-btns button{
+  width:200px;
+  border:none;
+  outline:none;
+  padding:15px 0;
+  border-radius:100px;
+  font-size:1em;
+  background:#e4b417;
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:2px;
+}
+
+header .popular-game\-slider .popular-game\-slider-content .game\-btns button .fa{
+  font-size:.65em;
+  color:#fff;
+}
+
+header .popular-game\-slider .popular-game\-slider-content .game\-btns button:hover{
+  background:#000;
+}
+/*end of popular game banner section*/
+
+/*start of search bar section*/
+.image-footer{
+  background:#141414;
+  color:#fff;
+  align-items:center;
+  padding:5px 100px;
+}
+
+.divider{
+  flex-shrink: 0;
+  background:#fff;
+  width:100%;
+  margin-top: 25px;
+  margin-bottom: 20px;
+  height:3px;
+  overflow:hidden;
+}
+
+.bar{
+  width:20%;
+  height:inherit;
+  background:#e4b417;
+  border-radius:50px;
 }
 
 .search-container {
@@ -16,10 +139,7 @@ body {
   justify-content: center;
   align-items: center;
   width: 80%;
-  margin: auto 20px;
-  border: 2px solid #FFB612;
   border-radius: 10px;
-  background-color: #333;
   overflow: hidden;
 }
 
@@ -28,8 +148,8 @@ body {
   padding: 10px;
   border: none;
   outline: none;
-  background-color: #333;
-  color: #FFB612;
+  background-color: #33333300;
+  color: #e4b417;
   font-size: 16px;
   font-family: 'Open Sans', Arial, sans-serif;
 }
@@ -38,8 +158,8 @@ body {
   padding: 10px;
   border: none;
   outline: none;
-  background-color: #444;
-  color: #FFB612;
+  background-color: #141414;
+  color: #FFF;
   font-size: 16px;
   font-family: 'Open Sans', Arial, sans-serif;
   cursor: pointer;
@@ -52,7 +172,9 @@ body {
   width: 100%;
   margin-top: 20px;
 }
+/*end of search bar section*/
 
+/*start of game sliders*/
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -73,7 +195,7 @@ body {
 .category-title {
   font-size: 24px;
   font-weight: bold;
-  color: #FFB612;
+  color: #e4b417;
   margin-bottom: 10px;
 }
 
@@ -98,7 +220,7 @@ body {
   top: 50%;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
-  color: #FFB612;
+  color: #e4b417;
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -123,60 +245,105 @@ body {
 }
 
 .category-container::-webkit-scrollbar-thumb {
-  background: #FFB612;
+  background: #e4b417;
   border-radius: 4px;
 }
 
 .category-container::-webkit-scrollbar-track {
   background: #333;
 }
-.gamecards-container{
-  padding: 50px;
-}
+/*end of game sliders*/
+
+/*start of gamecards*/
 .gamecard {
+  position: relative;
   flex: 0 0 auto;
   width: 200px;
-  background-color: #333;
-  border: 2px solid #FFB612;
+  height: 250px;
+  background-color: #141414;
+  border-color: #00000000;
   border-radius: 10px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
   text-align: center;
 }
+
 button{
   margin: 10px;
-  padding: 5px;
+  padding: 0px;
 }
 
 .gamecard img {
   width: 100%;
-  height: 200px;
+  height: 100%;
   object-fit: cover;
   border-radius: 10px;
-  margin-bottom: 10px;
+  transition: filter 0.5s ease;
 }
-.gamecard .title {
+
+.gamecard .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  display: flex;
+  align-items: flex-end; 
+  justify-content: center;
+  padding: 10px;
+  background: linear-gradient(to top, rgb(0, 0, 0), rgba(0, 0, 0, 0));
   color: #FFFFFF;
   font-size: 16px;
   font-weight: bold;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  transition: height 0.3s ease, align-items 0.3s ease;
+}
+
+.gamecard .overlay .title {
+  display: block;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 .gamecard:hover {
-  transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+.gamecard:hover img {
+  filter: blur(5px);
+}
+
+.gamecard:hover .overlay {
+  height: 100%;
+  align-items: center;
+  background: linear-gradient(to top, rgb(0, 0, 0),rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+}
+
+.gamecard:hover .overlay .title {
+  transform: translateY(-40px);
+}
+
 
 .gamecard:active {
   transform: scale(0.95);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-/* Content area */
+/*end of gamecards*/
+
 .content {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(20vh - 50px); /* Adjust for fixed navbar height */
+}
+
+#navbar button {
+  margin: 0;
 }
