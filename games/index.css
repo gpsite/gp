@@ -1,17 +1,76 @@
+/*start of lines background*/
+html,
+body {
+  background-color: #1d1e22;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   margin: 0;
   padding: 0;
   background-color: #1d1e22;
-  background-position: 50% 30%;
-  background-size: 2.1rem 2.1rem;
-  overflow-x: hidden;
   font-family: 'Open Sans', sans-serif;
-  color: #E0E0E0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  overflow-x: hidden; 
 }
+
+.lines {
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  pointer-events: none; 
+  z-index: 1;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.line::after {
+  position: absolute;
+  top: 50%;
+  left: -20%;
+  transform: translateY(-50%);
+  content: "";
+  width: 20%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    #e4b417 80%,
+    #e4b417 100%
+  );
+  animation: move 6s infinite;
+  animation-delay: var(--random-delay, 0s);
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@keyframes move {
+  0% {
+    left: -20%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+/*end of lines background*/
 
 /*start of popular game banner section*/
 header{
-  background:url('https://georgepickenssite.github.io/georgepickens/img/banners/game-banner.png');
+  background:url('/img/banners/game-banner.png');
   background-size:cover;
   background-position:center;
   width:100%;
@@ -322,9 +381,9 @@ button{
 }
 
 .gamecard:hover .overlay {
-  height: 100%;
+  height: 55%;
   align-items: center;
-  background: linear-gradient(to top, rgb(0, 0, 0),rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+  background: linear-gradient(to top, rgb(0, 0, 0),rgba(0, 0, 0,), rgba(0, 0, 0,), rgba(0, 0, 0, 0));
 }
 
 .gamecard:hover .overlay .title {
@@ -344,6 +403,7 @@ button{
   justify-content: center;
 }
 
+/*reset nav margnn*/
 #navbar button {
   margin: 0;
 }
