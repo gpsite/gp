@@ -73,13 +73,15 @@ function displayGames(games) {
         });
     });
 
-    Object.keys(categories).forEach(category => {
+    const categoryKeys = Object.keys(categories);
+
+    categoryKeys.forEach((category, index) => {
         const categoryRow = document.createElement('div');
         categoryRow.className = 'category-row';
 
         const categoryTitle = document.createElement('div');
         categoryTitle.className = 'category-title';
-        categoryTitle.textContent = category;
+        categoryTitle.textContent = category.toUpperCase();
 
         const categoryContainer = document.createElement('div');
         categoryContainer.className = 'category-container';
@@ -126,6 +128,16 @@ function displayGames(games) {
         categoryRow.appendChild(rightArrow);
 
         container.appendChild(categoryRow);
+
+
+        if (index < categoryKeys.length - 1) {
+            const line = document.createElement('div');
+            line.className = 'line';
+            const randomDelay = Math.random() * 5;
+            line.style.setProperty('--random-delay', `${randomDelay}s`);
+
+            container.appendChild(line);
+        }
     });
 }
 
@@ -206,4 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const navbar = template.content.querySelector('#navbar-template').content;
             document.getElementById('navbar').appendChild(navbar);
         });
+
+
+    const lines = document.querySelectorAll('.line');
+    lines.forEach(line => {
+        const randomDelay = Math.random() * 5;
+        line.style.setProperty('--random-delay', `${randomDelay}s`);
+    });
 });
