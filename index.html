@@ -90,49 +90,13 @@
     </div>
     <div class="featuredupdates">
       <div class="grid-container" id="gamecards-container">
-        <button class="game-card" onclick="getURL('https://vault.rips.cc/video/interstellar.2014?k=')">
-          <img src="https://georgepickenssite.github.io/georgepickens/img/poster/interstellar.png" alt="Interstellar">
-          <div class="title">Interstellar</div>
-          <div class="subtitle">Rated PG-13</div>
+     
         </button>
-        <button class="game-card" onclick="getURL('https://vault.rips.cc/video/avengers.endgame.2019?k=')">
-          <img src="https://georgepickenssite.github.io/georgepickens/img/poster/endgame.png" alt="endgame">
-          <div class="title">Avengers: Endgame</div>
-          <div class="subtitle">Rated PG-13</div>
-        </button>
-        <button class="game-card" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/blockblast'">
-          <img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/blockblast.png" alt="blockblast">
-          <div class="title">Block Blast</div>
-          <div class="subtitle">Category: Puzzle</div>
-        </button>
-        <button class="game-card" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/snowrider'">
-          <img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/snowrider.png" alt="snowrider">
-          <div class="title">Snow Rider 3D</div>
-          <div class="subtitle">Category: Runner</div>
-        </button>
-      </div>
-    </div>
+  
 
     <script>
-      function searchGameCards() {
-        const input = document.querySelector('.search-bar');
-        const filter = input.value.toLowerCase();
-        const gamecards = document.querySelectorAll('.gamecard');
-
-        gamecards.forEach(card => {
-          const text = card.textContent.toLowerCase();
-          card.style.display = text.includes(filter) ? 'block' : 'none';
-        });
-      }
-
-      function shuffleGameCards() {
-        const container = document.getElementById('gamecards-container');
-        const cards = Array.from(container.children);
-        for (let i = cards.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          container.appendChild(cards[j]);
-        }
-      }
+ 
+     
 
       document.addEventListener('DOMContentLoaded', shuffleGameCards);
 
