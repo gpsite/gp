@@ -1,116 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846568305709462"
-     crossorigin="anonymous"></script>
-    <!-- Google tag (gtag.js) -->
+<head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846568305709462"
+crossorigin="anonymous"></script>
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-S8PZFKDPMN"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
 
-  gtag('config', 'G-S8PZFKDPMN');
+gtag('config', 'G-S8PZFKDPMN');
 </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>George Pickens</title>
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-      .game-card {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        width: 200px;
-        height: 300px;
-        margin: 10px;
-        padding: 10px;
-        border: 1px solid #FFB612;
-        border-radius: 8px;
-        background-color: #313135;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s;
-      }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>George Pickens</title>
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+.game-card {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: space-between;
+width: 200px;
+height: 300px;
+margin: 10px;
+padding: 10px;
+border: 1px solid #FFB612;
+border-radius: 8px;
+background-color: #313135;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+transition: transform 0.2s;
+}
 
-      .game-card:hover {
-        transform: scale(1.05);
-      }
+.game-card:hover {
+transform: scale(1.05);
+}
 
-      .game-card img {
-        width: 100%;
-        height: auto;
-        max-height: 70%;
-        object-fit: cover;
-        border-radius: 4px;
-      }
+.game-card img {
+width: 100%;
+height: auto;
+max-height: 70%;
+object-fit: cover;
+border-radius: 4px;
+}
 
-      .game-card .title {
-        font-size: 1.2em;
-        font-weight: bold;
-        margin: 5px 0;
-        text-align: center;
-      }
+.game-card .title {
+font-size: 1.2em;
+font-weight: bold;
+margin: 5px 0;
+text-align: center;
+}
 
-      .game-card .subtitle {
-        font-size: 0.9em;
-        color: #666;
-        text-align: center;
-      }
+.game-card .subtitle {
+font-size: 0.9em;
+color: #666;
+text-align: center;
+}
 
-      .grid-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
-      }
-    </style>
-  </head>
-  <body onload="shuffleGameCards()">
-    <div id="navbar"></div>
+.grid-container {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 20px;
+}
+</style>
+</head>
+<body onload="shuffleGameCards()">
+<div id="navbar"></div>
 
-    <div class="header">
-      <div class="wave">
-        <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <path fill="orange" d="M0,280L48,264.7C96,249,192,219,288,192.7C384,166,480,142,576,150C672,158,768,198,864,203.3C960,208,1056,176,1152,150C1248,124,1344,104,1392,96.7L1440,90L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
-          <path fill="#000" d="M0,300L48,284.7C96,269,192,239,288,212.7C384,186,480,162,576,170C672,178,768,218,864,223.3C960,228,1056,196,1152,170C1248,144,1344,124,1392,116.7L1440,110L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
-        </svg>
-      </div>
-      <div class="poster"></div>
-    </div>
-    <div class="content">
-      <div class="announcements">
-        <h2>ANNOUNCEMENTS:</h2>
+<div class="header">
+<div class="wave">
+<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+<path fill="orange" d="M0,280L48,264.7C96,249,192,219,288,192.7C384,166,480,142,576,150C672,158,768,198,864,203.3C960,208,1056,176,1152,150C1248,124,1344,104,1392,96.7L1440,90L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
+<path fill="#000" d="M0,300L48,284.7C96,269,192,239,288,212.7C384,186,480,162,576,170C672,178,768,218,864,223.3C960,228,1056,196,1152,170C1248,144,1344,124,1392,116.7L1440,110L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
+</svg>
+</div>
+<div class="poster"></div>
+</div>
+<div class="content">
+<div class="announcements">
+<h2>ANNOUNCEMENTS:</h2>
         <p><span class="highlight">Updates</span>: All games currenty work,if not, please fill out a bug report.  </p>
         <p>Home page is also outdated, will be updated in the near future</p>
-      </div>
-    </div>
-    <div class="featuredupdates">
-      <div class="grid-container" id="gamecards-container">
-     
-        </button>
-  
+</div>
+</div>
+<div class="featuredupdates">
+<div class="grid-container" id="gamecards-container">
+<button class="game-card" onclick="getURL('https://vault.rips.cc/video/interstellar.2014?k=')">
+<img src="https://georgepickenssite.github.io/georgepickens/img/poster/interstellar.png" alt="Interstellar">
+<div class="title">Interstellar</div>
+<div class="subtitle">Rated PG-13</div>
+</button>
+<button class="game-card" onclick="getURL('https://vault.rips.cc/video/avengers.endgame.2019?k=')">
+<img src="https://georgepickenssite.github.io/georgepickens/img/poster/endgame.png" alt="endgame">
+<div class="title">Avengers: Endgame</div>
+<div class="subtitle">Rated PG-13</div>
+</button>
+<button class="game-card" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/blockblast'">
+<img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/blockblast.png" alt="blockblast">
+<div class="title">Block Blast</div>
+<div class="subtitle">Category: Puzzle</div>
+</button>
+<button class="game-card" onclick="location.href='https://georgepickenssite.github.io/georgepickens/games/snowrider'">
+<img src="https://georgepickenssite.github.io/georgepickens/img/thumbnail/snowrider.png" alt="snowrider">
+<div class="title">Snow Rider 3D</div>
+<div class="subtitle">Category: Runner</div>
+</button>
+</div>
+</div>
 
-    <script>
- 
-     
+<script>
+function searchGameCards() {
+const input = document.querySelector('.search-bar');
+const filter = input.value.toLowerCase();
+const gamecards = document.querySelectorAll('.gamecard');
 
-      document.addEventListener('DOMContentLoaded', shuffleGameCards);
+gamecards.forEach(card => {
+const text = card.textContent.toLowerCase();
+card.style.display = text.includes(filter) ? 'block' : 'none';
+});
+}
 
-      fetch('dev/navbar.html')
-        .then(response => response.text())
-        .then(data => {
-          const template = document.createElement('template');
-          template.innerHTML = data;
-          const navbar = template.content.querySelector('#navbar-template').content;
-          document.getElementById('navbar').appendChild(navbar);
+function shuffleGameCards() {
+const container = document.getElementById('gamecards-container');
+const cards = Array.from(container.children);
+for (let i = cards.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+container.appendChild(cards[j]);
+}
+}
 
-          const script = navbar.querySelector('script');
-          if (script) eval(script.innerText);
-        });
-    </script>
-  </body>
+document.addEventListener('DOMContentLoaded', shuffleGameCards);
+
+fetch('dev/navbar.html')
+.then(response => response.text())
+.then(data => {
+const template = document.createElement('template');
+template.innerHTML = data;
+const navbar = template.content.querySelector('#navbar-template').content;
+document.getElementById('navbar').appendChild(navbar);
+
+const script = navbar.querySelector('script');
+if (script) eval(script.innerText);
+});
+</script>
+</body>
 </html>
