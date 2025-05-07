@@ -17,7 +17,7 @@ body, html {
     margin: auto;
     top: 10%;
     background-color: #000;
-    border: 2px solid #FFB612;
+    border: 2px solid #003594;
     border-radius: 10px;
     overflow: hidden;
 }
@@ -34,7 +34,7 @@ body, html {
     left: 50%;
     transform: translateX(-50%);
     padding: 10px 15px;
-    background-color: #FFB612;
+    background-color: #003594;
     color: #000;
     border: none;
     border-radius: 5px;
