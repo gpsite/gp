@@ -72,7 +72,7 @@ body {
 }
 
 .announcements p {
-  color: #FFB612;
+  color: #003594;
   font-size: 14px;
 }
 
@@ -91,7 +91,7 @@ body {
 
 .game-card {
   background-color: #111;
-  border: 2px solid #FFB612;
+  border: 2px solid #003594;
   border-radius: 15px;
   text-align: center;
   padding: 10px;
