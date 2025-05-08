@@ -71,7 +71,20 @@ gap: 20px;
 </head>
 <body onload="shuffleGameCards()">
 <div id="navbar"></div>
-
+<div id="popup1" class="overlay">
+    <div class="popup" >
+    
+    <?php
+  $banner1="mybanner";
+  $banner2="mybanner";
+  $banner3="mybanner";
+  $banners = array($banner1, $banner2, $banner3);
+  shuffle($banners);
+  
+  echo $banners[0]; ?>
+                
+    </div>
+</div>
 <div class="header">
 <div class="wave">
 <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
