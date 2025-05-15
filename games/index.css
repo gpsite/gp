@@ -49,8 +49,8 @@ body {
   background: linear-gradient(
     to right,
     rgba(255, 255, 255, 0) 0%,
-    #003594 80%,
-    #003594 100%
+    #305CDE 80%,
+    #305CDE 100%
   );
   animation: move 6s infinite;
   animation-delay: var(--random-delay, 0s);
@@ -125,7 +125,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-info{
 }
 
 header .popular-game\-slider .popular-game\-slider-content .game\-info .fa-circle{
-  color:#003594; 
+  color:#305CDE; 
   font-size:.85em;
 }
 
@@ -149,7 +149,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button{
   padding:15px 0;
   border-radius:100px;
   font-size:1em;
-  background:#003594;
+  background:#305CDE;
   color:#fff;
   cursor:pointer;
   display:flex;
@@ -189,7 +189,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
 .bar{
   width:20%;
   height:inherit;
-  background:#003594;
+  background:#305CDE;
   border-radius:50px;
 }
 
@@ -208,7 +208,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   border: none;
   outline: none;
   background-color: #33333300;
-  color: #003594;
+  color: #305CDE;
   font-size: 16px;
   font-family: 'Open Sans', Arial, sans-serif;
 }
@@ -254,7 +254,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
 .category-title {
   font-size: 24px;
   font-weight: bold;
-  color: #003594;
+  color: #305CDE;
   margin-bottom: 10px;
 }
 
@@ -279,7 +279,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   top: 50%;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
-  color: #003594;
+  color: #305CDE;
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -304,7 +304,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
 }
 
 .category-container::-webkit-scrollbar-thumb {
-  background: #003594;
+  background: #305CDE;
   border-radius: 4px;
 }
 
