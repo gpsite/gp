@@ -43,6 +43,8 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
         .big-btn:hover {
             background: #4f4f4f;
@@ -57,34 +59,32 @@
             font-style: italic;
         }
     </style>
-    
-        <div id="navbar"></div>
 </head>
 <body>
+    <div id="navbar"></div>
     <div class="container">
         <h1>GP Experimental</h1>
-        <button class="big-btn" href="https://georgepickenssite.github.io/georgepickens/dev/beta/proxy/tiktok.html" target="_blank">
+        <a class="big-btn" href="https://georgepickenssite.github.io/georgepickens/dev/beta/proxy/tiktok.html" target="_blank">
             TikTok <span class="in-dev-label">(In Active Development)</span>
-        </button>
+        </a>
         <div class="dev-warning">
             This is all in active development and is subject to additions/changes.
         </div>
     </div>
 
-<script>
-    fetch('dev/navbar.html')
-    .then(response => response.text())
-    .then(data => {
-    const template = document.createElement('template');
-    template.innerHTML = data;
-    const navbar = template.content.querySelector('#navbar-template').content;
-    document.getElementById('navbar').appendChild(navbar);
-
-    const script = navbar.querySelector('script');
-    if (script) eval(script.innerText);
-
-    });
-</script>
-
+    <script>
+        fetch('dev/navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            const template = document.createElement('template');
+            template.innerHTML = data;
+            const navbarTemplate = template.content.querySelector('#navbar-template');
+            if (navbarTemplate && navbarTemplate.content) {
+                document.getElementById('navbar').appendChild(navbarTemplate.content.cloneNode(true));
+            } else {
+                document.getElementById('navbar').innerHTML = data;
+            }
+        });
+    </script>
 </body>
 </html>
