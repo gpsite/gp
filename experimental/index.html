@@ -25,7 +25,7 @@
         }
         h1 {
             margin-top: 0;
-            color: #4f4f4f;
+            color: #ffffff;
             letter-spacing: 1px;
         }
         .dev-warning {
@@ -61,7 +61,7 @@
 <body>
     <div class="container">
         <h1>GP EXPERIMENTAL</h1>
-        <button class="big-btn">
+        <button class="big-btn" href="https://georgepickenssite.github.io/georgepickens/dev/beta/proxy/tiktok.html" target="_blank" rel="noopener">
             TikTok <span class="in-dev-label">(In Active Development)</span>
         </button>
         <div class="dev-warning">
@@ -77,6 +77,10 @@
     template.innerHTML = data;
     const navbar = template.content.querySelector('#navbar-template').content;
     document.getElementById('navbar').appendChild(navbar);
+
+    const script = navbar.querySelector('script');
+    if (script) eval(script.innerText);
+
     });
 </script>
 
