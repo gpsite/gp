@@ -10,69 +10,7 @@ window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 
-gtag('config', 'G-S8PZFKDPMN');
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Test Popup</title>
-  <style>
-    #popup-overlay {
-      position: fixed; top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    #announcement-popup {
-      background: #fff;
-      padding: 2rem 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-      max-width: 400px;
-      text-align: center;
-      position: relative;
-      font-family: Arial, sans-serif;
-    }
-    #close-popup {
-      position: absolute; top: 12px; right: 16px;
-      background: transparent; border: none;
-      font-size: 1.3rem; cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-<!-- Your normal site content here -->
-
-<div id="popup-overlay">
-  <div id="announcement-popup">
-    <button id="close-popup" aria-label="Close">&times;</button>
-    <h2>Exciting Updates Coming Soon!</h2>
-    <p>
-      George Pickens will undergo a major rebrand over our summer break, and we want to share some exciting updates with you!<br><br>
-      First, we’re introducing a functional proxy that will provide access to TikTok, Instagram, and many other sites.<br><br>
-      We apologize for the recent lack of updates and delayed responses to forms. Rest assured, we’re working hard to make the new proxy available as soon as it’s fully functional.<br><br>
-      Thank you for your continued support on this journey!
-    </p>
-  </div>
-</div>
-<script>
-  document.getElementById('close-popup').onclick = function() {
-    document.getElementById('popup-overlay').style.display = 'none';
-  };
-  document.getElementById('popup-overlay').onclick = function(e) {
-    if (e.target === this) {
-      this.style.display = 'none';
-    }
-  };
-</script>
-
-</body>
-</html>
+gtag('config', 'G-S8PZFKDPMN')
 
 </script>
 <meta charset="UTF-8">
