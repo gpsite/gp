@@ -14,7 +14,11 @@
             display: flex;
             flex-direction: column;
         }
-
+        #navbar {
+            width: 100%;
+            display: flex;
+            min-height: 60px;
+        }
         .container {
             background: #1a1a1a;
             padding: 2rem 2.5rem;
@@ -61,9 +65,8 @@
     </style>
 </head>
 <body>
-    <div id="navbar"></div>
-    <script src="../../shared/navbar.js" defer></script>
-    <div class="container">
+        <template id="navbar-template"></template>
+        <div class="container">
         <h1>GP Experimental</h1>
         <a class="big-btn" href="https://georgepickenssite.github.io/georgepickens/dev/beta/proxy/tiktok.html" target="_blank">
             TikTok <span class="in-dev-label">(In Active Development)</span>
@@ -78,5 +81,6 @@
             This is all in active development and is subject to additions/changes.
         </div>
     </div>
+    <script src="../../shared/navbar.js" defer></script>
 </body>
 </html>
