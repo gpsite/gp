@@ -5,8 +5,18 @@
   <title>TikTok</title>
 </head>
 <body>
-    <button onclick="window.open('https://as.v2202412243821302479.quicksrv.de/service/hvtrs8%2F-wuw%2Ctkkvoi.aoo%2F', '_blank')">
-      Open TikTok Proxy
-    </button>
+    <button onclick="openTikTok()">Open TikTok Proxy</button>
+    
+    <script>
+      function openTikTok() {
+        const win = window.open('', '_blank', 'width=1000,height=700');
+        win.document.title = 'TikTok Viewer';
+        win.document.body.innerHTML = `
+          <h1>Loading TikTok Proxy...</h1>
+          <iframe src="https://as.v2202412243821302479.quicksrv.de/service/hvtrs8%2F-wuw%2Ctkkvoi.aoo%2F" 
+                  style="width:100%; height:90vh; border:none;"></iframe>
+        `;
+      }
+</script>
 </body>
 </html>
