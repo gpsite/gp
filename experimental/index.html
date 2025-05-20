@@ -75,26 +75,12 @@
             YouTube <span class="in-dev-label">(In Active Development)</span>
         </a>
         <a class="big-btn" target="_blank">
-            More Coming Soon... <span class="in-dev-label"> </span>
+            More Coming Soon... <span class="in-dev-label"> (In Active Development) </span>
         </a>
         <div class="dev-warning">
             This is all in active development and is subject to additions/changes.
         </div>
     </div>
-
-    <script>
-        fetch('/georgepickens/dev/navbar.html')
-        .then(response => response.text())
-        .then(data => {
-            const template = document.createElement('template');
-            template.innerHTML = data;
-            const navbarTemplate = template.content.querySelector('#navbar-template');
-            if (navbarTemplate && navbarTemplate.content) {
-                document.getElementById('navbar').appendChild(navbarTemplate.content.cloneNode(true));
-            } else {
-                document.getElementById('navbar').innerHTML = data;
-            }
-        });
-    </script>
+    <script src="../../shared/navbar.js" defer></script>
 </body>
 </html>
