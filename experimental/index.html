@@ -65,12 +65,12 @@
     </style>
 </head>
 <body>
-        <template id="navbar-template"></template>
-        <div class="container">
+    <template id="navbar-template"></template>
+    <div class="container">
         <h1>GP Experimental</h1>
-        <a class="big-btn" href="https://georgepickenssite.github.io/georgepickens/dev/beta/proxy/tiktok.html" target="_blank">
+        <button class="big-btn" id="tiktok-btn" type="button">
             TikTok <span class="in-dev-label">(In Active Development)</span>
-        </a>
+        </button>
         <a class="big-btn" href="https://georgepickenssite.github.io/georgepickens/dev/beta/proxy/youtube.html" target="_blank">
             YouTube <span class="in-dev-label">(In Active Development)</span>
         </a>
@@ -82,5 +82,29 @@
         </div>
     </div>
     <script src="../../shared/navbar.js" defer></script>
+    <script>
+    document.getElementById('tiktok-btn').addEventListener('click', function () {
+        var directPreviousPage = localStorage.getItem('directPreviousPage') || 'https://www.google.com/';
+        var iframeURL = 'https://as.v2202412243821302479.quicksrv.de/service/hvtrs8%2F-wuw%2Ctkkvoi.aoo%2F';
+
+        var win = window.open();
+        if (!win) {
+            alert("Popup are blocked, please allow popups for Pickens to run properly.");
+            return;
+        }
+        win.document.body.style.margin = "0";
+        win.document.body.style.height = "100vh";
+        var iframe = win.document.createElement("iframe");
+        iframe.style.border = "none";
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.margin = "0";
+        iframe.referrerPolicy = "no-referrer";
+        iframe.allow = "fullscreen";
+        iframe.src = iframeURL;
+        win.document.body.appendChild(iframe);
+        window.location.replace(directPreviousPage);
+    });
+    </script>
 </body>
 </html>
