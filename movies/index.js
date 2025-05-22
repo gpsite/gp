@@ -1,5 +1,33 @@
 const OMDB_API_KEY = '54d76e21'; // Replace with your OMDB API key
 
+// NEW: Function to get poster from the new API
+function getMoviePoster(imdbID) {
+    const url = `https://movie-database-by-based-api.p.rapidapi.com/v1/movies/?i=${imdbID}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-key': '03dbb49dbcmshbb458e36e78bcffp101756jsn615f428efc88',
+            'x-rapidapi-host': 'movie-database-by-based-api.p.rapidapi.com'
+        }
+    };
+    return fetch(url, options)
+        .then(response => response.json())
+        .then(data => {
+            // Adjust according to actual API response structure
+            if (data && data.poster) {
+                return data.poster;
+            } else if (data && data.results && data.results[0] && data.results[0].poster) {
+                return data.results[0].poster;
+            } else {
+                throw new Error("Poster not found");
+            }
+        })
+        .catch(err => {
+            console.error('Poster fetch failed:', err);
+            return 'https://via.placeholder.com/300x450?text=No+Poster'; // fallback image
+        });
+}
+
 function getMovieInfo(imdbID) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -10,7 +38,7 @@ function getMovieInfo(imdbID) {
                     const movieInfo = {
                         title: response.Title,
                         year: response.Year,
-                        imageUrl: response.Poster,
+                        // Don't use OMDB's Poster anymore!
                         rated: response.Rated,
                         genre: response.Genre,
                         ratings: response.imdbRating,
@@ -63,23 +91,25 @@ function getURL(link, tt) {
 
 function createMovie(link, imdbID) {
     getMovieInfo(imdbID).then(movieInfo => {
-        const container = document.getElementById('gamecards-container');
-        const card = document.createElement('button');
-        card.classList.add('gamecard');
-        card.innerHTML = `
-            <img src="https://georgepickenssite.github.io/georgepickens/img/poster/${imdbID}.png" alt="${movieInfo.title}">
-            <div class="title">${movieInfo.title}</div>
-            <div class="subtitle"><strong>Genre</strong>: ${movieInfo.genre}</div>
-            <div class="description">
-            <p><strong>Description:</strong> ${movieInfo.plot}</p>
-             <p><strong>Actors:</strong> ${movieInfo.actors}</p>
-            <p><strong>Rated:</strong> ${movieInfo.rated}</p>
-            <p><strong><i class="fa fa-star"></i></strong> ${movieInfo.ratings}</p>
-        </div>
-        <button class="expand-btn" onclick="toggleDescription(event)">Details</button>
-        `;
-        card.onclick = () => getURL(link, imdbID);
-        container.appendChild(card);
+        getMoviePoster(imdbID).then(posterUrl => {
+            const container = document.getElementById('gamecards-container');
+            const card = document.createElement('button');
+            card.classList.add('gamecard');
+            card.innerHTML = `
+                <img src="${posterUrl}" alt="${movieInfo.title}">
+                <div class="title">${movieInfo.title}</div>
+                <div class="subtitle"><strong>Genre</strong>: ${movieInfo.genre}</div>
+                <div class="description">
+                <p><strong>Description:</strong> ${movieInfo.plot}</p>
+                 <p><strong>Actors:</strong> ${movieInfo.actors}</p>
+                <p><strong>Rated:</strong> ${movieInfo.rated}</p>
+                <p><strong><i class="fa fa-star"></i></strong> ${movieInfo.ratings}</p>
+            </div>
+            <button class="expand-btn" onclick="toggleDescription(event)">Details</button>
+            `;
+            card.onclick = () => getURL(link, imdbID);
+            container.appendChild(card);
+        });
     }).catch(error => {
         console.error(error);
     });
@@ -120,7 +150,7 @@ fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
         document.getElementById('navbar').appendChild(navbar);
     });
 
-    function toggleDescription(event) {
+function toggleDescription(event) {
     event.stopPropagation();
     const button = event.target;
     const description = button.previousElementSibling;
@@ -130,6 +160,5 @@ fetch('https://georgepickenssite.github.io/georgepickens/dev/navbar.html')
     } else {
         description.style.display = 'none';
         button.textContent = 'Expand';
-    }};
-
-
+    }
+}
