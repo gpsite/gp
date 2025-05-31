@@ -243,9 +243,8 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  align-items: center; 
-  min-height: unset;   
-  height: 270px;       
+  align-items: center;
+  height: 270px; 
 }
 
 .vertical-title {
@@ -254,16 +253,16 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   font-size: 24px;
   font-weight: bold;
   color: #305CDE;
-  margin-right: 18px;
+  margin-right: 10px;
   margin-left: 0;
   letter-spacing: 2px;
   user-select: none;
   text-align: center;
-  height: auto;        
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;       
+  min-width: 32px;
   padding: 0;
 }
 
@@ -271,8 +270,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   display: flex;
   overflow-x: auto;
   gap: 16px;
-  margin-bottom: 24px;
-  padding: 12px 0;
+  padding: 10px 0;
   background: #222;
   border-radius: 8px;
   scrollbar-width: none;
@@ -308,11 +306,11 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
 }
 
 .new-games-row .scroll-arrow.left {
-  left: 60px;
+  left: -20px;
 }
 
 .new-games-row .scroll-arrow.right {
-  right: 20px;
+  right: -20px; 
 }
 
 .new-games-row .scroll-arrow:hover {
