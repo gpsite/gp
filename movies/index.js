@@ -90,73 +90,29 @@ function getURL(link, tt) {
 }
 
 function createMovie(link, imdbID) {
-  getMovieInfo(imdbID).then(movieInfo => {
-    getMoviePoster(imdbID).then(posterUrl => {
-      const genreList = movieInfo.Genre ? movieInfo.Genre.toLowerCase().split(',').map(g => g.trim()) : ['uncategorized'];
-
-      genreList.forEach(genre => {
-        if (!movieCategories[genre]) movieCategories[genre] = [];
-        movieCategories[genre].push({ ...movieInfo, posterUrl, link, imdbID });
-      });
-
-      displayMoviesByCategory();
+    getMovieInfo(imdbID).then(movieInfo => {
+        getMoviePoster(imdbID).then(posterUrl => {
+            const container = document.getElementById('gamecards-container');
+            const card = document.createElement('button');
+            card.classList.add('gamecard');
+            card.innerHTML = `
+                <img src="${posterUrl}" alt="${movieInfo.title}">
+                <div class="title">${movieInfo.title}</div>
+                <div class="subtitle"><strong>Genre</strong>: ${movieInfo.genre}</div>
+                <div class="description">
+                <p><strong>Description:</strong> ${movieInfo.plot}</p>
+                 <p><strong>Actors:</strong> ${movieInfo.actors}</p>
+                <p><strong>Rated:</strong> ${movieInfo.rated}</p>
+                <p><strong><i class="fa fa-star"></i></strong> ${movieInfo.ratings}</p>
+            </div>
+            <button class="expand-btn" onclick="toggleDescription(event)">Details</button>
+            `;
+            card.onclick = () => getURL(link, imdbID);
+            container.appendChild(card);
+        });
+    }).catch(error => {
+        console.error(error);
     });
-  });
-}
-
-function displayMoviesByCategory() {
-  const container = document.getElementById('gamecards-container');
-  container.innerHTML = '';
-
-  const genres = Object.keys(movieCategories);
-
-  genres.forEach((genre, index) => {
-    const categoryRow = document.createElement('div');
-    categoryRow.className = 'category-row';
-
-    const title = document.createElement('div');
-    title.className = 'category-title';
-    title.textContent = genre.toUpperCase();
-
-    const rowContainer = document.createElement('div');
-    rowContainer.className = 'category-container';
-
-    movieCategories[genre].forEach(movie => {
-      const card = document.createElement('button');
-      card.className = 'gamecard';
-      card.onclick = () => getURL(movie.link, movie.imdbID);
-
-      card.innerHTML = `
-        <img src="${movie.posterUrl}" alt="${movie.Title}">
-        <div class="overlay"><span class="title">${movie.Title}</span></div>
-      `;
-
-      rowContainer.appendChild(card);
-    });
-
-    const leftArrow = document.createElement('button');
-    leftArrow.className = 'scroll-arrow left';
-    leftArrow.innerHTML = '&#9664;';
-    leftArrow.onclick = () => scrollCategory(rowContainer, 'left');
-
-    const rightArrow = document.createElement('button');
-    rightArrow.className = 'scroll-arrow right';
-    rightArrow.innerHTML = '&#9654;';
-    rightArrow.onclick = () => scrollCategory(rowContainer, 'right');
-
-    categoryRow.appendChild(leftArrow);
-    categoryRow.appendChild(title);
-    categoryRow.appendChild(rowContainer);
-    categoryRow.appendChild(rightArrow);
-    container.appendChild(categoryRow);
-
-    if (index < genres.length - 1) {
-      const line = document.createElement('div');
-      line.className = 'line';
-      line.style.setProperty('--random-delay', `${Math.random() * 5}s`);
-      container.appendChild(line);
-    }
-  });
 }
 
 function searchGameCards() {
