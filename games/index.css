@@ -241,27 +241,53 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   overflow: hidden;
   padding: 0 20px;
   box-sizing: border-box;
-}
-
-.new-games-header {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  margin-bottom: 10px;
-  position: relative;
-  width: 100%;
+  min-height: 300px;
 }
 
-.new-games-header .category-title {
+.vertical-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
   font-size: 24px;
   font-weight: bold;
   color: #305CDE;
-  margin: 0 auto;
+  margin-right: 18px;
+  margin-left: 0;
+  letter-spacing: 2px;
+  user-select: none;
   text-align: center;
-  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.new-games-header .scroll-arrow {
+#new-games-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 12px 0;
+  background: #222;
+  border-radius: 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 250px;
+  align-items: center;
   position: relative;
+}
+
+#new-games-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.new-games-row .scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
   color: #305CDE;
   border: none;
@@ -277,26 +303,17 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   transition: background 0.2s, color 0.2s;
 }
 
-.new-games-header .scroll-arrow:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
+.new-games-row .scroll-arrow.left {
+  left: 60px;
 }
 
-#new-games-slider {
-  display: flex;
-  overflow-x: auto;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding: 12px 0;
-  background: #222;
-  border-radius: 8px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  width: 100%;
-  box-sizing: border-box;
+.new-games-row .scroll-arrow.right {
+  right: 20px;
 }
-#new-games-slider::-webkit-scrollbar {
-  display: none;
+
+.new-games-row .scroll-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
 }
 /*end of newgames section*/
 
