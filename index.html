@@ -2,172 +2,95 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>George Pickens Site</title>
-  <link rel="stylesheet" href="home/index.css">
+  <title>George Pickens</title>
+  <script src="games/index.js" defer></script>
+
 </head>
 <body>
-  <div id="navbar"></div>
+  <div id="navbar-container"></div>
   <div id="content"></div>
 
-  <script>
-    const routes = {
-      "home": "home/home.html",
-      "games": "games/index.html",
-      "movies": "movies/index.html",
-      "about/changelog": "about/changelog.html"
-    };
+<script>
+  const routes = {
+    "home": "home/home.html",
+    "games": "games/index.html",
+    "movies": "movies/index.html",
+    "about/changelog": "about/changelog.html"
+  };
 
-    async function loadNavbar() {
-      try {
-        const res = await fetch("/dev/navbar.html");
-        const text = await res.text();
-        const temp = document.createElement("div");
-        temp.innerHTML = text;
-        const template = temp.querySelector("#navbar-template");
-        if (template) {
-          const clone = template.content.cloneNode(true);
-          document.getElementById("navbar").appendChild(clone);
-        }
-      } catch (err) {
-        console.error("Navbar load error:", err);
-      }
-    }
-
-    async function loadPageFromHash() {
-      const hash = location.hash.slice(1) || "home";
-      const path = routes[hash];
-
-      if (!path) {
-        document.getElementById("content").innerHTML = "<p>Page not found.</p>";
-        return;
-      }
-
-      try {
-        const res = await fetch(path);
-        const html = await res.text();
+  function loadPageFromHash() {
+    const hash = location.hash.slice(1);
+    const page = routes[hash] || routes["home"];
+    fetch(page)
+      .then(res => {
+        if (!res.ok) throw new Error("Page not found");
+        return res.text();
+      })
+      .then(html => {
         document.getElementById("content").innerHTML = html;
-
-        if (hash === "games") {
-          loadGamePage();
-        }
-      } catch (err) {
+      })
+      .catch(err => {
         document.getElementById("content").innerHTML = "<p>Failed to load page.</p>";
         console.error(err);
-      }
-    }
-
-    async function loadGamePage() {
-      try {
-        const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
-        const res = await fetch(SHEET_URL);
-        const data = await res.json();
-
-        const rows = data.values;
-        const headers = rows.shift();
-        const titleIndex = headers.indexOf("Title");
-        const categoryIndex = headers.indexOf("Category");
-        const urlIndex = headers.indexOf("URL");
-        const thumbnailIndex = headers.indexOf("Thumbnail");
-
-        const gameMap = new Map();
-        rows.forEach(row => {
-          const title = row[titleIndex];
-          const url = row[urlIndex];
-          const thumbnail = row[thumbnailIndex];
-          const rawCategories = row[categoryIndex];
-          const categoryList = rawCategories ? rawCategories.split(',').map(c => c.trim().toLowerCase()) : [];
-
-          const key = title.toLowerCase();
-          if (!gameMap.has(key)) {
-            gameMap.set(key, {
-              title,
-              url,
-              thumbnail,
-              categories: new Set(categoryList)
-            });
-          } else {
-            categoryList.forEach(cat => gameMap.get(key).categories.add(cat));
-          }
-        });
-
-        const allGameData = Array.from(gameMap.values()).map(game => ({
-          ...game,
-          categories: Array.from(game.categories)
-        }));
-
-        displayGames(allGameData);
-
-      } catch (err) {
-        console.error("Game data load error:", err);
-      }
-    }
-
-    function displayGames(games) {
-      const container = document.getElementById("gamecards-container");
-      if (!container) return;
-
-      container.innerHTML = "";
-      if (games.length === 0) {
-        container.innerHTML = '<p style="color:white; text-align:center;">Game not found.</p>';
-        return;
-      }
-
-      const categories = {};
-      games.forEach(game => {
-        game.categories.forEach(cat => {
-          if (!categories[cat]) categories[cat] = [];
-          categories[cat].push(game);
-        });
       });
+  }
 
-      Object.entries(categories).forEach(([cat, games]) => {
-        const row = document.createElement("div");
-        row.className = "category-row";
+  // Handle initial load and hash changes
+  window.addEventListener("hashchange", loadPageFromHash);
+  window.addEventListener("DOMContentLoaded", () => {
+    // Load the navbar first
+    fetch('dev/navbar.html')
+  .then(res => res.text())
+  .then(html => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const template = tempDiv.querySelector('template');
+    const clone = template.content.cloneNode(true);
+    document.getElementById("navbar-container").appendChild(clone);
 
-        const title = document.createElement("div");
-        title.className = "category-title";
-        title.textContent = cat.toUpperCase();
-        row.appendChild(title);
+    // Then load the correct content
+    loadPageFromHash();
+  })
+  .catch(err => {
+    console.error("Failed to load navbar:", err);
+    document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
+  });
+    fetch('dev/navbar.html')
+  .then(res => res.text())
+  .then(html => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const template = tempDiv.querySelector('template');
+    const clone = template.content.cloneNode(true);
+    document.getElementById("navbar-container").appendChild(clone);
 
-        const container = document.createElement("div");
-        container.className = "category-container";
+    // Then load the correct content
+    loadPageFromHash();
+  })
+  .catch(err => {
+    console.error("Failed to load navbar:", err);
+    document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
+  });
+    fetch('dev/navbar.html')
+  .then(res => res.text())
+  .then(html => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const template = tempDiv.querySelector('template');
+    const clone = template.content.cloneNode(true);
+    document.getElementById("navbar-container").appendChild(clone);
 
-        games.forEach(game => {
-          const card = document.createElement("button");
-          card.className = "gamecard";
-          card.onclick = () => {
-            location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
-          };
+    // Then load the correct content
+    loadPageFromHash();
+  })
+  .catch(err => {
+    console.error("Failed to load navbar:", err);
+    document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
+  });
 
-          const img = document.createElement("img");
-          img.src = game.thumbnail;
-          img.alt = game.title;
-
-          const overlay = document.createElement("div");
-          overlay.className = "overlay";
-
-          const span = document.createElement("span");
-          span.className = "title";
-          span.textContent = game.title;
-
-          overlay.appendChild(span);
-          card.appendChild(img);
-          card.appendChild(overlay);
-
-          container.appendChild(card);
-        });
-
-        row.appendChild(container);
-        document.getElementById("gamecards-container").appendChild(row);
-      });
-    }
-
-    window.addEventListener("hashchange", loadPageFromHash);
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      await loadNavbar();
-      await loadPageFromHash();
-    });
-  </script>
+    // Then load content
+    loadPageFromHash();
+  });
+</script>
 </body>
 </html>
