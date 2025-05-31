@@ -37,9 +37,54 @@
   window.addEventListener("hashchange", loadPageFromHash);
   window.addEventListener("DOMContentLoaded", () => {
     // Load the navbar first
-    const template = document.getElementById("navbar-template");
+    fetch('dev/navbar.html')
+  .then(res => res.text())
+  .then(html => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const template = tempDiv.querySelector('template');
     const clone = template.content.cloneNode(true);
     document.getElementById("navbar-container").appendChild(clone);
+
+    // Then load the correct content
+    loadPageFromHash();
+  })
+  .catch(err => {
+    console.error("Failed to load navbar:", err);
+    document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
+  });
+    fetch('dev/navbar.html')
+  .then(res => res.text())
+  .then(html => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const template = tempDiv.querySelector('template');
+    const clone = template.content.cloneNode(true);
+    document.getElementById("navbar-container").appendChild(clone);
+
+    // Then load the correct content
+    loadPageFromHash();
+  })
+  .catch(err => {
+    console.error("Failed to load navbar:", err);
+    document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
+  });
+    fetch('dev/navbar.html')
+  .then(res => res.text())
+  .then(html => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const template = tempDiv.querySelector('template');
+    const clone = template.content.cloneNode(true);
+    document.getElementById("navbar-container").appendChild(clone);
+
+    // Then load the correct content
+    loadPageFromHash();
+  })
+  .catch(err => {
+    console.error("Failed to load navbar:", err);
+    document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
+  });
 
     // Then load content
     loadPageFromHash();
