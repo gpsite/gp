@@ -231,6 +231,8 @@ if (!window.__gamesScriptLoaded__) {
         });
       }
 
+      window.searchGameCards = searchGameCards;
+
       function scrollCategory(container, direction) {
         const scrollAmount = 300;
         const currentScroll = container.scrollLeft;
