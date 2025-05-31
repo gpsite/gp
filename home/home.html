@@ -116,21 +116,6 @@ gap: 20px;
 </head>
 <body onload="shuffleGameCards()">
 <div id="navbar"></div>
-
-  <!-- Popup overlay and content -->
-  <div id="popup-overlay">
-    <div id="announcement-popup">
-      <button id="close-popup" aria-label="Close">&times;</button>
-      <h2>Exciting Updates Coming Soon!</h2>
-      <p>
-        George Pickens will undergo a major rebrand over our summer break, and we want to share some exciting updates with you!<br><br>
-        First, we’re introducing a functional proxy that will provide access to TikTok, Instagram, and many other sites.<br><br>
-        We apologize for the recent lack of updates and delayed responses to forms. Rest assured, we’re working hard to make the new proxy available as soon as it’s fully functional.<br><br>
-        Thank you for your continued support on this journey!
-      </p>
-    </div>
-  </div>
-
 <div class="header">
 <div class="wave">
 <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -154,16 +139,6 @@ gap: 20px;
 </div>
 
 <script>
-    // Close popup when the button is clicked
-    document.getElementById('close-popup').onclick = function() {
-      document.getElementById('popup-overlay').style.display = 'none';
-    };
-    // Optionally: close popup on overlay click (but not when clicking inside the popup)
-    document.getElementById('popup-overlay').onclick = function(e) {
-      if (e.target === this) {
-        this.style.display = 'none';
-      }
-    };
 
 function searchGameCards() {
 const input = document.querySelector('.search-bar');
