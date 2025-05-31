@@ -17,7 +17,7 @@
   };
 
   function loadPageFromHash() {
-    const hash = location.hash.slice(1); // Remove the #
+    const hash = location.hash.slice(1);
     const page = routes[hash] || routes["home"];
     fetch(page)
       .then(res => {
