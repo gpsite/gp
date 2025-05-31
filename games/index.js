@@ -64,6 +64,7 @@ if (!window.__gamesScriptLoaded__) {
         }
       }
 
+
       function displayGames(games) {
         const container = document.getElementById('gamecards-container');
         container.innerHTML = '';
@@ -147,31 +148,40 @@ if (!window.__gamesScriptLoaded__) {
       }
 
       function displayNewGamesSlider(games) {
-       const slider = document.getElementById('new-games-slider');
-       if (!slider) return;
-       slider.innerHTML = '';
+        const slider = document.getElementById('new-games-slider');
+        if (!slider) return;
+        slider.innerHTML = '';
             
-       if (games.length === 0) {
-         slider.style.display = 'none';
-         return;
-       }
-       slider.style.display = 'flex';
+        if (games.length === 0) {
+          slider.style.display = 'none';
+          return;
+        }
+        slider.style.display = 'flex';
       
-       games.forEach(game => {
-         const card = document.createElement('button');
-         card.className = 'gamecard slider-card';
-         card.onclick = () => {
-           location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
-         };
+        games.forEach(game => {
+          const card = document.createElement('button');
+          card.className = 'gamecard slider-card';
+          card.onclick = () => {
+            location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
+          };
         
-         card.innerHTML = `
-           <img src="${game.thumbnail}" alt="${game.title}">
-           <div class="title">${game.title}</div>
-         `;
+          const img = document.createElement('img');
+          img.src = game.thumbnail;
+          img.alt = game.title;
         
-         slider.appendChild(card);
-       });
-}
+          const overlay = document.createElement('div');
+          overlay.className = 'overlay';
+        
+          const titleSpan = document.createElement('span');
+          titleSpan.className = 'title';
+          titleSpan.textContent = game.title;
+        
+          overlay.appendChild(titleSpan);
+          card.appendChild(img);
+          card.appendChild(overlay);
+          slider.appendChild(card);
+        });
+      }
 
       function searchGameCards() {
         const input = document.querySelector('.search-bar').value.toLowerCase().trim();
@@ -182,32 +192,41 @@ if (!window.__gamesScriptLoaded__) {
           displayGames(allGameData);
           return;
         }
-
+      
         container.innerHTML = "";
-
+      
         const filteredGames = allGameData.filter(game => {
           const titleMatch = input === "" || game.title.toLowerCase().includes(input);
           const categoryMatch = dropdown === "" || game.categories.some(cat => cat.toLowerCase() === dropdown);
           return titleMatch && categoryMatch;
         });
-
+      
         if (filteredGames.length === 0) {
           container.innerHTML = '<p style="color: white; text-align: center;">Game not found.</p>';
           return;
         }
-
+      
         filteredGames.forEach(game => {
           const card = document.createElement('button');
           card.className = 'gamecard';
           card.onclick = () => {
             location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
           };
-
-          card.innerHTML = `
-            <img src="${game.thumbnail}" alt="${game.title}">
-            <div class="title">${game.title}</div>
-          `;
-
+        
+          const img = document.createElement('img');
+          img.src = game.thumbnail;
+          img.alt = game.title;
+        
+          const overlay = document.createElement('div');
+          overlay.className = 'overlay';
+        
+          const titleSpan = document.createElement('span');
+          titleSpan.className = 'title';
+          titleSpan.textContent = game.title;
+        
+          overlay.appendChild(titleSpan);
+          card.appendChild(img);
+          card.appendChild(overlay);
           container.appendChild(card);
         });
       }
