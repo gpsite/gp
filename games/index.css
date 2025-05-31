@@ -256,23 +256,31 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   font-size: 1.3em;
   margin-bottom: 8px;
   margin-left: 8px;
+  /* Add this for spacing */
+  justify-content: flex-start;
+  position: relative; /* Add this for future absolute positioning if needed */
 }
-.new-games-title {
-  font-weight: bold;
-  color: #305CDE;
-  margin-right: 10px;
-}
+
 #new-games-left, #new-games-right {
-  background: none;
+  background: #222;
   border: none;
-  color: #fff;
+  color: #305CDE;
   font-size: 1.5em;
   cursor: pointer;
-  padding: 0 8px;
-  transition: color 0.2s;
+  padding: 6px 12px;
+  border-radius: 50%;
+  margin-left: 4px;
+  margin-right: 4px;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 #new-games-left:hover, #new-games-right:hover {
-  color: #ff0;
+  background: #305CDE;
+  color: #fff;
 }
 /*end of newgames section*/
 
