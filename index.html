@@ -1,78 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>George Pickens</title>
 </head>
 <body>
   <div id="navbar-container"></div>
   <div id="content"></div>
 
-<script>
-  const routes = {
-    "home": "home/home.html",
-    "games": "games/index.html",
-    "movies": "movies/index.html",
-    "about/changelog": "about/changelog.html"
-  };
+  <script>
+    const routes = {
+      "home": "home/home.html",
+      "games": "games/index.html",
+      "movies": "movies/index.html",
+      "about/changelog": "about/changelog.html"
+    };
 
-  function loadPageFromHash() {
-    const hash = location.hash.slice(1);
-    const page = routes[hash] || routes["home"];
+    function loadPageFromHash() {
+      const hash = location.hash.slice(1);
+      const page = routes[hash] || routes["home"];
 
-    fetch(page)
-      .then(res => {
-        if (!res.ok) throw new Error("Page not found");
-        return res.text();
-      })
-      .then(html => {
-        const content = document.getElementById("content");
-        content.innerHTML = html;
+      fetch(page)
+        .then(res => {
+          if (!res.ok) throw new Error("Page not found");
+          return res.text();
+        })
+        .then(html => {
+          const content = document.getElementById("content");
+          content.innerHTML = html;
 
-        // Extract and run scripts
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        const scripts = tempDiv.querySelectorAll('script');
-        scripts.forEach(oldScript => {
-          const newScript = document.createElement('script');
-          if (oldScript.src) {
-            newScript.src = oldScript.src;
-            newScript.defer = oldScript.defer;
-          } else {
-            newScript.textContent = oldScript.textContent;
-          }
-          document.body.appendChild(newScript);
+          // Manually run scripts from the fetched HTML
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = html;
+          const scripts = tempDiv.querySelectorAll("script");
+
+          scripts.forEach(script => {
+            const newScript = document.createElement("script");
+            if (script.src) {
+              newScript.src = script.src;
+              newScript.async = false; // ensure order
+            } else {
+              newScript.textContent = script.textContent;
+            }
+            document.body.appendChild(newScript);
+          });
+        })
+        .catch(err => {
+          document.getElementById("content").innerHTML = "<p>Failed to load page.</p>";
+          console.error(err);
         });
-      })
-      .catch(err => {
-        document.getElementById("content").innerHTML = "<p>Failed to load page.</p>";
-        console.error(err);
-      });
-  }
+    }
 
-  window.addEventListener("hashchange", loadPageFromHash);
+    window.addEventListener("hashchange", loadPageFromHash);
 
-  window.addEventListener("DOMContentLoaded", () => {
-    fetch('dev/navbar.html')
-      .then(res => res.text())
-      .then(html => {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        const template = tempDiv.querySelector('template');
-        if (template) {
-          const clone = template.content.cloneNode(true);
-          document.getElementById("navbar-container").appendChild(clone);
-        } else {
-          document.getElementById("navbar-container").innerHTML = html;
-        }
-        loadPageFromHash();
-      })
-      .catch(err => {
-        console.error("Failed to load navbar:", err);
-        document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
-        loadPageFromHash();
-      });
-  });
-</script>
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch("dev/navbar.html")
+        .then(res => res.text())
+        .then(html => {
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = html;
+          const template = tempDiv.querySelector("template");
+
+          if (template) {
+            document.getElementById("navbar-container").appendChild(
+              template.content.cloneNode(true)
+            );
+          } else {
+            document.getElementById("navbar-container").innerHTML = html;
+          }
+
+          loadPageFromHash();
+        })
+        .catch(err => {
+          console.error("Failed to load navbar:", err);
+          document.getElementById("navbar-container").innerHTML = "<p>Navbar failed to load.</p>";
+          loadPageFromHash();
+        });
+    });
+  </script>
 </body>
 </html>
