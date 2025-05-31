@@ -5,35 +5,38 @@
       font-family: Arial, sans-serif;
       position: fixed;
       top: 0;
-      width: 100%;
+      left: 0;
+      height: 100vh;
+      width: 60px;
       z-index: 1000;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
-      padding: 10px 50px;
+      padding-top: 20px;
     }
 
     .navbar .brand {
-      font-size: 20px;
-      font-weight: bold;
-      color: #fff;
+      display: none;
     }
 
     .navbar-content {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 15px;
-      margin-left: auto;
+      gap: 20px;
+      width: 100%;
     }
 
-    .navbar a, .navbar button, .dropbtn {
-      font-size: 14px;
+    .navbar a,
+    .navbar button,
+    .dropbtn {
       color: #fff;
       background: none;
       border: none;
-      padding: 10px 16px;
-      text-decoration: none;
-      font-weight: 500;
+      font-size: 20px;
+      padding: 10px;
+      width: 100%;
+      text-align: center;
       cursor: pointer;
       transition: background 0.3s;
     }
@@ -42,22 +45,23 @@
     .navbar button:hover,
     .dropdown:hover .dropbtn {
       background-color: #5a5a5a;
-      color: #fff;
     }
 
     .dropdown {
       position: relative;
-      display: inline-block;
+      width: 100%;
     }
 
     .dropdown-content {
       display: none;
       position: absolute;
+      left: 60px;
+      top: 0;
       background-color: #333;
       min-width: 160px;
       box-shadow: 0px 8px 16px rgba(0,0,0,0.3);
-      top: 100%;
       z-index: 1001;
+      flex-direction: column;
     }
 
     .dropdown-content a {
@@ -70,50 +74,53 @@
 
     .dropdown-content a:hover {
       background-color: #5a5a5a;
-      color: #fff;
     }
 
     .dropdown:hover .dropdown-content {
-      display: block;
+      display: flex;
     }
 
     .menu-icon {
       display: none;
-      font-size: 24px;
-      color: #fff;
-      background: none;
-      border: none;
-      cursor: pointer;
     }
 
     @media screen and (max-width: 768px) {
-      .navbar-content a,
-      .navbar-content .dropdown {
-        display: none;
+      .navbar {
+        flex-direction: row;
+        width: 100%;
+        height: auto;
+        padding: 10px;
       }
-      .menu-icon {
-        display: block;
+
+      .navbar-content {
+        flex-direction: row;
+        gap: 15px;
+      }
+
+      .dropdown-content {
+        position: absolute;
+        top: 60px;
+        left: 0;
       }
     }
   </style>
 
   <nav id="navbar1">
     <div class="navbar">
-      <div class="brand">GEORGE PICKENS</div>
       <div class="navbar-content">
-        <a href="https://georgepickenssite.github.io/georgepickens/"><i class="fa fa-home"></i> Home</a>
-        <a href="https://georgepickenssite.github.io/georgepickens/games"><i class="fa fa-gamepad"></i> Games</a>
-        <a href="https://georgepickenssite.github.io/georgepickens/movies"><i class="fa fa-film"></i> Movies</a>
-        <a href="https://georgepickenssite.github.io/georgepickens/about/changelog.html"><i class="fa fa-info"></i> Changelog</a>
+        <a href="https://georgepickenssite.github.io/georgepickens/" title="Home"><i class="fa fa-home"></i></a>
+        <a href="https://georgepickenssite.github.io/georgepickens/games" title="Games"><i class="fa fa-gamepad"></i></a>
+        <a href="https://georgepickenssite.github.io/georgepickens/movies" title="Movies"><i class="fa fa-film"></i></a>
+        <a href="https://georgepickenssite.github.io/georgepickens/about/changelog.html" title="Changelog"><i class="fa fa-info"></i></a>
         <div class="dropdown">
-          <button class="dropbtn"><i class="fa fa-envelope"></i> Contact <i class="fa fa-caret-down"></i></button>
+          <button class="dropbtn" title="Contact"><i class="fa fa-envelope"></i></button>
           <div class="dropdown-content">
             <a href="https://forms.gle/u5SA63EqKNpPr1ZA8">Add a Movie</a>
             <a href="https://forms.gle/sS1kHqbRWAMw8BpFA">Add a Game</a>
             <a href="https://forms.gle/xrtxUaJ7uWvWS3yTA">Bug Report</a>
           </div>
         </div>
-        <a href="https://www.instagram.com/georgepickenssite/"><i class="fa fa-instagram fa-lg"></i></a>
+        <a href="https://www.instagram.com/georgepickenssite/" title="Instagram"><i class="fa fa-instagram fa-lg"></i></a>
       </div>
     </div>
   </nav>
