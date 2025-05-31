@@ -233,6 +233,18 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
 }
 /*end of search bar section*/
 
+#new-games-slider {
+  padding: 12px 0;
+  background: #222;
+  border-radius: 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+#new-games-slider .slider-card {
+  min-width: 180px;
+  flex: 0 0 auto;
+}
+
 /*start of game sliders*/
 .grid-container {
   display: grid;

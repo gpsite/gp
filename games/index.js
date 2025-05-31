@@ -61,6 +61,9 @@ if (!window.__gamesScriptLoaded__) {
         }
       }
 
+      const lastTenGames = allGameData.slice(-10);
+      displayNewGamesSlider(lastTenGames);
+
       function displayGames(games) {
         const container = document.getElementById('gamecards-container');
         container.innerHTML = '';
@@ -142,6 +145,33 @@ if (!window.__gamesScriptLoaded__) {
           }
         });
       }
+
+      function displayNewGamesSlider(games) {
+       const slider = document.getElementById('new-games-slider');
+       if (!slider) return;
+       slider.innerHTML = '';
+            
+       if (games.length === 0) {
+         slider.style.display = 'none';
+         return;
+       }
+       slider.style.display = 'flex';
+      
+       games.forEach(game => {
+         const card = document.createElement('button');
+         card.className = 'gamecard slider-card';
+         card.onclick = () => {
+           location.href = `game-frame/index.html?gameUrl=${encodeURIComponent(game.url)}`;
+         };
+        
+         card.innerHTML = `
+           <img src="${game.thumbnail}" alt="${game.title}">
+           <div class="title">${game.title}</div>
+         `;
+        
+         slider.appendChild(card);
+       });
+}
 
       function searchGameCards() {
         const input = document.querySelector('.search-bar').value.toLowerCase().trim();
