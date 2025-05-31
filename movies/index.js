@@ -206,25 +206,3 @@ function toggleDescription(event) {
         button.textContent = 'Expand';
     }
 }
-
-function scrollCategory(container, direction) {
-  const scrollAmount = 300;
-  const currentScroll = container.scrollLeft;
-  const targetScroll = direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount;
-
-  const startTime = performance.now();
-  const duration = 10;
-
-  function animateScroll(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = progress < 0.5
-      ? 2 * progress * progress
-      : -1 + (4 - 2 * progress) * progress;
-
-    container.scrollLeft = currentScroll + (targetScroll - currentScroll) * ease;
-    if (progress < 1) requestAnimationFrame(animateScroll);
-  }
-
-  requestAnimationFrame(animateScroll);
-}
