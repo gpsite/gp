@@ -233,17 +233,48 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
 }
 /*end of search bar section*/
 
+/*start of newgames section*/
 #new-games-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 16px;
+  margin-bottom: 24px;
   padding: 12px 0;
   background: #222;
   border-radius: 8px;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
-#new-games-slider .slider-card {
-  min-width: 180px;
-  flex: 0 0 auto;
+#new-games-slider::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Webkit */
 }
+.new-games-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 1.3em;
+  margin-bottom: 8px;
+  margin-left: 8px;
+}
+.new-games-title {
+  font-weight: bold;
+  color: #305CDE;
+  margin-right: 10px;
+}
+#new-games-left, #new-games-right {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5em;
+  cursor: pointer;
+  padding: 0 8px;
+  transition: color 0.2s;
+}
+#new-games-left:hover, #new-games-right:hover {
+  color: #ff0;
+}
+/*end of newgames section*/
 
 /*start of game sliders*/
 .grid-container {

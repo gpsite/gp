@@ -273,6 +273,19 @@ if (!window.__gamesScriptLoaded__) {
             document.getElementById('navbar').appendChild(navbar);
           });
 
+            // New Games slider arrows
+        const leftArrow = document.getElementById('new-games-left');
+        const rightArrow = document.getElementById('new-games-right');
+        const slider = document.getElementById('new-games-slider');
+        if (leftArrow && rightArrow && slider) {
+          leftArrow.onclick = () => {
+            slider.scrollBy({ left: -300, behavior: 'smooth' });
+          };
+          rightArrow.onclick = () => {
+            slider.scrollBy({ left: 300, behavior: 'smooth' });
+          };
+        }
+
         const lines = document.querySelectorAll('.line');
         lines.forEach(line => {
           const randomDelay = Math.random() * 5;
