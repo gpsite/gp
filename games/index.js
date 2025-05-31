@@ -55,14 +55,14 @@ if (!window.__gamesScriptLoaded__) {
             categories: Array.from(game.categories)
           }));
 
+          const lastTenGames = allGameData.slice(-10);
+          displayNewGamesSlider(lastTenGames);
+
           displayGames(allGameData);
         } catch (error) {
           console.error('Error fetching game data:', error);
         }
       }
-
-      const lastTenGames = allGameData.slice(-10);
-      displayNewGamesSlider(lastTenGames);
 
       function displayGames(games) {
         const container = document.getElementById('gamecards-container');
