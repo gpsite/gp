@@ -147,14 +147,19 @@
         fetch('dev/navbar.html')
           .then(response => response.text())
           .then(data => {
-          const template = document.createElement('template');
-          template.innerHTML = data;
-          const navbar = template.content.querySelector('#navbar-template').content;
-          document.getElementById('navbar').appendChild(navbar);
-          
-          const script = navbar.querySelector('script');
-          if (script) eval(script.innerText);
-        });
+            const template = document.createElement('template');
+            template.innerHTML = data;
+            const navbarTemplate = template.content.querySelector('#navbar-template');
+            if (navbarTemplate) {
+              const navbar = navbarTemplate.content;
+              document.getElementById('navbar').appendChild(navbar);
+            
+              const script = navbar.querySelector('script');
+              if (script) eval(script.innerText);
+            } else {
+              console.error("navbar.html is missing #navbar-template");
+            }
+          });
     </script>
 </body>
 </html>
