@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
 
     <style>
@@ -21,6 +20,41 @@
         body {
             margin-left: 60px; /* 60px margin for the navbar */
             padding: 0;
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-section {
+            padding: 60px 40px 40px 40px;
+            background: #f7f7f7;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #0b79b9;
+        }
+
+        .announcement {
+            background: #e3f2fd;
+            color: #0b79b9;
+            padding: 18px 24px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(11,121,185,0.07);
+        }
+
+        .content {
+            flex: 1 0 auto;
+            padding: 40px;
         }
 
         .statistics {
@@ -33,6 +67,7 @@
             );
             padding-top: 25px;
             padding-bottom: 25px;
+            margin-left: -60px; /* negate navbar margin */
         }
 
         .statistics-container {
@@ -80,6 +115,14 @@
 </head>
 <body>
     <div id="navbar"></div>
+    <div class="top-section">
+        <div class="main-title">George Pickens</div>
+        <div class="announcement">
+            Thank you for supporting us throughout the year, we couldn't have done it without yall! We hope to see you next year, and to the seniors, we wish you the best of luck in your futures!
+        </div>
+    </div>
+    <div class="content">
+    </div>
     <div class="statistics">
         <div class="limit-container">
             <div class="statistics-container">
