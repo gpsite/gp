@@ -238,13 +238,13 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   position: relative;
   margin: 20px auto;
   max-width: 1200px;
-  overflow: hidden;
-  padding: 0 20px;
+  overflow: visible;
+  padding: 0 40px;  
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   align-items: center;
-  height: 270px; 
+  height: 270px;
 }
 
 .vertical-title {
@@ -272,7 +272,7 @@ header .popular-game\-slider .popular-game\-slider-content .game\-btns button:ho
   gap: 16px;
   padding: 10px 0;
   background: #222;
-  border-radius: 8px;
+  border-radius: 0 16px 16px 0;
   scrollbar-width: none;
   -ms-overflow-style: none;
   width: 100%;
