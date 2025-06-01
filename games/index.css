@@ -2,7 +2,7 @@
 html,
 body {
   background-color: #1d1e22;
-  margin: 0;
+  margin-left: 60px; /*nnav width*/
   padding: 0;
 }
 
