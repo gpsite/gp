@@ -3,73 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Intro</title>
+  <title>George Pickens</title>
   <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@700&display=swap" rel="stylesheet"/>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: black;
+  div:first-of-type {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  p {
+    font-family: "Urbanist", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
+  #text {
+    transform: translateX(50%);
+    font-size: 72px;
+    stroke-width: 1;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1100;
+    animation: draw 110s cubic-bezier(0,1,0.2,1) forwards;
+  }
+  
+  @keyframes draw {
+    100% {
+      stroke-dashoffset: 0;
     }
-
-    body {
-      font-family: "Urbanist", sans-serif;
+  }
+  
+  #screenBlack {
+    width: 120vw;
+    height: 100vh;
+    background-color: #000;
+    position: absolute;
+    top: 0;
+    left: -120%;
+    animation: moveRight 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 1.8s forwards;
+    z-index: 0;
+    clip-path: polygon(100% 0%, 89% 100%, 0 100%, 0 0);
+  }
+  
+  @keyframes moveRight {
+    from {
+      left: -100%;
     }
-
-    .title-container {
-      position: fixed;
-      top: 0;
+    
+    to {
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 2;
     }
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+  }
 
-    #text {
-      transform: translateX(50%);
-      font-size: 72px;
-      stroke-width: 1;
-      stroke-dasharray: 1000;
-      stroke-dashoffset: 1100;
-      animation: draw 110s cubic-bezier(0,1,0.2,1) forwards;
-    }
-
-    @keyframes draw {
-      to {
-        stroke-dashoffset: 0;
-      }
-    }
-
-    #screenBlack {
-      width: 120vw;
-      height: 100vh;
-      background-color: black;
-      position: absolute;
-      top: 0;
-      left: -120%;
-      animation: moveRight 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 1.8s forwards;
-      z-index: 1;
-      clip-path: polygon(100% 0%, 89% 100%, 0 100%, 0 0);
-    }
-
-    @keyframes moveRight {
-      to {
-        left: 0;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="title-container">
-    <svg xmlns="http://www.w3.org/2000/svg" width="100vw" height="150" viewBox="0 0 1000 150">
-      <text x="500" y="100" text-anchor="middle" id="text" stroke="black" fill="white">George Pickens</text>
-    </svg>
+  <div>
+    <p>
+      <svg xmlns="http://www.w3.org/2000/svg" width="100vw" height="100" viewBox="0 0 100 100">
+        <text x="0" y="60" text-anchor="middle" id="text" stroke="black" fill="white">George Pickens</text>
+      </svg>
+    </p>
   </div>
-  <div id="screenBlack"></div>
+  <div id="screenBlack">
 
   <script>
     document.getElementById("screenBlack").addEventListener("animationend", () => {
