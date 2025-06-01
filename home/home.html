@@ -1,178 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846568305709462"
-crossorigin="anonymous"></script>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-S8PZFKDPMN"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>George Pickens</title>
 
-gtag('config', 'G-S8PZFKDPMN')
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
 
-</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>George Pickens</title>
-<link rel="stylesheet" href="home/index.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-<style>
-.game-card {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: space-between;
-width: 200px;
-height: 300px;
-margin: 10px;
-padding: 10px;
-border: 1px solid #FFFFFF;
-border-radius: 8px;
-background-color: #313135;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-transition: transform 0.2s;
-}
+    <style>
+        * {
+            font-family: "Roboto", sans-serif;
+        }
 
-.game-card:hover {
-transform: scale(1.05);
-}
+        html,
+        body {
+            margin-left: 60px; /* 60px margin for the navbar */
+            padding: 0;
+        }
 
-.game-card img {
-width: 100%;
-height: auto;
-max-height: 70%;
-object-fit: cover;
-border-radius: 4px;
-}
+        .statistics {
+            width: 100%;
+            background: rgb(11, 121, 185);
+            background: linear-gradient(
+                90deg,
+                rgba(11, 121, 185, 1) 0,
+                rgb(63, 137, 180) 100%
+            );
+            padding-top: 25px;
+            padding-bottom: 25px;
+        }
 
-.game-card .title {
-font-size: 1.2em;
-font-weight: bold;
-margin: 5px 0;
-text-align: center;
-}
+        .statistics-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            gap: 10px;
+            margin-top: 60px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
 
-.game-card .subtitle {
-font-size: 0.9em;
-color: #666;
-text-align: center;
-}
+        .statistics-card {
+            width: 150px;
+            height: auto;
+        }
 
-.grid-container {
-display: flex;
-flex-wrap: wrap;
-justify-content: center;
-gap: 20px;
-}
+        .statistics-card > img {
+            max-width: 48px;
+            height: 48px;
+            display: block;
+            margin-bottom: 40px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-  /* Popup background */
-    #popup-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    /* Popup box */
-    #announcement-popup {
-      background: #fff;
-      padding: 2rem 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-      max-width: 400px;
-      text-align: center;
-      position: relative;
-      font-family: Arial, sans-serif;
-    }
-    /* Close button */
-    #close-popup {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: transparent;
-      border: none;
-      font-size: 1.3rem;
-      cursor: pointer;
-    }
-    #announcement-popup h2 {
-      margin-top: 0;
-      font-size: 1.3rem;
-      margin-bottom: 0.7rem;
-    }
-    #announcement-popup p {
-      font-size: 1rem;
-      color: #333;
-      margin-bottom: 0;
-    }
+        .statistics-card > p {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+        }
 
-</style>
+        .statistics-card > h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        @media only screen and (max-width: 1470px) {
+            .statistics-container {
+                gap: 80px 200px;
+            }
+        }
+    </style>
 </head>
-<body onload="shuffleGameCards()">
-<div id="navbar"></div>
-<div class="header">
-<div class="wave">
-<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-<path fill="orange" d="M0,280L48,264.7C96,249,192,219,288,192.7C384,166,480,142,576,150C672,158,768,198,864,203.3C960,208,1056,176,1152,150C1248,124,1344,104,1392,96.7L1440,90L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
-<path fill="#000" d="M0,300L48,284.7C96,269,192,239,288,212.7C384,186,480,162,576,170C672,178,768,218,864,223.3C960,228,1056,196,1152,170C1248,144,1344,124,1392,116.7L1440,110L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
-</svg>
-</div>
-<div class="poster"></div>
-</div>
-<div class="content">
-<div class="announcements">
-<h2>ANNOUNCEMENTS:</h2>
-        <p><span class="highlight">Updates</span>: All games currenty work,if not, please fill out a bug report.  </p>
-        <p>Home page is also outdated, will be updated in the near future</p>
-</div>
-</div>
-<div class="featuredupdates">
+<body>
+    <div id="navbar"></div>
+    <div class="statistics">
+        <div class="limit-container">
+            <div class="statistics-container">
+                <div class="statistics-card scroll-animate">
+                    <p>Updated Site</p>
+                    <h2 data-count="636">0</h2>
+                    <p>times</p>
+                </div>
+                <div class="statistics-card scroll-animate">
+                    <p>We Provide</p>
+                    <h2 data-count="216">0</h2>
+                    <p>unique games</p>
+                </div>
+                <div class="statistics-card scroll-animate">
+                    <p>Gathered</p>
+                    <h2 data-count="154">0</h2>
+                    <p>different movies</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const elements = Array.from(document.querySelectorAll("h2[data-count]"));
+            const observer = new IntersectionObserver(
+                function (entries) {
+                    entries.forEach((entry) => {
+                        if (entry.intersectionRatio >= 0.5) {
+                            const index = elements.indexOf(entry.target);
+                            const delay = index * 250;
+                            setTimeout(() => startCounter(entry.target), delay);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                {
+                    threshold: 0.5
+                }
+            );
+            elements.forEach((element) => observer.observe(element));
 
+            function startCounter(element) {
+                const target = parseInt(element.getAttribute("data-count"));
+                const additionalData = element.getAttribute("additional-data") || "";
+                const totalFrames = 480;
+                let frame = 0;
 
-</div>
+                function easeOut(t, b, c, d) {
+                    return c * ((t = t / d - 1) * t * t + 1) + b;
+                }
 
-<script>
+                function counter() {
+                    if (frame >= totalFrames) {
+                        element.textContent = target + additionalData;
+                        return;
+                    }
+                    frame++;
+                    const easedValue = easeOut(frame, 0, target, totalFrames);
+                    element.textContent = Math.floor(easedValue) + additionalData;
+                    requestAnimationFrame(counter);
+                }
+                counter();
+            }
+        });
 
-function searchGameCards() {
-const input = document.querySelector('.search-bar');
-const filter = input.value.toLowerCase();
-const gamecards = document.querySelectorAll('.gamecard');
-
-gamecards.forEach(card => {
-const text = card.textContent.toLowerCase();
-card.style.display = text.includes(filter) ? 'block' : 'none';
-});
-}
-
-function shuffleGameCards() {
-const container = document.getElementById('gamecards-container');
-const cards = Array.from(container.children);
-for (let i = cards.length - 1; i > 0; i--) {
-const j = Math.floor(Math.random() * (i + 1));
-container.appendChild(cards[j]);
-}
-}
-
-document.addEventListener('DOMContentLoaded', shuffleGameCards);
-
-fetch('dev/navbar.html')
-.then(response => response.text())
-.then(data => {
-const template = document.createElement('template');
-template.innerHTML = data;
-const navbar = template.content.querySelector('#navbar-template').content;
-document.getElementById('navbar').appendChild(navbar);
-
-const script = navbar.querySelector('script');
-if (script) eval(script.innerText);
-});
-</script>
+        fetch('dev/navbar.html')
+          .then(response => response.text())
+          .then(data => {
+          const template = document.createElement('template');
+          template.innerHTML = data;
+          const navbar = template.content.querySelector('#navbar-template').content;
+          document.getElementById('navbar').appendChild(navbar);
+          
+          const script = navbar.querySelector('script');
+          if (script) eval(script.innerText);
+        });
+    </script>
 </body>
 </html>
