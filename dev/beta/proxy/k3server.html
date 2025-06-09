@@ -10,15 +10,39 @@
             padding: 0;
             height: 100%;
         }
-        iframe {
-            width: 100%;
-            height: 100%;
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        #gameframe {
+            width: 100vw;
+            height: 100vh;
             border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 60px;
+            background: rgba(255,255,255,0.95);
+            z-index: 100;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #222;
         }
     </style>
 </head>
 <body>
-    <iframe id="gameframe" src="https://www.bing.com/copilotsearch?q=&FORM=CSSCOP&safesearch=strict&adlt=strict"iframe></body>
+    <iframe id="gameframe" src="https://www.bing.com/copilotsearch?q=&FORM=CSSCOP&safesearch=strict&adlt=strict"></iframe>
+    <div id="overlay">Navigation is disabled for security reasons.</div>
+</body>
 </html>
-
-
