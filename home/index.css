@@ -1,114 +1,520 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #000;
-  color: white;
+/* Fonts */
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+
+/* General */
+* {
+  box-sizing: border-box;
 }
 
-.header {
+main {
   position: relative;
-  height: 400px;
-  background-color: transparent;
-  background-image: url('img/home/homebanner.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: 100vh;
+  z-index: -10;
+  background: linear-gradient(to top, hsla(200, 5%, 11%, 1), hsla(0, 100%, 75%, 0.75));
+}
+
+body {
+  font-size: 12px;
+  font-family: 'Josefin Sans', 'Roboto', sans-serif;
+  color: hsla(0, 100%, 75%, 0.75);
   overflow: hidden;
+  background-color: hsla(210, 3%, 15%, 1);
 }
 
-.wave {
+/* Specific */
+.crane__list,
+.skyscrappers__list,
+.tree__container {
   position: absolute;
-  bottom: 0;
   width: 100%;
-  height: 100px;
+  bottom: 0;
 }
 
-.wave svg {
-  display: block;
+.advice {
+  display: flex;
+  height: 50vh;
+  width: 100vw;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.advice__title {
+  font-size: 3rem;
+  text-align: center;
+}
+
+.advice__description {
+  margin-top: 1rem;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.advice__description span:first-child {
+  margin-right: -0.7rem;
+}
+
+.advice__description span:last-child {
+  margin-left: -0.7rem;
+}
+
+.city-stuff {
+  display: flex;
+  position: absolute;
+  justify-content: center;
   width: 100%;
   height: 100%;
+  bottom: 0;
+  overflow: hidden;
+  box-shadow: inset 0 -60px 0 -30px hsla(178, 40%, 49%, 1);
 }
 
-.poster {
+.skyscrappers__list {
+  width: 100%;
+  height: 86px; /* 260px / 1.5 / 2 */
+  left: 0;
+  position: relative;
+}
+
+.skyscrapper__item {
   position: absolute;
-  top: 100%;
-  right: 20px;
-  transform: translateY(-50%);
-  width: 250px;
-  height: 400px;
-  background-image: url('img/home/pickens-fullbody.png');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: 3;
+  height: 86px;
+  bottom: 15%;
+  width: 65px; /* 260px/1.5/4 approx */
+  background: linear-gradient(
+    115deg,
+    hsla(178, 40%, 49%, 1) 73%,
+    /* darken by 10% */
+    rgba(10, 97, 84, 1) 73%,
+    rgba(10, 97, 84, 1) 100%
+  );
 }
 
-.poster::after {
+.skyscrapper__item::after {
   content: '';
   position: absolute;
+  width: 80%;
+  height: 80%;
+  left: 10%;
+  bottom: 10%;
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAGCAYAAAAG5SQMAAAAFElEQVQImWP4////fwYYIJKDEwAAfPsP8eFXG40AAAAASUVORK5CYII=') space;
+}
+
+.skyscrapper__item:last-child:not(:only-child) {
+  background: hsla(178, 40%, 49%, 1);
+}
+
+/* Manually expanded @for loop for skyscrappers 1 to 5 */
+
+.skyscrapper-1 {
+  width: 260px / (1 / 0.7); /* ~182px */
+  height: 260px / (1 / 0.8); /* ~208px */
+  right: 25%; /* 15 + (1*10) = 25% */
   bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, black 100%);
-  z-index: 2;
+  z-index: 10;
+  transform: rotate(180deg);
 }
 
-.content {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.skyscrapper-2 {
+  width: 260px / (2 / 0.7); /* ~91px */
+  height: 260px / (2 / 0.8); /* ~104px */
+  right: 35%; /* 15 + (2*10) = 35% */
+  bottom: 10%;
+  z-index: 10;
+  transform: rotate(180deg);
+}
+
+@media screen and (max-width: 900px) {
+  .skyscrapper-2 {
+    display: none;
+  }
+}
+
+.skyscrapper-3 {
+  width: 260px / (3 / 0.7); /* ~60.6px */
+  height: 260px / (3 / 2); /* 173.33 / (3/2) = 115.5px */
+  right: 45%; /* 15 + (3*10) = 45% */
+  bottom: 0;
+  z-index: 10;
+  transform: rotate(180deg);
+}
+
+@media screen and (max-width: 900px) {
+  .skyscrapper-3 {
+    display: none;
+  }
+}
+
+.skyscrapper-4 {
+  width: 260px / (4 / 0.7); /* ~45.5px */
+  height: 260px / (4 / 2); /* 260 / 2 = 130px */
+  right: 55%; /* 15 + (4*10) = 55% */
+  bottom: 0;
+  z-index: 10;
+  transform: rotate(180deg);
+}
+
+.skyscrapper-4::after {
+  width: 20%;
+  height: 60%;
+  left: 25%;
+}
+
+.skyscrapper-5 {
+  width: 7%;
+  right: 67%;
+  height: 50%;
+  bottom: 0;
+  z-index: 11;
+  transform: rotate(180deg);
+}
+
+.skyscrapper-5::after {
+  height: 0;
+}
+
+@media screen and (max-width: 450px) {
+  .skyscrapper-1 {
+    display: none;
+  }
+}
+
+/* Cranes */
+
+.crane-cabin,
+.crane-arm,
+.crane-picker {
+  transform-origin: 80% center;
+  animation: crane__movement 12s infinite alternate;
+}
+
+.crane__list {
+  width: 260px;
+  height: 173px; /* 260 / 1.5 */
+  z-index: 0;
+  perspective: 600px;
   position: relative;
+}
+
+.crane__item {
+  position: absolute;
+  border: solid 1px hsla(178, 40%, 49%, 1);
+  border-radius: 2px;
+}
+
+.crane-cable {
+  width: 1px;
+  height: 1px;
+  border: none;
+  outline: 1px solid transparent;
+  background: hsla(178, 40%, 49%, 1);
+  z-index: 0;
+  position: absolute;
+}
+
+.crane-cable-1 {
+  width: 60%;
+  top: 0;
+  left: 11%;
+  transform-origin: right 0;
+  animation: cable-1__movement 12s infinite alternate;
+}
+
+.crane-cable-2 {
+  width: 19%;
+  top: 0;
+  right: 8%;
+  transform-origin: top left;
+  animation: cable-2__movement 12s infinite alternate;
+}
+
+.crane-cable-3 {
+  height: 30%;
+  top: 22%;
+  left: 9%;
+  transform-origin: right center;
+  animation: cable-3__movement 12s ease-in-out infinite alternate;
+  position: relative;
+}
+
+.crane-cable-3::after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 0.2em;
+  width: 9000%;
+  bottom: 0;
+  left: -4500%;
+  background: rgba(88, 198, 179, 0.7); /* lighten(c-malabars, 20%) approximation */
+  border: 1px solid hsla(178, 40%, 49%, 1);
+}
+
+.crane-stand {
+  width: 5%;
+  height: 100%;
+  right: 25%;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    hsla(178, 40%, 49%, 1),
+    /* desaturate(lighten(c-malabars, 30%), 20%) approximation */
+    rgba(121, 183, 173, 0.6)
+  );
+  position: absolute;
+  top: 0;
+}
+
+.crane-weight {
+  width: 8%;
+  height: 20%;
+  right: 4%;
+  top: 12%;
+  z-index: 2;
+  background: rgba(121, 183, 173, 0.7);
+  transform-origin: 0 center;
+  animation: crane-weight__movement 12s infinite alternate;
+  position: absolute;
+}
+
+.crane-cabin {
+  width: 12%;
+  height: 9%;
+  right: 24%;
+  top: 20%;
+  z-index: 2;
+  background: rgba(121, 183, 173, 0.7);
+  position: absolute;
+}
+
+.crane-cabin::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 10%;
+  top: 60%;
+  left: 0;
+  background: hsla(0, 0%, 100%, 1);
+}
+
+.crane-arm {
+  width: 100%;
+  height: 7%;
+  top: 15%;
+  border-top-left-radius: 10px;
   z-index: 3;
+  background: rgba(121, 183, 173, 0.7);
+  position: absolute;
 }
 
-.announcements {
-  max-width: 500px;
+/* Crane positioning expanded (1 to 3) */
+
+.crane-1 {
+  left: 20%;
+  z-index: 10;
+  position: absolute;
 }
 
-.announcements h2 {
-  font-size: 20px;
+.crane-2 {
+  left: 30%;
+  bottom: -1rem;
+  z-index: -1;
+  transform: scale(0.75) scaleX(-1);
+  position: absolute;
 }
 
-.announcements p {
-  color: #003594;
-  font-size: 14px;
+@media screen and (max-width: 900px) {
+  .crane-2 {
+    display: none;
+  }
 }
 
-.highlight {
-  font-weight: bold;
-  color: white;
+.crane-3 {
+  left: 40%;
+  bottom: -0.5rem;
+  transform: scale(0.8);
+  position: absolute;
 }
 
-.game-grid {
+@media screen and (max-width: 900px) {
+  .crane-3 {
+    z-index: -1;
+    transform: scale(0.75) scaleX(-1);
+    display: none;
+  }
+}
+
+/* Tree container */
+
+.tree__container {
+  width: 100%;
+  height: 86px; /* 260 / 1.5 / 2 - 8 * 3 */
+  left: 0;
+  margin-bottom: 4px; /* 8px / 2 */
+  position: absolute;
+  bottom: 0;
+}
+
+/* Tree item */
+
+.tree__item {
   display: flex;
-  justify-content: space-around;
-  margin-top: 60px;
-  padding: 20px;
-  gap: 20px;
+  flex-flow: column nowrap;
+  position: absolute;
+  justify-content: flex-end;
+  align-items: center;
+  left: 60%;
 }
 
-.game-card {
-  background-color: #111;
-  border: 2px solid #003594;
-  border-radius: 15px;
-  text-align: center;
-  padding: 10px;
-  width: 120px;
+/* Tree trunk */
+
+.tree__trunk {
+  order: 2;
+  display: block;
+  position: absolute;
+  width: 4px; /* 8 / 2 */
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background: hsla(23, 18%, 29%, 1);
 }
 
-.game-card .thumb {
-  width: 80px;
-  height: 80px;
-  border-radius: 20px;
-  margin: 0 auto 10px;
-  background-image: url('https://placehold.co/80'); /* fallback if card fails to load so it wotn look broken do not removbe */
-  background-size: cover;
-  background-position: center;
+/* Tree leaves */
+
+.tree__leaves {
+  order: 1;
+  position: relative;
+  border-top: 0 solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 32px solid hsla(178, 40%, 49%, 1); /* 8 * 4 */
+  border-left: 4px solid transparent;
+  position: relative;
 }
 
-.game-card p {
-  margin: 0;
-  font-size: 13px;
+.tree__leaves::after {
+  content: '';
+  position: absolute;
+  height: 100%;
+  left: -4px;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 32px solid rgba(10, 97, 84, 1); /* darken by 10% */
+  border-left: 4px solid transparent;
+}
+
+/* Trees (1 to 8) with positioning */
+
+.tree-1 {
+  left: calc(65% + 1px);
+}
+
+.tree-2 {
+  left: calc(65% + 2px);
+}
+
+@media screen and (max-width: 768px) {
+  .tree-1,
+  .tree-2 {
+    display: none;
+  }
+}
+
+.tree-4 {
+  left: calc(53% + 4px);
+}
+
+.tree-5 {
+  left: calc(53% + 5px);
+}
+
+/* Trees 7 and 8 */
+
+.tree-7 {
+  left: calc(44% + 7px);
+}
+
+.tree-8 {
+  left: calc(44% + 8px);
+}
+
+@media screen and (max-width: 450px) {
+  .tree-7,
+  .tree-8 {
+    display: none;
+  }
+}
+
+/* Animations */
+
+@keyframes cable-1__movement {
+  0%,
+  20% {
+    transform: rotateY(0) rotateZ(-10deg);
+  }
+
+  70%,
+  100% {
+    transform: rotateY(45deg) rotateZ(-10deg);
+  }
+}
+
+@keyframes cable-2__movement {
+  0%,
+  20% {
+    transform: rotateY(0) rotateZ(29deg);
+  }
+
+  70%,
+  100% {
+    transform: rotateY(15deg) rotateZ(29deg);
+  }
+}
+
+@keyframes cable-3__movement {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  20% {
+    transform: translate(2500%, -18%);
+  }
+
+  60% {
+    transform: translate(11000%, -25%);
+  }
+
+  70% {
+    height: 30%;
+    transform: translate(9100%, -25%);
+  }
+
+  90%,
+  100% {
+    height: 80%;
+    transform: translate(9100%, -15%);
+  }
+}
+
+@keyframes crane__movement {
+  0%,
+  20% {
+    transform: rotateY(0);
+  }
+
+  70%,
+  100% {
+    transform: rotateY(45deg);
+  }
+}
+
+@keyframes crane-weight__movement {
+  0%,
+  20% {
+    transform: rotateY(0) translateX(0);
+  }
+
+  70%,
+  100% {
+    transform: rotateY(45deg) translateX(-50%);
+  }
 }
