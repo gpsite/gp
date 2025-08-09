@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>rips.cc search → vault URL builder</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; max-width:900px; margin:24px auto; padding:12px; }
+    h1 { margin:0 0 8px 0; }
+    .row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+    input[type="text"]{ padding:8px; font-size:15px; min-width:220px; }
+    button { padding:8px 12px; font-size:15px; cursor:pointer; }
+    pre { background:#f6f6f6; padding:8px; border-radius:6px; overflow:auto; }
+    ul { padding-left:18px; }
+    li { margin:8px 0; }
+    .note { color:#666; font-size:13px; margin-top:8px; }
+    .error { color:darkred; }
+  </style>
+</head>
+<body>
+  <h1>rips.cc Search → vault URL</h1>
+  <p>Type a movie title, click Search, then pick a result. You can paste your own <code>k</code> token or auto-generate one (today + next two days).</p>
+
+  <div class="row">
+    <input id="query" type="text" placeholder="e.g. the dark knight" value="batman" />
+    <button id="searchBtn">Search rips.cc</button>
+    <label style="display:flex; gap:6px; align-items:center;">
+      <input id="followRedirects" type="checkbox" checked /> include duplicates
+    </label>
+  </div>
+
+  <div class="row">
+    <input id="kinput" type="text" placeholder="k token (optional) — e.g. 202508082025080920250810" style="flex:1" />
+    <button id="autoK">Auto-generate k (today,tomorrow,day+2)</button>
+  </div>
+
+  <div id="status" class="note"></div>
+
+  <h2>Search results</h2>
+  <div id="results">No search yet.</div>
+
+  <script>
+  // Helper: format date yyyyMMdd for given Date
+  function yyyymmdd(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return '' + y + m + day;
+  }
+
+  // Auto-generate k as concatenation: today + tomorrow + day after
+  document.getElementById('autoK').addEventListener('click', () => {
+    const now = new Date();
+    const d1 = new Date(now);
+    const d2 = new Date(now); d2.setDate(now.getDate() + 1);
+    const d3 = new Date(now); d3.setDate(now.getDate() + 2);
+    document.getElementById('kinput').value = yyyymmdd(d1) + yyyymmdd(d2) + yyyymmdd(d3);
+  });
+
+  document.getElementById('searchBtn').addEventListener('click', async () => {
+    const query = document.getElementById('query').value.trim();
+    const status = document.getElementById('status');
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '';
+    status.textContent = '';
+
+    if (!query) {
+      status.textContent = 'Enter a search term.';
+      return;
+    }
+
+    status.textContent = 'Searching rips.cc...';
+
+    try {
+      // Build form body
+      const body = new URLSearchParams();
+      body.append('action','search');
+      body.append('query', query);
+
+      // POST to rips.cc/get just like the site does
+      const resp = await fetch('https://rips.cc/get', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'x-requested-with': 'XMLHttpRequest'
+        },
+        body: body.toString(),
+        mode: 'cors',
+        credentials: 'include' // include cookies if available
+      });
+
+      if (!resp.ok) throw new Error('Network response not OK: ' + resp.status);
+
+      const txt = await resp.text();
+
+      // The site returns HTML. Parse it and find /video/... links.
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(txt, 'text/html');
+
+      // Query all anchors with href starting with /video/
+      const anchors = Array.from(doc.querySelectorAll('a[href]'))
+        .map(a => a.getAttribute('href'))
+        .filter(h => h && h.startsWith('/video/'));
+
+      // Unique them (optionally remove duplicates)
+      const includeDuplicates = document.getElementById('followRedirects').checked;
+      const unique = includeDuplicates ? anchors : Array.from(new Set(anchors));
+
+      if (unique.length === 0) {
+        resultsDiv.innerHTML = '<div class="note">No results found or response format changed.</div>';
+        status.textContent = '';
+        return;
+      }
+
+      // Build UI list
+      const kval = document.getElementById('kinput').value.trim();
+      const vaultBase = 'https://vault.rips.cc/video/';
+
+      const ul = document.createElement('ul');
+      unique.forEach(h => {
+        // strip leading /video/
+        const id = h.replace(/^\/video\//, '').replace(/\/?$/, '');
+        const vaultUrl = vaultBase + encodeURIComponent(id) + (kval ? ('?k=' + encodeURIComponent(kval)) : '');
+        const li = document.createElement('li');
+
+        // show link to the internal video path and the constructed vault URL
+        li.innerHTML = `<strong>id:</strong> <code>${escapeHtml(id)}</code> — <a href="${vaultUrl}" target="_blank" rel="noopener noreferrer">Open vault URL</a><br>
+                        <small>video path: <a href="${'https://rips.cc' + h}" target="_blank" rel="noopener noreferrer">${h}</a></small>`;
+        ul.appendChild(li);
+      });
+
+      resultsDiv.appendChild(ul);
+      status.textContent = 'Done. Click any "Open vault URL" to test (may require proper k token).';
+
+    } catch (err) {
+      console.error(err);
+      // CORS is common when running local files. Tell the user.
+      const msg = err.message || String(err);
+      document.getElementById('results').innerHTML = `<div class="error">Error: ${escapeHtml(msg)}</div>
+        <div class="note">If you see a CORS or blocked request error, try opening this page from an HTTP server (not file://),
+        or use a browser extension or proxy that allows cross-origin requests to rips.cc.</div>`;
+      document.getElementById('status').textContent = '';
+    }
+  });
+
+  // small helper to avoid inserting raw HTML
+  function escapeHtml(s){
+    return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+  </script>
+</body>
+</html>
