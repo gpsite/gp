@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GP Pages + Firebase Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #000;
+      --panel: #0e0f13;
+      --panel-2: #13141a;
+      --muted: #222428;
+      --muted-2: #2b2e33;
+      --chip: #222428;
+      --chip-text: #fff;
+      --white: #fff;
+      --primary: #7f8592;
+      --me: #ffffff;
+      --me-text: #111214;
+      --other: #575b62;
+      --other-text: #e7e8ec;
+      --input: #111214;
+      --ring: 18px;
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--white);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      display: grid; place-items: center; padding: 16px;
+    }
+    .app {
+      width: min(1200px, 96vw); height: min(720px, 90vh); display: grid; grid-template-columns: 320px 1fr; gap: 32px;
+    }
+    .panel {
+      background: var(--panel); border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgb(0 0 0 / 0.25);
+      display: flex; flex-direction: column;
+    }
+    /* Sidebar */
+    .sidebar-header {
+      display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 2px solid #2a2c31; background: var(--panel-2);
+    }
+    .chip {
+      background: var(--chip); color: var(--chip-text); border-radius: 999px; padding: 10px 16px; font-weight: 600; font-size: 16px; cursor: pointer; user-select: none;
+    }
+    .icon-pill {
+      width: 44px; height: 44px; display: grid; place-items: center; border-radius: 999px; background: var(--chip); color: var(--chip-text); cursor: pointer;
+    }
+    .sidebar-list { padding: 16px; overflow: auto; flex: 1; }
+    .contact-pill {
+      background: #2f3238; padding: 16px 20px; border-radius: 999px; color: var(--chip-text); font-weight: 600; font-size: 18px; margin: 18px 0; cursor: pointer; transition: transform .1s ease;
+    }
+    .contact-pill:hover { transform: translateY(-1px); }
+    .contact-pill.active { outline: 2px solid #3a3f47; }
+
+    /* Chat */
+    .chat { display: flex; flex-direction: column; height: 100%; }
+    .chat-topbar {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 2px solid #2a2c31; background: var(--panel-2);
+    }
+    .chat-title { justify-self: end; background: var(--chip); color: var(--chip-text); border-radius: 999px; padding: 10px 16px; font-weight: 600; font-size: 18px; }
+    .chat-icons { display: flex; gap: 10px; }
+    .chat-scroll { flex: 1; overflow: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+    .bubble { max-width: 56ch; padding: 16px 18px; border-radius: 18px; line-height: 1.35; font-size: 18px; }
+    .bubble.other { background: var(--other); color: var(--other-text); align-self: flex-start; border-bottom-left-radius: 8px; }
+    .bubble.me { background: var(--me); color: var(--me-text); align-self: flex-end; border-bottom-right-radius: 8px; }
+
+    .chat-inputbar { display: grid; grid-template-columns: 1fr 44px; gap: 12px; padding: 14px 16px; }
+    .input {
+      background: var(--input); color: #cfd2d8; border: none; outline: none; padding: 18px 22px; border-radius: 999px; font-size: 18px; box-shadow: inset 0 0 0 2px #2a2d33;
+    }
+    .send { width: 44px; height: 44px; border-radius: 999px; display: grid; place-items: center; background: var(--chip); color: var(--chip-text); cursor: pointer; }
+
+    /* Modals */
+    dialog { border: none; border-radius: 16px; padding: 0; background: var(--panel-2); color: var(--white); width: min(520px, 96vw); }
+    .modal { padding: 18px; display: grid; gap: 14px; }
+    .modal h3 { margin: 0; font-size: 18px; }
+    .row { display: flex; gap: 10px; align-items: center; }
+    .row > input, .row > button, .row > select { flex: 1; }
+    .btn { background: #3b3f46; color: var(--white); border: none; border-radius: 12px; padding: 10px 14px; font-weight: 600; cursor: pointer; }
+
+    /* Call UI */
+    .call-modal { width: min(960px, 98vw); }
+    .call-wrap { padding: 12px; display: grid; gap: 12px; }
+    .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    video { width: 100%; height: 420px; background: #0c0d10; border-radius: 16px; object-fit: cover; }
+    .call-controls { display: flex; gap: 10px; justify-content: center; padding: 8px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Contacts sidebar -->
+    <section class="panel" id="sidebar">
+      <div class="sidebar-header">
+  <div title="Friends" id="friendsBtn" class="icon-pill"><i class="fa-solid fa-users"></i></div>
+        <button id="editContacts" class="chip" style="margin-left:auto">Edit Contacts</button>
+      </div>
+      <div class="sidebar-list" id="contacts"></div>
+    </section>
+
+    <!-- Chat panel -->
+    <section class="panel chat">
+      <div class="chat-topbar">
+        <div class="chat-icons">
+          <div title="Audio call" id="callBtn" class="icon-pill"><i class="fa-solid fa-phone"></i></div>
+          <div title="Video call" id="videoBtn" class="icon-pill"><i class="fa-solid fa-video"></i></div>
+        </div>
+        <div class="chat-title" id="activeName">Select a contact</div>
+      </div>
+
+      <div class="chat-scroll" id="messages"></div>
+
+      <div class="chat-inputbar">
+        <input id="msgInput" class="input" placeholder="Message..." />
+        <button id="sendBtn" class="send"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modals -->
+
+  <dialog id="friendsDialog">
+    <div class="modal" style="padding:0;">
+      <div class="friends-tabs" style="display:flex; background:var(--panel-2); border-radius:16px 16px 0 0; overflow:hidden;">
+        <button class="tab-btn active" data-tab="codeTab" style="flex:1;">My Friendcode</button>
+        <button class="tab-btn" data-tab="addTab" style="flex:1;">Add Friends</button>
+        <button class="tab-btn" data-tab="requestsTab" style="flex:1;">Friend Requests</button>
+      </div>
+      <div class="tab-content" id="codeTab">
+        <h3>Your friend code</h3>
+        <div class="row">
+          <input id="myCodeField" readonly />
+          <button id="copyCode" class="btn">Copy</button>
+        </div>
+      </div>
+      <div class="tab-content" id="addTab" style="display:none;">
+        <h3>Add friend by code</h3>
+        <div class="row"><input id="friendCodeField" placeholder="Enter 6-char code" maxlength="6" /></div>
+        <div class="row">
+          <input id="friendAliasField" placeholder="Display name (optional)" />
+        </div>
+        <div class="row">
+          <button id="confirmAdd" class="btn">Add</button>
+        </div>
+      </div>
+      <div class="tab-content" id="requestsTab" style="display:none;">
+        <h3>Friend Requests</h3>
+        <div id="friendRequestsList" style="min-height:40px;"></div>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn" onclick="friendsDialog.close()">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="editDialog">
+    <div class="modal">
+      <h3>Edit contact</h3>
+      <div class="row"><input id="editNameField" /></div>
+      <div class="row">
+        <button id="saveEdit" class="btn">Save</button>
+        <button class="btn" onclick="editDialog.close()">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="callDialog" class="call-modal">
+    <div class="call-wrap">
+      <div class="video-grid">
+        <video id="localVideo" playsinline muted></video>
+        <video id="remoteVideo" playsinline></video>
+      </div>
+      <div class="call-controls">
+        <button id="hangupBtn" class="btn"><i class="fa-solid fa-phone-slash"></i> Hang up</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Firebase SDKs (v11 modular) -->
+  <script type="module">
+    // i really dont care that the keys are here just dont hack pls this is why we cant have nice things
+    const firebaseConfig = {
+      apiKey: "AIzaSyDhPv49xQEXZCmhfXZwDgq3GsMezpAsRbc",
+      authDomain: "gp-chat-5c186.firebaseapp.com",
+      projectId: "gp-chat-5c186",
+      storageBucket: "gp-chat-5c186.firebasestorage.app",
+      messagingSenderId: "611958051858",
+      appId: "1:611958051858:web:dbb118278f6e69d79774cb",
+      databaseURL: "https://gp-chat-5c186-default-rtdb.firebaseio.com"
+    };
+
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
+    import { getAuth, signInAnonymously, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js';
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, serverTimestamp, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js';
+    import { getDatabase, ref, onValue, set, push, remove } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app); // used for WebRTC signaling
+
+    // UI refs
+    const contactsEl = document.getElementById('contacts');
+    const messagesEl = document.getElementById('messages');
+    const activeNameEl = document.getElementById('activeName');
+
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+  const friendsBtn = document.getElementById('friendsBtn');
+    const editContactsBtn = document.getElementById('editContacts');
+
+    const callBtn = document.getElementById('callBtn');
+    const videoBtn = document.getElementById('videoBtn');
+
+  const friendsDialog = document.getElementById('friendsDialog');
+    const myCodeField = document.getElementById('myCodeField');
+    const copyCodeBtn = document.getElementById('copyCode');
+
+    const friendCodeField = document.getElementById('friendCodeField');
+    const friendAliasField = document.getElementById('friendAliasField');
+    const confirmAddBtn = document.getElementById('confirmAdd');
+
+    const editDialog = document.getElementById('editDialog');
+    const editNameField = document.getElementById('editNameField');
+    const saveEditBtn = document.getElementById('saveEdit');
+
+    const callDialog = document.getElementById('callDialog');
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const hangupBtn = document.getElementById('hangupBtn');
+
+    let me = null; // auth user
+    let myProfile = null; // user doc
+    let activeContact = null; // { uid, displayName }
+    let unsubMessages = null;
+    let pc = null; // RTCPeerConnection
+    let localStream = null;
+
+    function shortCode(uid) {
+      // 6-char base36 code based on UID
+      const seed = [...uid].reduce((a, c) => (a * 33 + c.charCodeAt(0)) >>> 0, 5381);
+      return seed.toString(36).slice(-6).toUpperCase();
+    }
+
+    function chatIdFor(a, b) { return [a, b].sort().join('_'); }
+
+    async function ensureUserDoc(user) {
+      const uref = doc(db, 'users', user.uid);
+      const snap = await getDoc(uref);
+      if (!snap.exists()) {
+        const code = shortCode(user.uid);
+        await setDoc(uref, { uid: user.uid, friendCode: code, createdAt: Date.now(), displayName: 'Me' });
+      }
+      const data = (await getDoc(uref)).data();
+      myProfile = data;
+      myCodeField.value = data.friendCode;
+      return data;
+    }
+
+    function renderContactItem(contact) {
+      const div = document.createElement('div');
+      div.className = 'contact-pill';
+      div.textContent = contact.displayName || 'Unknown';
+      div.dataset.uid = contact.uid;
+      div.onclick = () => selectContact(contact);
+      div.oncontextmenu = (e) => { e.preventDefault(); openEdit(contact); };
+      if (activeContact && activeContact.uid === contact.uid) div.classList.add('active');
+      return div;
+    }
+
+    async function loadContacts() {
+      contactsEl.innerHTML = '';
+      const col = collection(db, 'users', me.uid, 'contacts');
+      const qs = await getDocs(col);
+      const list = [];
+      qs.forEach(d => list.push(d.data()));
+      list.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+      for (const c of list) contactsEl.appendChild(renderContactItem(c));
+    }
+
+    function watchMessages(withUid) {
+      if (unsubMessages) { unsubMessages(); unsubMessages = null; }
+      const cid = chatIdFor(me.uid, withUid);
+      const q = query(collection(db, 'chats', cid, 'messages'), orderBy('ts'));
+      unsubMessages = onSnapshot(q, snap => {
+        messagesEl.innerHTML = '';
+        snap.forEach(doc => {
+          const m = doc.data();
+          const b = document.createElement('div');
+          b.className = 'bubble ' + (m.from === me.uid ? 'me' : 'other');
+          b.textContent = m.text;
+          messagesEl.appendChild(b);
+        });
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      });
+    }
+
+    async function selectContact(contact) {
+      activeContact = contact;
+      document.querySelectorAll('.contact-pill').forEach(n => n.classList.remove('active'));
+      const pill = [...contactsEl.children].find(n => n.dataset.uid === contact.uid);
+      if (pill) pill.classList.add('active');
+      activeNameEl.textContent = contact.displayName || 'Chat';
+      watchMessages(contact.uid);
+    }
+
+    async function sendMessage() {
+      if (!activeContact) return;
+      const text = msgInput.value.trim();
+      if (!text) return;
+      msgInput.value = '';
+      const cid = chatIdFor(me.uid, activeContact.uid);
+      await addDoc(collection(db, 'chats', cid, 'messages'), {
+        from: me.uid,
+        to: activeContact.uid,
+        text,
+        ts: serverTimestamp(),
+      });
+    }
+
+    // Add friend flow
+    async function addFriendByCode(code, alias) {
+      code = (code || '').toUpperCase();
+      if (code === myProfile.friendCode) { alert('That is your own code.'); return; }
+      const qUsers = query(collection(db, 'users'), where('friendCode', '==', code));
+      const hits = await getDocs(qUsers);
+      if (hits.empty) { alert('No user found for that code.'); return; }
+      const target = hits.docs[0].data();
+      const cRef = doc(db, 'users', me.uid, 'contacts', target.uid);
+      await setDoc(cRef, { uid: target.uid, displayName: alias || target.displayName || 'Friend' });
+      await loadContacts();
+      addDialog.close();
+    }
+
+    // Edit contact
+    let editingContact = null;
+    function openEdit(contact) {
+      editingContact = contact; editNameField.value = contact.displayName || ''; editDialog.showModal();
+    }
+    async function saveEdit() {
+      if (!editingContact) return;
+      await setDoc(doc(db, 'users', me.uid, 'contacts', editingContact.uid), {
+        uid: editingContact.uid,
+        displayName: editNameField.value || 'Friend'
+      });
+      editDialog.close();
+      await loadContacts();
+      if (activeContact && activeContact.uid === editingContact.uid) {
+        activeNameEl.textContent = editNameField.value || 'Friend';
+      }
+    }
+
+    // Call / Facetime (WebRTC) using Firebase RTDB for signaling
+    async function startCall(video) {
+      if (!activeContact) return alert('Select a contact first.');
+      const cid = chatIdFor(me.uid, activeContact.uid);
+
+
+      pc = new RTCPeerConnection({ iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' }
+      ]});
+
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video });
+      localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+      localVideo.srcObject = localStream; await localVideo.play().catch(()=>{});
+
+      pc.onicecandidate = (e) => { if (e.candidate) push(offerCandidatesRef, e.candidate.toJSON()); };
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await set(callRef, { offer });
+
+      onValue(callRef, async (snap) => {
+        const v = snap.val();
+        if (v?.answer && !pc.currentRemoteDescription) {
+          await pc.setRemoteDescription(new RTCSessionDescription(v.answer));
+        }
+      });
+      onValue(answerCandidatesRef, async (snap) => {
+        const vals = snap.val() || {};
+        Object.values(vals).forEach(c => pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{}));
+      });
+
+      callDialog.showModal();
+    }
+
+    // Answer incoming calls listener
+    function listenForIncoming() {
+      onValue(ref(rtdb, 'calls'), async (snap) => {
+        const all = snap.val() || {};
+        for (const key of Object.keys(all)) {
+          const [a, b] = key.split('_');
+          const mine = key.includes(me.uid);
+          const theOther = mine && (a === me.uid ? b : a);
+          const call = all[key];
+          if (!mine || !call.offer) continue;
+
+          // Only answer if the other party is the active contact
+          if (!activeContact || theOther !== activeContact.uid) continue;
+          if (pc) continue; // already in call
+
+          // Prepare peer
+          pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+          const wantsVideo = !!call.offer.sdp?.includes('m=video');
+          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: wantsVideo });
+          localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+          localVideo.srcObject = localStream; await localVideo.play().catch(()=>{});
+          pc.ontrack = (e) => { remoteVideo.srcObject = e.streams[0]; remoteVideo.play().catch(()=>{}); };
+
+          const callRef = ref(rtdb, `calls/${key}`);
+          const offerCandidatesRef = ref(rtdb, `calls/${key}/offerCandidates`);
+          const answerCandidatesRef = ref(rtdb, `calls/${key}/answerCandidates`);
+
+          pc.onicecandidate = (e) => { if (e.candidate) push(answerCandidatesRef, e.candidate.toJSON()); };
+
+          await pc.setRemoteDescription(new RTCSessionDescription(call.offer));
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          await set(callRef, { ...call, answer });
+
+          onValue(offerCandidatesRef, snap => {
+            const vals = snap.val() || {}; Object.values(vals).forEach(c => pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{}));
+          });
+
+          callDialog.showModal();
+        }
+      });
+    }
+
+    async function hangup() {
+      try {
+        if (pc) pc.getSenders().forEach(s => s.track && s.track.stop());
+        if (localStream) localStream.getTracks().forEach(t => t.stop());
+        if (pc) pc.close();
+      } catch {}
+      pc = null; localStream = null;
+      callDialog.close();
+      // Clear signaling for this chat
+      if (activeContact) {
+        await remove(ref(rtdb, `calls/${chatIdFor(me.uid, activeContact.uid)}`));
+      }
+    }
+
+    // Listeners
+    sendBtn.onclick = sendMessage;
+    msgInput.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }}
+
+
+    // Friends modal logic
+    friendsBtn.onclick = () => {
+      myCodeField.value = myProfile.friendCode;
+      friendCodeField.value = '';
+      friendAliasField.value = '';
+      showTab('codeTab');
+      friendsDialog.showModal();
+      loadFriendRequests();
+    };
+    copyCodeBtn.onclick = async () => { await navigator.clipboard.writeText(myCodeField.value); copyCodeBtn.textContent = 'Copied'; setTimeout(()=> copyCodeBtn.textContent = 'Copy', 1200); };
+    confirmAddBtn.onclick = () => addFriendByCode(friendCodeField.value, friendAliasField.value);
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => showTab(btn.dataset.tab);
+    });
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+      document.querySelector('.tab-btn[data-tab="'+tabId+'"]').classList.add('active');
+      document.getElementById(tabId).style.display = '';
+    }
+
+    // Friend Requests logic (placeholder, needs backend support)
+    async function loadFriendRequests() {
+      const list = document.getElementById('friendRequestsList');
+      list.innerHTML = '<div style="color:var(--primary);opacity:0.7;">No requests yet.</div>';
+      // TODO: Load real requests from backend
+    }
+
+    editContactsBtn.onclick = async () => {
+      if (!activeContact) return alert('Right-click a contact to edit, or select one first.');
+      openEdit(activeContact);
+    };
+    saveEditBtn.onclick = saveEdit;
+
+    callBtn.onclick = () => startCall(false);
+    videoBtn.onclick = () => startCall(true);
+    hangupBtn.onclick = hangup;
+
+    // Boot
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        await signInAnonymously(auth);
+        return;
+      }
+      me = user;
+      await ensureUserDoc(user);
+      await loadContacts();
+      listenForIncoming();
+    });
+  </script>
+</body>
+</html>
