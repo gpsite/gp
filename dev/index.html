@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GP Pages + Firebase Chat</title>
+  <title>Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,12 +18,12 @@
       --chip: #222428;
       --chip-text: #fff;
       --white: #fff;
-      --primary: #7f8592;
-      --me: #ffffff;
+      --primary: #2b2e33;
+      --me: #fff;
       --me-text: #111214;
-      --other: #575b62;
-      --other-text: #e7e8ec;
-      --input: #111214;
+      --other: #2b2e33;
+      --other-text: #fff;
+      --input: #13141a;
       --ring: 18px;
       --radius: 22px;
     }
@@ -90,7 +90,64 @@
     .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     video { width: 100%; height: 420px; background: #0c0d10; border-radius: 16px; object-fit: cover; }
     .call-controls { display: flex; gap: 10px; justify-content: center; padding: 8px; }
-  </style>
+
+    /* Friends modal tabs */
+    .friends-tabs {
+      display: flex;
+      background: var(--panel-2);
+      border-bottom: 2px solid #2a2c31;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 14px;
+      background: transparent;
+      color: #cfd2d8;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .tab-btn:hover {
+      background: var(--muted);
+    }
+    .tab-btn.active {
+      background: var(--chip);
+      color: var(--chip-text);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .tab-content {
+      padding: 18px;
+      display: none;
+    }
+    .tab-content h3 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .tab-content .row input {
+      background: var(--input);
+      color: #cfd2d8;
+      border: none;
+      outline: none;
+      padding: 14px 18px;
+      border-radius: 999px;
+      font-size: 16px;
+      box-shadow: inset 0 0 0 2px #2a2d33;
+    }
+
+    #confirmAdd {
+      background: var(--chip);
+      color: var(--chip-text);
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-size: 16px;
+    }
+    #confirmAdd:hover {
+      background: var(--muted-2);
+    }
+</style>
 </head>
 <body>
   <div class="app">
@@ -127,9 +184,9 @@
   <dialog id="friendsDialog">
     <div class="modal" style="padding:0;">
       <div class="friends-tabs" style="display:flex; background:var(--panel-2); border-radius:16px 16px 0 0; overflow:hidden;">
-        <button class="tab-btn active" data-tab="codeTab" style="flex:1;">My Friendcode</button>
-        <button class="tab-btn" data-tab="addTab" style="flex:1;">Add Friends</button>
-        <button class="tab-btn" data-tab="requestsTab" style="flex:1;">Friend Requests</button>
+    <button class="tab-btn active" data-tab="codeTab">My Friendcode</button>
+    <button class="tab-btn" data-tab="addTab">Add Friends</button>
+    <button class="tab-btn" data-tab="requestsTab">Friend Requests</button>
       </div>
       <div class="tab-content" id="codeTab">
         <h3>Your friend code</h3>
@@ -149,8 +206,8 @@
         </div>
       </div>
       <div class="tab-content" id="requestsTab" style="display:none;">
-        <h3>Friend Requests</h3>
-        <div id="friendRequestsList" style="min-height:40px;"></div>
+    <h3>Friend Requests</h3>
+    <div id="friendRequestsList"></div>
       </div>
       <div class="row" style="margin-top:10px;">
         <button class="btn" onclick="friendsDialog.close()">Close</button>
@@ -165,6 +222,9 @@
       <div class="row">
         <button id="saveEdit" class="btn">Save</button>
         <button class="btn" onclick="editDialog.close()">Cancel</button>
+      </div>
+      <div class="row">
+        <button id="removeContact" class="btn" style="background:#c0392b;">Remove Contact</button>
       </div>
     </div>
   </dialog>
@@ -182,327 +242,507 @@
   </dialog>
 
   <!-- Firebase SDKs (v11 modular) -->
-  <script type="module">
-    // i really dont care that the keys are here just dont hack pls this is why we cant have nice things
-    const firebaseConfig = {
-      apiKey: "AIzaSyDhPv49xQEXZCmhfXZwDgq3GsMezpAsRbc",
-      authDomain: "gp-chat-5c186.firebaseapp.com",
-      projectId: "gp-chat-5c186",
-      storageBucket: "gp-chat-5c186.firebasestorage.app",
-      messagingSenderId: "611958051858",
-      appId: "1:611958051858:web:dbb118278f6e69d79774cb",
-      databaseURL: "https://gp-chat-5c186-default-rtdb.firebaseio.com"
-    };
+<script type="module">
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDhPv49xQEXZCmhfXZwDgq3GsMezpAsRbc",
+    authDomain: "gp-chat-5c186.firebaseapp.com",
+    projectId: "gp-chat-5c186",
+    storageBucket: "gp-chat-5c186.firebasestorage.app",
+    messagingSenderId: "611958051858",
+    appId: "1:611958051858:web:dbb118278f6e69d79774cb",
+    databaseURL: "https://gp-chat-5c186-default-rtdb.firebaseio.com"
+  };
 
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
-    import { getAuth, signInAnonymously, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js';
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, serverTimestamp, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js';
-    import { getDatabase, ref, onValue, set, push, remove } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js';
+  import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js';
+  import {
+    getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot,
+    collection, addDoc, query, orderBy, serverTimestamp, where, getDocs, deleteDoc
+  } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js';
+  import { getDatabase, ref, onValue, set, push, remove } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
+  import {
+    getMessaging, getToken, onMessage, isSupported
+  } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging.js';
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const rtdb = getDatabase(app); // used for WebRTC signaling
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const rtdb = getDatabase(app); // WebRTC signaling
 
-    // UI refs
-    const contactsEl = document.getElementById('contacts');
-    const messagesEl = document.getElementById('messages');
-    const activeNameEl = document.getElementById('activeName');
+  // UI refs
+  const contactsEl = document.getElementById('contacts');
+  const messagesEl = document.getElementById('messages');
+  const activeNameEl = document.getElementById('activeName');
 
-    const msgInput = document.getElementById('msgInput');
-    const sendBtn = document.getElementById('sendBtn');
+  const msgInput = document.getElementById('msgInput');
+  const sendBtn = document.getElementById('sendBtn');
 
   const friendsBtn = document.getElementById('friendsBtn');
-    const editContactsBtn = document.getElementById('editContacts');
+  const editContactsBtn = document.getElementById('editContacts');
 
-    const callBtn = document.getElementById('callBtn');
-    const videoBtn = document.getElementById('videoBtn');
+  const callBtn = document.getElementById('callBtn');
+  const videoBtn = document.getElementById('videoBtn');
 
   const friendsDialog = document.getElementById('friendsDialog');
-    const myCodeField = document.getElementById('myCodeField');
-    const copyCodeBtn = document.getElementById('copyCode');
+  const myCodeField = document.getElementById('myCodeField');
+  const copyCodeBtn = document.getElementById('copyCode');
 
-    const friendCodeField = document.getElementById('friendCodeField');
-    const friendAliasField = document.getElementById('friendAliasField');
-    const confirmAddBtn = document.getElementById('confirmAdd');
+  const friendCodeField = document.getElementById('friendCodeField');
+  const friendAliasField = document.getElementById('friendAliasField');
+  const confirmAddBtn = document.getElementById('confirmAdd');
 
-    const editDialog = document.getElementById('editDialog');
-    const editNameField = document.getElementById('editNameField');
-    const saveEditBtn = document.getElementById('saveEdit');
+  const editDialog = document.getElementById('editDialog');
+  const editNameField = document.getElementById('editNameField');
+  const saveEditBtn = document.getElementById('saveEdit');
+  const removeContactBtn = document.getElementById('removeContact');
 
-    const callDialog = document.getElementById('callDialog');
-    const localVideo = document.getElementById('localVideo');
-    const remoteVideo = document.getElementById('remoteVideo');
-    const hangupBtn = document.getElementById('hangupBtn');
+  const callDialog = document.getElementById('callDialog');
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  const hangupBtn = document.getElementById('hangupBtn');
 
-    let me = null; // auth user
-    let myProfile = null; // user doc
-    let activeContact = null; // { uid, displayName }
-    let unsubMessages = null;
-    let pc = null; // RTCPeerConnection
-    let localStream = null;
+  let me = null;           // auth user
+  let myProfile = null;    // user doc
+  let activeContact = null; // { uid, displayName }
+  let unsubMessages = null;
+  let pc = null;           // RTCPeerConnection
+  let localStream = null;
 
-    function shortCode(uid) {
-      // 6-char base36 code based on UID
-      const seed = [...uid].reduce((a, c) => (a * 33 + c.charCodeAt(0)) >>> 0, 5381);
-      return seed.toString(36).slice(-6).toUpperCase();
-    }
+  // ---------- Helpers ----------
+  function shortCode(uid) {
+    // 6-char base36 code based on UID
+    const seed = [...uid].reduce((a, c) => (a * 33 + c.charCodeAt(0)) >>> 0, 5381);
+    return seed.toString(36).slice(-6).toUpperCase();
+  }
+  function chatIdFor(a, b) { return [a, b].sort().join('_'); }
 
-    function chatIdFor(a, b) { return [a, b].sort().join('_'); }
-
-    async function ensureUserDoc(user) {
-      const uref = doc(db, 'users', user.uid);
-      const snap = await getDoc(uref);
-      if (!snap.exists()) {
-        const code = shortCode(user.uid);
-        await setDoc(uref, { uid: user.uid, friendCode: code, createdAt: Date.now(), displayName: 'Me' });
-      }
-      const data = (await getDoc(uref)).data();
-      myProfile = data;
-      myCodeField.value = data.friendCode;
-      return data;
-    }
-
-    function renderContactItem(contact) {
-      const div = document.createElement('div');
-      div.className = 'contact-pill';
-      div.textContent = contact.displayName || 'Unknown';
-      div.dataset.uid = contact.uid;
-      div.onclick = () => selectContact(contact);
-      div.oncontextmenu = (e) => { e.preventDefault(); openEdit(contact); };
-      if (activeContact && activeContact.uid === contact.uid) div.classList.add('active');
-      return div;
-    }
-
-    async function loadContacts() {
-      contactsEl.innerHTML = '';
-      const col = collection(db, 'users', me.uid, 'contacts');
-      const qs = await getDocs(col);
-      const list = [];
-      qs.forEach(d => list.push(d.data()));
-      list.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
-      for (const c of list) contactsEl.appendChild(renderContactItem(c));
-    }
-
-    function watchMessages(withUid) {
-      if (unsubMessages) { unsubMessages(); unsubMessages = null; }
-      const cid = chatIdFor(me.uid, withUid);
-      const q = query(collection(db, 'chats', cid, 'messages'), orderBy('ts'));
-      unsubMessages = onSnapshot(q, snap => {
-        messagesEl.innerHTML = '';
-        snap.forEach(doc => {
-          const m = doc.data();
-          const b = document.createElement('div');
-          b.className = 'bubble ' + (m.from === me.uid ? 'me' : 'other');
-          b.textContent = m.text;
-          messagesEl.appendChild(b);
-        });
-        messagesEl.scrollTop = messagesEl.scrollHeight;
+  async function ensureUserDoc(user) {
+    const uref = doc(db, 'users', user.uid);
+    const snap = await getDoc(uref);
+    if (!snap.exists()) {
+      const code = shortCode(user.uid);
+      await setDoc(uref, {
+        uid: user.uid,
+        friendCode: code,
+        createdAt: Date.now(),
+        displayName: code // default displayName = friendCode
       });
     }
-
-    async function selectContact(contact) {
-      activeContact = contact;
-      document.querySelectorAll('.contact-pill').forEach(n => n.classList.remove('active'));
-      const pill = [...contactsEl.children].find(n => n.dataset.uid === contact.uid);
-      if (pill) pill.classList.add('active');
-      activeNameEl.textContent = contact.displayName || 'Chat';
-      watchMessages(contact.uid);
+    const data = (await getDoc(uref)).data();
+    
+    // If displayName is unset, default to friendCode
+    if (!data.displayName || data.displayName === 'Unset') {
+      data.displayName = data.friendCode;
+      await updateDoc(uref, { displayName: data.displayName });
     }
 
-    async function sendMessage() {
-      if (!activeContact) return;
-      const text = msgInput.value.trim();
-      if (!text) return;
-      msgInput.value = '';
-      const cid = chatIdFor(me.uid, activeContact.uid);
-      await addDoc(collection(db, 'chats', cid, 'messages'), {
-        from: me.uid,
-        to: activeContact.uid,
-        text,
-        ts: serverTimestamp(),
+    myProfile = data;
+    myCodeField.value = data.friendCode;
+    return data;
+  }
+
+
+  function renderContactItem(contact) {
+    const div = document.createElement('div');
+    div.className = 'contact-pill';
+    div.textContent = contact.displayName || 'Unknown';
+    div.dataset.uid = contact.uid;
+    div.onclick = () => selectContact(contact);
+    div.oncontextmenu = (e) => { e.preventDefault(); openEdit(contact); };
+    if (activeContact && activeContact.uid === contact.uid) div.classList.add('active');
+    return div;
+  }
+
+  async function loadContacts() {
+    contactsEl.innerHTML = '';
+    const colRef = collection(db, 'users', me.uid, 'contacts');
+    const qs = await getDocs(colRef);
+    const list = [];
+    qs.forEach(d => list.push(d.data()));
+    list.sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+    for (const c of list) contactsEl.appendChild(renderContactItem(c));
+  }
+
+  function watchMessages(withUid) {
+    if (unsubMessages) { unsubMessages(); unsubMessages = null; }
+    const cid = chatIdFor(me.uid, withUid);
+    const qRef = query(collection(db, 'chats', cid, 'messages'), orderBy('ts'));
+    unsubMessages = onSnapshot(qRef, snap => {
+      messagesEl.innerHTML = '';
+      snap.forEach(docSnap => {
+        const m = docSnap.data();
+        const b = document.createElement('div');
+        b.className = 'bubble ' + (m.from === me.uid ? 'me' : 'other');
+        b.textContent = m.text;
+        messagesEl.appendChild(b);
       });
-    }
-
-    // Add friend flow
-    async function addFriendByCode(code, alias) {
-      code = (code || '').toUpperCase();
-      if (code === myProfile.friendCode) { alert('That is your own code.'); return; }
-      const qUsers = query(collection(db, 'users'), where('friendCode', '==', code));
-      const hits = await getDocs(qUsers);
-      if (hits.empty) { alert('No user found for that code.'); return; }
-      const target = hits.docs[0].data();
-      const cRef = doc(db, 'users', me.uid, 'contacts', target.uid);
-      await setDoc(cRef, { uid: target.uid, displayName: alias || target.displayName || 'Friend' });
-      await loadContacts();
-      addDialog.close();
-    }
-
-    // Edit contact
-    let editingContact = null;
-    function openEdit(contact) {
-      editingContact = contact; editNameField.value = contact.displayName || ''; editDialog.showModal();
-    }
-    async function saveEdit() {
-      if (!editingContact) return;
-      await setDoc(doc(db, 'users', me.uid, 'contacts', editingContact.uid), {
-        uid: editingContact.uid,
-        displayName: editNameField.value || 'Friend'
-      });
-      editDialog.close();
-      await loadContacts();
-      if (activeContact && activeContact.uid === editingContact.uid) {
-        activeNameEl.textContent = editNameField.value || 'Friend';
-      }
-    }
-
-    // Call / Facetime (WebRTC) using Firebase RTDB for signaling
-    async function startCall(video) {
-      if (!activeContact) return alert('Select a contact first.');
-      const cid = chatIdFor(me.uid, activeContact.uid);
-
-
-      pc = new RTCPeerConnection({ iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' }
-      ]});
-
-      localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video });
-      localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-      localVideo.srcObject = localStream; await localVideo.play().catch(()=>{});
-
-      pc.onicecandidate = (e) => { if (e.candidate) push(offerCandidatesRef, e.candidate.toJSON()); };
-
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      await set(callRef, { offer });
-
-      onValue(callRef, async (snap) => {
-        const v = snap.val();
-        if (v?.answer && !pc.currentRemoteDescription) {
-          await pc.setRemoteDescription(new RTCSessionDescription(v.answer));
-        }
-      });
-      onValue(answerCandidatesRef, async (snap) => {
-        const vals = snap.val() || {};
-        Object.values(vals).forEach(c => pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{}));
-      });
-
-      callDialog.showModal();
-    }
-
-    // Answer incoming calls listener
-    function listenForIncoming() {
-      onValue(ref(rtdb, 'calls'), async (snap) => {
-        const all = snap.val() || {};
-        for (const key of Object.keys(all)) {
-          const [a, b] = key.split('_');
-          const mine = key.includes(me.uid);
-          const theOther = mine && (a === me.uid ? b : a);
-          const call = all[key];
-          if (!mine || !call.offer) continue;
-
-          // Only answer if the other party is the active contact
-          if (!activeContact || theOther !== activeContact.uid) continue;
-          if (pc) continue; // already in call
-
-          // Prepare peer
-          pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-          const wantsVideo = !!call.offer.sdp?.includes('m=video');
-          localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: wantsVideo });
-          localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-          localVideo.srcObject = localStream; await localVideo.play().catch(()=>{});
-          pc.ontrack = (e) => { remoteVideo.srcObject = e.streams[0]; remoteVideo.play().catch(()=>{}); };
-
-          const callRef = ref(rtdb, `calls/${key}`);
-          const offerCandidatesRef = ref(rtdb, `calls/${key}/offerCandidates`);
-          const answerCandidatesRef = ref(rtdb, `calls/${key}/answerCandidates`);
-
-          pc.onicecandidate = (e) => { if (e.candidate) push(answerCandidatesRef, e.candidate.toJSON()); };
-
-          await pc.setRemoteDescription(new RTCSessionDescription(call.offer));
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          await set(callRef, { ...call, answer });
-
-          onValue(offerCandidatesRef, snap => {
-            const vals = snap.val() || {}; Object.values(vals).forEach(c => pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{}));
-          });
-
-          callDialog.showModal();
-        }
-      });
-    }
-
-    async function hangup() {
-      try {
-        if (pc) pc.getSenders().forEach(s => s.track && s.track.stop());
-        if (localStream) localStream.getTracks().forEach(t => t.stop());
-        if (pc) pc.close();
-      } catch {}
-      pc = null; localStream = null;
-      callDialog.close();
-      // Clear signaling for this chat
-      if (activeContact) {
-        await remove(ref(rtdb, `calls/${chatIdFor(me.uid, activeContact.uid)}`));
-      }
-    }
-
-    // Listeners
-    sendBtn.onclick = sendMessage;
-    msgInput.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }}
-
-
-    // Friends modal logic
-    friendsBtn.onclick = () => {
-      myCodeField.value = myProfile.friendCode;
-      friendCodeField.value = '';
-      friendAliasField.value = '';
-      showTab('codeTab');
-      friendsDialog.showModal();
-      loadFriendRequests();
-    };
-    copyCodeBtn.onclick = async () => { await navigator.clipboard.writeText(myCodeField.value); copyCodeBtn.textContent = 'Copied'; setTimeout(()=> copyCodeBtn.textContent = 'Copy', 1200); };
-    confirmAddBtn.onclick = () => addFriendByCode(friendCodeField.value, friendAliasField.value);
-
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.onclick = () => showTab(btn.dataset.tab);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
     });
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-      document.querySelector('.tab-btn[data-tab="'+tabId+'"]').classList.add('active');
-      document.getElementById(tabId).style.display = '';
-    }
+  }
 
-    // Friend Requests logic (placeholder, needs backend support)
-    async function loadFriendRequests() {
-      const list = document.getElementById('friendRequestsList');
+  async function selectContact(contact) {
+    activeContact = contact;
+    document.querySelectorAll('.contact-pill').forEach(n => n.classList.remove('active'));
+    const pill = [...contactsEl.children].find(n => n.dataset.uid === contact.uid);
+    if (pill) pill.classList.add('active');
+
+    // Show friendCode if displayName is missing
+    activeNameEl.textContent = contact.displayName || contact.uid;
+    watchMessages(contact.uid);
+  }
+
+  async function sendMessage() {
+    if (!activeContact) return;
+    const text = msgInput.value.trim();
+    if (!text) return;
+    msgInput.value = '';
+    const cid = chatIdFor(me.uid, activeContact.uid);
+    await addDoc(collection(db, 'chats', cid, 'messages'), {
+      from: me.uid,
+      to: activeContact.uid,
+      text,
+      ts: serverTimestamp(),
+    });
+    // Cloud Function will send push to recipient (if configured)
+  }
+
+  // ---------- Friend Requests ----------
+  // Structure:
+  //   /users/{targetUid}/friendRequests/{fromUid} = { fromUid, fromName, createdAt }
+  // Accept:
+  //   write contacts for both users, then delete request.
+
+  async function addFriendByCode(code, alias) {
+    code = (code || '').toUpperCase();
+    if (code === myProfile.friendCode) { alert('That is your own code.'); return; }
+    const qUsers = query(collection(db, 'users'), where('friendCode', '==', code));
+    const hits = await getDocs(qUsers);
+    if (hits.empty) { alert('No user found for that code.'); return; }
+    const target = hits.docs[0].data();
+
+    // If already a contact, skip
+    const existing = await getDoc(doc(db, 'users', me.uid, 'contacts', target.uid));
+    if (existing.exists()) { alert('Already in contacts.'); return; }
+
+    // Create friend request on target
+    await setDoc(doc(db, 'users', target.uid, 'friendRequests', me.uid), {
+      fromUid: me.uid,
+      fromName: myProfile.displayName || 'Friend',
+      aliasForYou: alias || '',
+      createdAt: Date.now()
+    });
+
+    alert('Friend request sent.');
+    // Cloud Function can send a push to target here
+  }
+
+    let unsubscribeFriendRequests = null;
+
+function watchFriendRequests() {
+  if (unsubscribeFriendRequests) unsubscribeFriendRequests();
+
+  const reqsRef = collection(db, 'users', me.uid, 'friendRequests');
+  unsubscribeFriendRequests = onSnapshot(reqsRef, async (snapshot) => {
+    const list = document.getElementById('friendRequestsList');
+    list.innerHTML = '';
+    if (snapshot.empty) {
       list.innerHTML = '<div style="color:var(--primary);opacity:0.7;">No requests yet.</div>';
-      // TODO: Load real requests from backend
+      return;
     }
 
-    editContactsBtn.onclick = async () => {
-      if (!activeContact) return alert('Right-click a contact to edit, or select one first.');
-      openEdit(activeContact);
-    };
-    saveEditBtn.onclick = saveEdit;
+    for (const docSnap of snapshot.docs) {
+      const r = docSnap.data();
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.gap = '8px';
+      row.style.alignItems = 'center';
+      row.style.margin = '10px 0';
 
-    callBtn.onclick = () => startCall(false);
-    videoBtn.onclick = () => startCall(true);
-    hangupBtn.onclick = hangup;
+      // Fetch the sender's friendCode
+      const fromSnap = await getDoc(doc(db, 'users', r.fromUid));
+      const senderData = fromSnap.exists() ? fromSnap.data() : {};
+      const senderCode = senderData.friendCode || r.fromUid;
 
-    // Boot
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        await signInAnonymously(auth);
-        return;
-      }
-      me = user;
-      await ensureUserDoc(user);
-      await loadContacts();
-      listenForIncoming();
+      const label = document.createElement('div');
+      label.textContent = `Request from ${senderCode}`;
+      row.appendChild(label);
+
+      const acceptBtn = document.createElement('button');
+      acceptBtn.className = 'btn';
+      acceptBtn.textContent = 'Accept';
+      acceptBtn.onclick = () => acceptFriendRequest(r.fromUid, r.aliasForYou || '');
+      row.appendChild(acceptBtn);
+
+      const declineBtn = document.createElement('button');
+      declineBtn.className = 'btn';
+      declineBtn.style.background = '#444';
+      declineBtn.textContent = 'Decline';
+      declineBtn.onclick = () => declineFriendRequest(r.fromUid);
+      row.appendChild(declineBtn);
+
+      list.appendChild(row);
+    }
+  });
+}
+
+    async function acceptFriendRequest(fromUid, myAliasForThem) {
+    // Load requester profile
+    const fromSnap = await getDoc(doc(db, 'users', fromUid));
+    if (!fromSnap.exists()) { 
+      alert('User no longer exists.'); 
+      return; 
+    }
+    const fromUser = fromSnap.data();
+
+    // Add to my contacts
+    await setDoc(doc(db, 'users', me.uid, 'contacts', fromUid), {
+      uid: fromUid,
+      displayName: myAliasForThem || fromUser.displayName || 'Friend'
     });
-  </script>
+
+    // Add me to their contacts
+    await setDoc(doc(db, 'users', fromUid, 'contacts', me.uid), {
+      uid: me.uid,
+      displayName: myProfile.displayName || 'Friend'
+    });
+
+    // Remove the request
+    await deleteDoc(doc(db, 'users', me.uid, 'friendRequests', fromUid));
+
+    await loadContacts();
+    await watchFriendRequests();
+
+    // Show alert using friend code instead of display name
+    const senderCode = fromUser.friendCode || fromUid;
+    alert(`Friend request accepted from ${senderCode}.`);
+  }
+
+  async function declineFriendRequest(fromUid) {
+    await deleteDoc(doc(db, 'users', me.uid, 'friendRequests', fromUid));
+    await loadFriendRequests();
+  }
+
+  // Edit contact
+  let editingContact = null;
+  function openEdit(contact) {
+    editingContact = contact; editNameField.value = contact.displayName || ''; editDialog.showModal();
+  }
+  async function saveEdit() {
+    if (!editingContact) return;
+    await setDoc(doc(db, 'users', me.uid, 'contacts', editingContact.uid), {
+      uid: editingContact.uid,
+      displayName: editNameField.value || 'Friend'
+    });
+    editDialog.close();
+    await loadContacts();
+    if (activeContact && activeContact.uid === editingContact.uid) {
+      activeNameEl.textContent = editNameField.value || 'Friend';
+    }
+  }
+
+  // Remove contact (unchanged, but ensure it fully deletes)
+  removeContactBtn.onclick = async () => {
+    if (!editingContact) return;
+    if (!confirm('Remove this contact?')) return;
+    await deleteDoc(doc(db, 'users', me.uid, 'contacts', editingContact.uid));
+    await loadContacts();
+    editDialog.close();
+    if (activeContact && activeContact.uid === editingContact.uid) {
+      activeContact = null;
+      activeNameEl.textContent = 'Select a contact';
+      messagesEl.innerHTML = '';
+    }
+  };
+
+  // ---------- Calls (WebRTC) ----------
+  async function startCall(video) {
+    if (!activeContact) return alert('Select a contact first.');
+    const cid = chatIdFor(me.uid, activeContact.uid);
+
+    // Signaling refs
+    const callRef = ref(rtdb, `calls/${cid}`);
+    const offerCandidatesRef = ref(rtdb, `calls/${cid}/offerCandidates`);
+    const answerCandidatesRef = ref(rtdb, `calls/${cid}/answerCandidates`);
+
+    pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video });
+    localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+    localVideo.srcObject = localStream; await localVideo.play().catch(()=>{});
+
+    pc.ontrack = (e) => { remoteVideo.srcObject = e.streams[0]; remoteVideo.play().catch(()=>{}); };
+    pc.onicecandidate = (e) => { if (e.candidate) push(offerCandidatesRef, e.candidate.toJSON()); };
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await set(callRef, { offer });
+
+    onValue(callRef, async (snap) => {
+      const v = snap.val();
+      if (v?.answer && !pc.currentRemoteDescription) {
+        await pc.setRemoteDescription(new RTCSessionDescription(v.answer));
+      }
+    });
+    onValue(answerCandidatesRef, async (snap) => {
+      const vals = snap.val() || {};
+      Object.values(vals).forEach(c => pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{}));
+    });
+
+    callDialog.showModal();
+  }
+
+  function listenForIncoming() {
+    onValue(ref(rtdb, 'calls'), async (snap) => {
+      const all = snap.val() || {};
+      for (const key of Object.keys(all)) {
+        const [a, b] = key.split('_');
+        const mine = key.includes(me.uid);
+        const theOther = mine && (a === me.uid ? b : a);
+        const call = all[key];
+        if (!mine || !call.offer) continue;
+        if (!activeContact || theOther !== activeContact.uid) continue;
+        if (pc) continue;
+
+        pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+        const wantsVideo = !!call.offer.sdp?.includes('m=video');
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: wantsVideo });
+        localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+        localVideo.srcObject = localStream; await localVideo.play().catch(()=>{});
+        pc.ontrack = (e) => { remoteVideo.srcObject = e.streams[0]; remoteVideo.play().catch(()=>{}); };
+
+        const callRef = ref(rtdb, `calls/${key}`);
+        const offerCandidatesRef = ref(rtdb, `calls/${key}/offerCandidates`);
+        const answerCandidatesRef = ref(rtdb, `calls/${key}/answerCandidates`);
+
+        pc.onicecandidate = (e) => { if (e.candidate) push(answerCandidatesRef, e.candidate.toJSON()); };
+
+        await pc.setRemoteDescription(new RTCSessionDescription(call.offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await set(callRef, { ...call, answer });
+
+        onValue(offerCandidatesRef, snap => {
+          const vals = snap.val() || {}; Object.values(vals).forEach(c => pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{}));
+        });
+
+        callDialog.showModal();
+      }
+    });
+  }
+
+  async function hangup() {
+    try {
+      if (pc) pc.getSenders().forEach(s => s.track && s.track.stop());
+      if (localStream) localStream.getTracks().forEach(t => t.stop());
+      if (pc) pc.close();
+    } catch {}
+    pc = null; localStream = null;
+    callDialog.close();
+    if (activeContact) {
+      await remove(ref(rtdb, `calls/${chatIdFor(me.uid, activeContact.uid)}`));
+    }
+  }
+
+  // ---------- Notifications (FCM) ----------
+  let messaging = null;
+
+  async function initPush() {
+    const supported = await isSupported();
+    if (!supported) return;
+
+    // Service worker must be at site root: /firebase-messaging-sw.js
+    await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+
+    messaging = getMessaging(app);
+
+    // Ask for permission and capture token
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    const vapidKey = 'BEu2x_iTjMTBBS1xvSu4FOXGs_Uo3MleciprkBvmVvHSLqE7o78Ms5n5DMcl5mmmffn_A_VrE9BUWHVjUW_lHa0';
+
+    try {
+      const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: await navigator.serviceWorker.ready });
+      if (token) {
+        // Store token under user so backend can target this device
+        await setDoc(doc(db, 'users', me.uid), { fcmToken: token }, { merge: true });
+      }
+    } catch (err) {
+      console.error('getToken error:', err);
+    }
+
+    // Foreground messages (tab open)
+    onMessage(messaging, (payload) => {
+      // Show a basic notification even when page is focused
+      const { title, body } = payload.notification || {};
+      if (title || body) {
+        new Notification(title || 'New notification', { body: body || '' });
+      }
+    });
+  }
+
+  // ---------- UI Listeners ----------
+  sendBtn.onclick = sendMessage;
+  msgInput.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }}
+
+  friendsBtn.onclick = () => {
+    myCodeField.value = myProfile.friendCode;
+    friendCodeField.value = '';
+    friendAliasField.value = '';
+    showTab('codeTab');
+    friendsDialog.showModal();
+    watchFriendRequests(); // <--- real-time updates now
+  };
+
+  copyCodeBtn.onclick = async () => { await navigator.clipboard.writeText(myCodeField.value); copyCodeBtn.textContent = 'Copied'; setTimeout(()=> copyCodeBtn.textContent = 'Copy', 1200); };
+  confirmAddBtn.onclick = () => addFriendByCode(friendCodeField.value, friendAliasField.value);
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => showTab(btn.dataset.tab);
+  });
+  function showTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+    document.querySelector('.tab-btn[data-tab="'+tabId+'"]').classList.add('active');
+    document.getElementById(tabId).style.display = 'block';
+  }
+
+  editContactsBtn.onclick = async () => {
+    if (!activeContact) return alert('Right-click a contact to edit, or select one first.');
+    openEdit(activeContact);
+  };
+  saveEditBtn.onclick = saveEdit;
+
+  callBtn.onclick = () => startCall(false);
+  videoBtn.onclick = () => startCall(true);
+  hangupBtn.onclick = hangup;
+
+  // ---------- Boot ----------
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      await signInAnonymously(auth);
+      return;
+    }
+    me = user;
+    await ensureUserDoc(user);
+
+    // Prompt first-time users to set a display name
+    if (myProfile.displayName === 'Unset') {
+      let name = '';
+      while (!name) {
+        name = prompt('Enter your display name:')?.trim() || '';
+      }
+      await setDoc(doc(db, 'users', me.uid), { displayName: name }, { merge: true });
+      myProfile.displayName = name;
+    }
+
+    await loadContacts();
+    listenForIncoming();
+
+    // Initialize push after login so we can store token to /users/{uid}
+    try { await initPush(); } catch(e) { console.warn('Push init skipped:', e); }
+  });
+</script>
 </body>
 </html>
