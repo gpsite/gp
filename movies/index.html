@@ -1,352 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6846568305709462"
-     crossorigin="anonymous"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GP Movies</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="index.js"></script>
-    <link rel="stylesheet" href="../../shared/styles.css">
-    <script src="../../shared/scripts.js" defer></script>
-    <script src="../../shared/navbar.js" defer></script>
-    <style>
-        #category-dropdown {
-  padding: 10px;
-  border: none;
-  outline: none;
-  background-color: #444;
-  color: #003594;
-  font-size: 16px;
-  font-family: 'Open Sans', Arial, sans-serif;
-  cursor: pointer;
-}
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #1d1e22;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-position: 50% 30%;
-            background-size: 2.1rem 2.1rem;
-            overflow-x: hidden;
-            font-family: 'Open Sans', sans-serif;
-            color: #E0E0E0;
-            background-attachment: fixed;
-        }
-
-        .search-bar {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  outline: none;
-  background-color: #333;
-  color: #003594;
-  font-size: 16px;
-  font-family: 'Open Sans', Arial, sans-serif;
-}
-.search-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 80%;
-  margin: 0 auto 20px;
-  border: 2px solid #003594;
-  border-radius: 10px;
-  background-color: #333;
-  overflow: hidden;
-}
-
-        .gamesearch {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            width: 81.5%;
-        }
-
-        .gamecard {
-            background-color: #333;
-            border: 2px solid #003594;
-            border-radius: 10px;
-            padding: 10px;
-            font-family: 'Open Sans', Arial, sans-serif;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .gamecard strong {
-            color: #ffffff;
-        }
-
-        .gamecard img {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .gamecard .title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #ffffff;
-        }
-
-        .gamecard .subtitle {
-            font-size: 14px;
-            color: #bbb;
-        }
-
-        .gamecard:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .gamecard:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: calc(100vh - 50px);
-        }
-        .expand-btn {
-  background-color: #003594;
-  border: none;
-  color: #333;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-  font-family: 'Open Sans', Arial, sans-serif;
-width: 100%;
-}
-
-.expand-btn:hover {
-  background-color: #e0a50c;
-}
-.gamecard .description {
-  display: none;
-  font-size: 12px;
-  color: #ccc;
-  margin-top: 10px;
-  font-family: 'Open Sans', Arial, sans-serif;
-}
-    </style>
+  <meta charset="UTF-8">
+  <title>Go to main site</title>
+  <style>
+    body {
+      background: #fff;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+    .large-btn {
+      display: inline-block;
+      padding: 40px 80px;
+      font-size: 2.5rem;
+      color: #fff;
+      background: #000;
+      border: none;
+      border-radius: 12px;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .large-btn:hover, .large-btn:focus {
+      background: #fff;
+      color: #000;
+      outline: 2px solid #000;
+    }
+  </style>
 </head>
-<body onload="loadMovies()">
-    <div id="navbar"></div>
-    <div>
-        <video id="videoplayer" width="100%" controls>
-            <source id="vidsource" type="video/mp4">
-            <track id="subs" kind="captions" label="English" srclang="en">
-        </video>
-    </div>
-    <div class="gamesearch">
-        <div class="search-container">
-        <input type="text" class="search-bar" onkeyup="searchGameCards()" placeholder="Search for movies...">
-        <!--<select id="category-dropdown-movies" onchange="searchGameCards()">
-            <option value="">All Categories</option>
-            <option value="Action">Action</option>
-            <option value="Adventure">Adventure</option>
-            <option value="Animation">Animation</option>
-            <option value="Anime">Anime</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Crime">Crime</option>
-            <option value="Documentary">Documentary</option>
-            <option value="Drama">Drama</option>
-            <option value="Family">Family</option>
-            <option value="Fantasy">Fantasy</option>
-            <option value="Horror">Horror</option>
-            <option value="Music">Music</option>
-            <option value="Musical">Musical</option>
-            <option value="Mystery">Mystery</option>
-            <option value="Romance">Romance</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Seasonal">Seasonal</option>
-            <option value="Short">Short</option>
-            <option value="Sport">Sport</option>
-            <option value="Thriller">Thriller</option>
-            <option value="Western">Western</option>
-        </select>-->
-        </div>
-        <div class="grid-container" id="gamecards-container"></div>
-    </div>
-<script>
-function loadMovies(){
-    createMovie('https://vault.rips.cc/video/interstellar.2014?k=', 'tt0816692');
-    createMovie('https://vault.rips.cc/video/the_shawshank_redemption_1994?k=', 'tt0111161');
-    createMovie('https://vault.rips.cc/video/the.godfather.1972?k=', 'tt0068646');
-    createMovie('https://vault.rips.cc/video/superbad.2007?k=', 'tt0829482');
-    createMovie('https://vault.rips.cc/video/step.brothers.2008?k=','tt0838283');
-    createMovie('https://vault.rips.cc/video/431954b1cf2a5206?k=','tt1636826');
-    createMovie('https://vault.rips.cc/video/the.hangover.2009.unrated?k=','tt1119646');
-    createMovie('https://vault.rips.cc/video/the.hangover.part.ii.2011.tt1411697.tt1411697?k=','tt1411697');
-    createMovie('https://vault.rips.cc/video/the.hangover.part.iii.2013.tt1951261?k=','tt1951261');
-    createMovie('https://vault.rips.cc/video/inception.2010?k=','tt1375666');
-    createMovie('https://vault.rips.cc/video/949e1deb802d5ff0?k=','tt1160419');
-    createMovie('https://vault.rips.cc/video/368415454ade5540?k=','tt15239678');
-    createMovie('https://vault.rips.cc/video/walle.2008.tt0910970.tt0910970?k=','tt0910970');
-    createMovie('https://vault.rips.cc/video/the.martian.2015?k=','tt3659388');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.i..the.phantom.menace.1999?k=','tt0120915');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.ii.attack.of.the.clones.2002?k=','tt0121765');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.iii..revenge.of.the.sith.2005?k=','tt0121766');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.iv..a.new.hope.1977?k=','tt0076759');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.v..the.empire.strikes.back.1980?k=','tt0080684');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.vi..return.of.the.jedi.1983?k=','tt0086190');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.vii..the.force.awakens.2015?k=','tt2488496');
-    createMovie('https://vault.rips.cc/video/star.wars.the.last.jedi.2017?k=','tt2527336');
-    createMovie('https://vault.rips.cc/video/star.wars.episode.ix..the.rise.of.skywalker.2019.tt2527338?k=','tt2527338');
-    createMovie('https://vault.rips.cc/video/rogue.one.2016?k=','tt3748528');
-    createMovie('https://vault.rips.cc/video/solo.a.star.wars.story.2018?k=','tt3778644');
-    createMovie('https://vault.rips.cc/video/f4e62f214350ce46?k=','tt1185834');
-    createMovie('https://vault.rips.cc/video/75ce71b641d0c13b?k=','tt10872600');
-    createMovie('https://vault.rips.cc/video/the.dark.knight.rises.2012?k=','tt1345836');
-    createMovie('https://vault.rips.cc/video/2d25692bf0788b20?k=','tt9362722');
-    createMovie('https://vault.rips.cc/video/a973ecb362f4e582?k=','tt4116284');
-    createMovie('https://vault.rips.cc/video/8caa72ffaf80a623?k=','tt7097896');
-    createMovie('https://vault.rips.cc/video/6faa94fb021605b7?k=','tt1663662');
-    createMovie('https://vault.rips.cc/video/a5763f615100e768?k=','tt6263850');
-    createMovie('https://vault.rips.cc/video/spiderman.into.the.spiderverse.2018?k=','tt4633694');
-    createMovie('https://vault.rips.cc/video/avengers.endgame.2019?k=','tt4154796');
-    createMovie('https://vault.rips.cc/video/5caa668b505770b7?k=','tt0114369');
-    createMovie('https://vault.rips.cc/video/c5c970539ef7a789?k=','tt15398776');
-    createMovie('https://vault.rips.cc/video/b00adaf32232bb1f?k=','tt1016150');
-    createMovie('https://vault.rips.cc/video/bf38d1bd03ed4c1c?k=','tt23468450');
-    createMovie('https://vault.rips.cc/video/a437307109d33489?k=','tt15474916');
-    createMovie('https://vault.rips.cc/video/e53e1b21fbd3e58b?k=','tt0251127');
-    createMovie('https://vault.rips.cc/video/10.things.i.hate.about.you.1999.tt0147800?k=','tt0147800');
-    createMovie('https://vault.rips.cc/video/95b36d3a4db9b9a5?k=','tt0780521');
-    createMovie('https://vault.rips.cc/video/875aa661a8ee85f7?k=','tt0454945');
-    createMovie('https://vault.rips.cc/video/4b8f0d762137ec09?k=','tt0377092');
-    createMovie('https://vault.rips.cc/video/the.dark.knight.2008?k=','tt0468569');
-    createMovie('https://vault.rips.cc/video/oceans.eight.2018.tt5164214?k=','tt5164214');
-    createMovie('https://vault.rips.cc/video/oceans.eleven.2001.tt0240772?k=','tt0054135');
-    createMovie('https://vault.rips.cc/video/2614054fd4c705cd?k=','tt1099212');
-    createMovie('https://vault.rips.cc/video/30079cb229748aee?k=','tt0120667');
-    createMovie('https://vault.rips.cc/video/2077ef9482179786?k=','tt0486576');
-    createMovie('https://vault.rips.cc/video/390f91b18289f4c8?k=','tt1727770');
-    createMovie('https://vault.rips.cc/video/186a80a2ba7ae44d?k=','tt1355644');
-    createMovie('https://vault.rips.cc/video/a8e4372c4d5d83e7?k=','tt0433035');
-    createMovie('https://vault.rips.cc/video/53d2ada9261e5bee?k=','tt0119698');
-    createMovie('https://vault.rips.cc/video/bb90276524aec520?k=','tt0758745');
-    createMovie('https://vault.rips.cc/video/gladiator.extended.remastered.2000?k=','tt0172495');
-    createMovie('https://vault.rips.cc/video/1f9723e3eb2ff949?k=','tt1490017');
-    createMovie('https://vault.rips.cc/video/b273ae8a18b061e0?k=','tt0371746');
-    createMovie('https://vault.rips.cc/video/iron.man.ii.x264?k=','tt1228705');
-    createMovie('https://vault.rips.cc/video/iron.man.3.2013?k=','tt1300854');
-    createMovie('https://vault.rips.cc/video/the_incredible_hulk_2008?k=','tt0800080');
-    createMovie('https://vault.rips.cc/video/thor.2011?k=','tt0800369');
-    createMovie('https://vault.rips.cc/video/thor.the.dark.world.2013?k=','tt1981115');
-    createMovie('https://vault.rips.cc/video/thor.ragnarok.2017?k=','tt3501632');
-    createMovie('https://vault.rips.cc/video/captain.america.2011?k=','tt0458339');
-    createMovie('https://vault.rips.cc/video/captain.america.civil.war.2016?k=','tt3498820');
-    createMovie('https://vault.rips.cc/video/captain.america.the.winter.soldier.2014?k=','tt1843866');
-    createMovie('https://vault.rips.cc/video/the.avengers.2012?k=','tt0848228');
-    createMovie('https://vault.rips.cc/video/avengers.age.of.ultron.2015.tt2395427.tt2395427?k=','tt2395427');
-    createMovie('https://vault.rips.cc/video/avengers.infinity.war.2018?k=','tt4154756');
-    createMovie('https://vault.rips.cc/video/guardians.of.the.galaxy.2014?k=','tt2015381');
-    createMovie('https://vault.rips.cc/video/guardians.of.the.galaxy.vol..2.2017?k=','tt3896198');
-    createMovie('https://vault.rips.cc/video/antman.2015?k=','tt0478970');
-    createMovie('https://vault.rips.cc/video/doctor.strange.2016?k=','tt1211837');
-    createMovie('https://vault.rips.cc/video/spiderman.homecoming.2017.tt2250912?k=','tt2250912');
-    createMovie('https://vault.rips.cc/video/black.panther.2018?k=','tt1825683');
-    createMovie('https://vault.rips.cc/video/antman.and.the.wasp.2018?k=','tt5095030');
-    createMovie('https://vault.rips.cc/video/captain.marvel.2019.tt4154664?k=','tt4154664');
-    createMovie('https://vault.rips.cc/video/414360ca2cfab167?k=','tt26047818');
-    createMovie('https://vault.rips.cc/video/efdfb4781ebcc1d5?k=','tt3480822');
-    createMovie('https://vault.rips.cc/video/b2fc9be0ce45495f?k=','tt9376612');
-    createMovie('https://vault.rips.cc/video/6b43a906523c57cc?k=','tt9032400');
-    createMovie('https://vault.rips.cc/video/6875ec8bad0c495f?k=','tt9419884');
-    createMovie('https://vault.rips.cc/video/spiderman.far.from.home.2019?k=','tt6320628');
-    createMovie('https://vault.rips.cc/video/c43ecc647202b083?k=','tt10648342');
-    createMovie('https://vault.rips.cc/video/03f0b2be1651423d?k=','tt9114286');
-    createMovie('https://vault.rips.cc/video/5459737bfb4880d6?k=','tt10954600');
-    createMovie('https://vault.rips.cc/video/ac21a573e3838dae?k=','tt6791350');
-    createMovie('https://vault.rips.cc/video/a295c361001109c1?k=','tt10676048');
-    createMovie('https://vault.rips.cc/video/8ee6853e8a3cc437?k=','tt0137523');
-    createMovie('https://vault.rips.cc/video/707e194f3cb84bbb?k=','tt0084827');
-    createMovie('https://vault.rips.cc/video/the.simpsons.movie.2007?k=','tt0462538');
-    createMovie('https://vault.rips.cc/video/9e893d30555fa375?k=','tt0423294');
-    createMovie('https://vault.rips.cc/video/ford.v.ferrari.2019.tt1950186?k=','tt1950186');
-    createMovie('https://vault.rips.cc/video/576f60f7a388d787?k=','tt0337563');
-    createMovie('https://vault.rips.cc/video/the.devil.wears.prada.2006?k=','tt0458352');
-    createMovie('https://vault.rips.cc/video/aee3ed6754f719ad?k=','tt0250494');
-    createMovie('https://vault.rips.cc/video/7dd97706789753a5?k=','tt0286788');
-    createMovie('https://vault.rips.cc/video/db050d22c598909e?k=','tt0332280');
-    createMovie('https://vault.rips.cc/video/the.green.mile.1999?k=','tt0120689');
-    createMovie('https://vault.rips.cc/video/the.lord.of.the.rings.the.fellowship.of.the.ring.extended.2001?k=','tt0120737');
-    createMovie('https://vault.rips.cc/video/the.lord.of.the.rings.the.two.towers.extended.2002?k=','tt0167261');
-    createMovie('https://vault.rips.cc/video/the.lord.of.the.rings.the.return.of.the.king.extended.2003?k=','tt0167260');
-    createMovie('https://vault.rips.cc/video/ready.player.one.2018?k=','tt1677720');
-    createMovie('https://vault.rips.cc/video/3d4de27e6bdf253b?k=','tt0892769');
-    createMovie('https://vault.rips.cc/video/4761b52b90f33e5c?k=','tt1646971');
-    createMovie('https://vault.rips.cc/video/4bbc63f70366830a?k=','tt2386490');
-    createMovie('https://vault.rips.cc/video/cc20770caa497955?k=','tt11112140');
-    createMovie('https://vault.rips.cc/video/the.shining.1980?k=','tt0081505');
-    createMovie('https://vault.rips.cc/video/cf56fc1c7836c680?k=','tt0317705');
-    createMovie('https://vault.rips.cc/video/f028052950271b6e?k=','tt3606756');
-    createMovie('https://vault.rips.cc/video/cars.2006.tt0317219?k=','tt0317219');
-    createMovie('https://vault.rips.cc/video/35b0f111af7b9587?k=','tt1216475');
-    createMovie('https://vault.rips.cc/video/8bb623d64aaf4f19?k=','tt3606752');
-    createMovie('https://vault.rips.cc/video/6c6997187daa0f71?k=','tt1104001');
-    createMovie('https://vault.rips.cc/video/b3e4a2ff0c95a043?k=','tt0119217');
-    createMovie('https://vault.rips.cc/video/catch.me.if.you.can.2002.tt0264464?k=','tt0264464');
-    createMovie('https://vault.rips.cc/video/deadpool.2016?k=','tt1431045');
-    createMovie('https://vault.rips.cc/video/deadpool.2.2018?k=','tt5463162');
-    createMovie('https://vault.rips.cc/video/harry_potter_and_the_philosophers_stone_2001.tt0241527.mkv.tt0241527?k=','tt0241527');
-    createMovie('https://vault.rips.cc/video/harry_potter_and_the_chamber_of_secrets_2002.mkv?k=', 'tt0295297');
-    createMovie('https://vault.rips.cc/video/harry_potter_and_the_prisoner_of_azkaban_2004.mkv?k=','tt0304141');
-    createMovie('https://vault.rips.cc/video/harry_potter_and_the_goblet_of_fire_2005.mkv?k=','tt0330373');
-    createMovie('https://vault.rips.cc/video/harry_potter_and_the_order_of_the_phoenix_2007.mkv?k=','tt0373889');
-    createMovie('https://vault.rips.cc/video/harry_potter_and_the_half_blood_prince_2009.tt0417741.tt0417741.tt0417741.tt0417741?k=','tt0417741');
-    createMovie('https://vault.rips.cc/video/hp7.2010.tt0926084?k=','tt0926084');
-    createMovie('https://vault.rips.cc/video/harry.potter.and.the.deathly.hallows.part.2.2011.tt1201607.tt1201607.tt1201607?k=','tt1201607');
-    createMovie('https://vault.rips.cc/video/9ba2f72fe2326f54?k=','tt0335345');
-    createMovie('https://vault.rips.cc/video/the.godfather.part.2.1974?k=','tt0071562');
-    createMovie('https://vault.rips.cc/video/the.godfather.part.3.1990?k=','tt0099674');
-    createMovie('https://vault.rips.cc/video/293c9c0b0bfed2ca?k=','tt9466114');
-    createMovie('https://vault.rips.cc/video/64ca4c924357f87a?k=','tt21830902');
-    createMovie('https://vault.rips.cc/video/9a309c5bdcb9bd44?k=','tt1001508');
-    createMovie('https://vault.rips.cc/video/b24bc0e23b0d9655?k=','tt0387564');
-    createMovie('https://vault.rips.cc/video/1eb54eff7b0a6ec1?k=','tt1596346');
-    createMovie('https://vault.rips.cc/video/4eb8f0c399f7b585?k=','tt0132477');
-    createMovie('https://vault.rips.cc/video/tropic.thunder.2008.unrated.director.cut?k=','tt0942385');
-    createMovie('https://vault.rips.cc/video/33b548a022271668?k=','tt0215129');
-    createMovie('https://vault.rips.cc/video/ab1b545bdf7a7a5d?k=','tt0480687');
-    createMovie('https://vault.rips.cc/video/c7025bf6fc18539a?k=','tt0163651');
-    createMovie('https://vault.rips.cc/video/forrest.gump.1994?k=','tt0109830');
-    createMovie('https://vault.rips.cc/video/1fe8ff1bd28236a2?k=','tt2463208');
-    createMovie('https://vault.rips.cc/video/851d416657cdc883?k=','tt9362930');
-    createMovie('https://vault.rips.cc/video/warrior.2011.tt1291584?k=','tt1291584');
-    createMovie('https://vault.rips.cc/video/jurassic.park.1993?k=','tt0107290');
-    createMovie('https://vault.rips.cc/video/7f5744f9e0a5dfd6?k=','tt0163025');
-    createMovie('https://vault.rips.cc/video/c39313584bca18ee?k=','tt0119567');
-    createMovie('https://vault.rips.cc/video/jurassic.world.2015?k=','tt0369610');
-    createMovie('https://vault.rips.cc/video/27ec3f88ec5a7de5?k=','tt4881806');
-    createMovie('https://vault.rips.cc/video/73c7617dfddd1dae?k=','tt8041270');
-    createMovie('https://vault.rips.cc/video/the.great.gatsby.2013?k=','tt1343092');
-    createMovie('https://vault.rips.cc/video/2ab723ef6640fc2e?k=','tt1259571');
-    createMovie('https://vault.rips.cc/video/f0dcff35d3452c7d?k=','tt1325004');
-    createMovie('https://vault.rips.cc/video/9d6e6440f8f44c05?k=','tt1673434');
-    createMovie('https://vault.rips.cc/video/prisoners.2013?k=','tt1392214');
-    createMovie('https://vault.rips.cc/video/db050d22c598909e?k=','tt0332280');
-    createMovie('https://vault.rips.cc/video/goodfellas.1990?k=','tt0099685');
-    createMovie('https://vault.rips.cc/video/9158bd72f6fd2147?k=','tt1745960');
-    createMovie('https://vault.rips.cc/video/drive.2011?k=','tt0780504');
-    shuffleGameCards();
-};
-</script>
+<body>
+  <a class="large-btn" href="https://georgepickenssite.github.io/georgepickens/index.html">
+    GO TO SITE
+  </a>
 </body>
 </html>
