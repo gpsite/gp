@@ -1,90 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Under Construction</title>
-<style>
-  body, html {
-    margin: 0; padding: 0; height: 100%;
-    background: #000;
-    color: #fff;
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-
-  .crane-container {
-    width: 400px;
-    height: 300px;
-    margin-bottom: 20px;
-  }
-
-  svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  .hook-group {
-    transform-origin: center top;
-  }
-
-  .hook-motion {
-    animation: hookUpDown 4s ease-in-out infinite alternate;
-  }
-
-  h1 {
-    font-size: 1.8rem;
-    color: #d4af37;
-    margin: 0;
-  }
-  p {
-    margin-top: 8px;
-    color: #ccc;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Go to main site</title>
+  <style>
+    body {
+      background: #fff;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+    .large-btn {
+      display: inline-block;
+      padding: 40px 80px;
+      font-size: 2.5rem;
+      color: #fff;
+      background: #000;
+      border: none;
+      border-radius: 12px;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .large-btn:hover, .large-btn:focus {
+      background: #fff;
+      color: #000;
+      outline: 2px solid #000;
+    }
+  </style>
 </head>
 <body>
-  <div class="crane-container" aria-label="SVG construction crane" role="img" aria-hidden="true">
-    <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" stroke="#d4af37" fill="#d4af37" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-      <!-- Stand (moved forward) -->
-<rect x="70" y="100" width="20" height="180" />
-<line x1="70" y1="140" x2="90" y2="140" />
-<line x1="70" y1="180" x2="90" y2="180" />
-
-      <!-- Arm (adjusted to match tower) -->
-      <rect x="90" y="100" width="230" height="10" />
-
-      <!-- Animated Cable -->
-      <line x1="320" y1="110" x2="320" y2="180" stroke="#d4af37" stroke-width="4">
-        <animate attributeName="y2" values="180;210;180" dur="4s" repeatCount="indefinite" />
-      </line>
-
-      <!-- Cabin (moved with tower) -->
-<rect x="80" y="110" width="30" height="20" fill="#d4af37" />
-<rect x="83" y="115" width="24" height="6" fill="#fff" />
-
-      <!-- Weight (optional: move if needed) -->
-      <rect x="60" y="90" width="20" height="20" fill="#bfa544" />
-
-      <!-- Hook and payload with synced animation -->
-      <g class="hook-group">
-        <g class="hook-motion">
-          <rect x="310" y="180" width="20" height="18" rx="3" ry="3" stroke="#d4af37" fill="none" />
-          <line x1="320" y1="198" x2="320" y2="205" />
-          <rect x="295" y="205" width="50" height="10" rx="2" />
-        </g>
-        <animateTransform attributeName="transform" type="translate" values="0,0;0,30;0,0" dur="4s" repeatCount="indefinite" />
-      </g>
-    </svg>
-  </div>
-  <div>
-    <h1>We're Building Something New</h1>
-    <p>All pages are currently under construction. Enjoy your Summer!</p>
-  </div>
+  <a class="large-btn" href="https://georgepickenssite.github.io/georgepickens/index.html">
+    GO TO SITE
+  </a>
 </body>
 </html>
