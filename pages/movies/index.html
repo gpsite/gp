@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Game Catalog</title>
+  <title>Movie Catalog</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
   <style>
@@ -32,15 +32,15 @@
     .catalog-frame { flex: 1; margin: 20px; border-radius: 20px; background: #0e0f13; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
     .catalog-inner { flex: 1; border-radius: 15px; background: #13141a; padding: 15px; overflow-y: scroll; scrollbar-width: none; }
     .catalog-inner::-webkit-scrollbar { display: none; }
-    .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
-    .game-card { background: #222428; border-radius: 15px; padding: 8px; text-align: center; cursor: pointer; }
-    .game-card h3 { font-size: 13px; margin: 5px 0; color: #fff; }
-    .game-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; background: #444; }
-    .game-card p { font-size: 11px; color: #fff; margin: 5px 0 0; }
+    .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
+    .movie-card { background: #222428; border-radius: 15px; padding: 8px; text-align: center; cursor: pointer; }
+    .movie-card h3 { font-size: 13px; margin: 5px 0; color: #fff; }
+    .movie-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; background: #444; }
+    .movie-card p { font-size: 11px; color: #fff; margin: 5px 0 0; }
     #homeBtn { margin-top: auto; }
 
-    /* overlay for game iframe */
-    .game-overlay {
+    /* overlay for movie iframe */
+    .movie-overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
@@ -51,7 +51,7 @@
       flex-direction: column;
       z-index: 9999;
     }
-    .game-overlay iframe, .game-overlay object {
+    .movie-overlay iframe, .movie-overlay object {
       width: 80vw;
       height: 80vh;
       border: none;
@@ -86,13 +86,13 @@
   <!-- Catalog -->
   <div class="catalog-frame">
     <div class="catalog-inner" id="catalog">
-      <div class="game-grid" id="gameGrid"></div>
+      <div class="movie-grid" id="movieGrid"></div>
     </div>
   </div>
 
   <!-- Overlay -->
-  <div class="game-overlay" id="gameOverlay">
-    <div id="gameContainer"></div>
+  <div class="movie-overlay" id="movieOverlay">
+    <div id="movieContainer"></div>
     <div class="overlay-controls">
       <button onclick="toggleFullscreen()">Fullscreen</button>
       <button onclick="closeOverlay()">Close</button>
@@ -100,23 +100,24 @@
   </div>
 
   <script>
+    const OMDB_API_KEY = '54d76e21';
     const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
     const catalog = document.getElementById("catalog");
     const thumb = document.querySelector(".thumb");
-    const gameGrid = document.getElementById("gameGrid");
+    const movieGrid = document.getElementById("movieGrid");
     const track = document.querySelector(".track");
     const searchBtn = document.getElementById("searchBtn");
     const searchInput = document.getElementById("searchInput");
     const filterBtn = document.getElementById("filterBtn");
     const filterMenu = document.getElementById("filterMenu");
-    const overlay = document.getElementById("gameOverlay");
-    const gameContainer = document.getElementById("gameContainer");
+    const overlay = document.getElementById("movieOverlay");
+    const movieContainer = document.getElementById("movieContainer");
 
-    let allGames = [];
+    let allMovies = [];
     let categories = new Set();
 
-    // Fetch game data from Google Sheets
-    async function fetchGameData() {
+    // Fetch movie data from Google Sheets
+    async function fetchMovieData() {
       try {
         const response = await fetch(SHEET_URL);
         const data = await response.json();
@@ -125,7 +126,7 @@
         const urlIndex = headers.indexOf('URL');
         const subtitlesIndex = headers.indexOf('Subtitles');
 
-        allGames = rows.map(row => ({
+        allMovies = rows.map(row => ({
           title: row[titleIndex],
           categories: row[categoryIndex] ? row[categoryIndex].split(',').map(c => c.trim()) : [],
           url: row[urlIndex],
@@ -133,25 +134,25 @@
         }));
 
         categories = new Set();
-        allGames.forEach(g => g.categories.forEach(c => categories.add(c)));
+        allMovies.forEach(g => g.categories.forEach(c => categories.add(c)));
         buildFilters();
-        renderGames(allGames);
-      } catch (e) { console.error("Error fetching game data", e); }
+        renderMovies(allMovies);
+      } catch (e) { console.error("Error fetching movie data", e); }
     }
 
-    // Render game cards
-    function renderGames(games) {
-      gameGrid.innerHTML = "";
-      games.forEach(game => {
+    // Render movie cards
+    function renderMovies(movies) {
+      movieGrid.innerHTML = "";
+      movies.forEach(movie => {
         const card = document.createElement("div");
-        card.className = "game-card";
+        card.className = "movie-card";
         card.innerHTML = `
-          <h3>${game.title}</h3>
-          <img src="${game.thumbnail}" alt="${game.title}">
-          <p>${game.categories.join(', ')}</p>
+          <h3>${movie.title}</h3>
+          <img src="${movie.thumbnail}" alt="${movie.title}">
+          <p>${movie.categories.join(', ')}</p>
         `;
-        card.addEventListener("click", () => openOverlay(game));
-        gameGrid.appendChild(card);
+        card.addEventListener("click", () => openOverlay(movie));
+        movieGrid.appendChild(card);
       });
     }
 
@@ -160,40 +161,40 @@
       filterMenu.innerHTML = "";
       const allBtn = document.createElement("button");
       allBtn.textContent = "All";
-      allBtn.onclick = () => renderGames(allGames);
+      allBtn.onclick = () => renderMovies(allMovies);
       filterMenu.appendChild(allBtn);
       categories.forEach(cat => {
         const btn = document.createElement("button");
         btn.textContent = cat;
-        btn.onclick = () => renderGames(allGames.filter(g => g.categories.includes(cat)));
+        btn.onclick = () => renderMovies(allMovies.filter(g => g.categories.includes(cat)));
         filterMenu.appendChild(btn);
       });
     }
 
-    // Open game overlay
-    function openOverlay(game) {
-      gameContainer.innerHTML = "";
-      if (game.url.endsWith(".swf")) {
-        gameContainer.innerHTML = `
-          <object id="gameObject" type="application/x-shockwave-flash" data="${game.url}" width="800" height="600">
-            <param name="movie" value="${game.url}">
+    // Open movie overlay
+    function openOverlay(movie) {
+      movieContainer.innerHTML = "";
+      if (movie.url.endsWith(".swf")) {
+        movieContainer.innerHTML = `
+          <object id="movieObject" type="application/x-shockwave-flash" data="${movie.url}" width="800" height="600">
+            <param name="movie" value="${movie.url}">
             <param name="quality" value="high">
             <param name="wmode" value="transparent">
           </object>
         `;
       } else {
-        gameContainer.innerHTML = `<iframe id="gameIframe" src="${game.url}" class="embed"></iframe>`;
+        movieContainer.innerHTML = `<iframe id="movieIframe" src="${movie.url}" class="embed"></iframe>`;
       }
       overlay.style.display = "flex";
     }
 
     function closeOverlay() {
       overlay.style.display = "none";
-      gameContainer.innerHTML = "";
+      movieContainer.innerHTML = "";
     }
 
     function toggleFullscreen() {
-      const el = document.querySelector("#gameIframe") || document.querySelector("#gameObject");
+      const el = document.querySelector("#movieIframe") || document.querySelector("#movieObject");
       if (!el) return;
       if (!document.fullscreenElement) {
         el.requestFullscreen().catch(err => console.error(err));
@@ -202,7 +203,7 @@
       }
     }
 
-    fetchGameData();
+    fetchMovieData();
 
     // Sync scrollbar thumb position
     function syncThumb() {
@@ -241,12 +242,12 @@
         searchInput.focus();
       } else {
         searchInput.value = "";
-        renderGames(allGames);
+        renderMovies(allMovies);
       }
     });
     searchInput.addEventListener("input", e => {
       const term = e.target.value.toLowerCase();
-      renderGames(allGames.filter(g => g.title.toLowerCase().includes(term)));
+      renderMovies(allMovies.filter(g => g.title.toLowerCase().includes(term)));
     });
 
     // --- Filter functionality ---
