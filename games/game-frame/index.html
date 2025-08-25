@@ -1,68 +1,41 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Game Frame</title>
-     <link rel="stylesheet" href="../../shared/styles.css">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
- </head>
- <body>
-     <div id="navbar"></div>
-     <div class="game-container" id="game-container">
-         <!-- Games are injected here -->
-     </div>
-     <button class="fullscreen-btn" onclick="toggleFullscreen()">Fullscreen</button>
- 
-     <script>
-         const params = new URLSearchParams(window.location.search);
-         const gameUrl = params.get('gameUrl');
- 
-         const container = document.getElementById('game-container');
- 
-         if (gameUrl) {
-             if (gameUrl.endsWith('.swf')) {
-                 //Render flash games
-                 //render flash games
-                 container.innerHTML = `
-                     <p align="center">
-                         <object type="application/x-shockwave-flash" data="${gameUrl}" width="800" height="600">
-                         <object id="game-object" type="application/x-shockwave-flash" data="${gameUrl}" width="800" height="600">
-                             <param name="movie" value="${gameUrl}">
-                             <param name="quality" value="high">
-                             <param name="wmode" value="transparent">
-                         </object>
-                     </p>
-                 `;
-             } else {
-                 //Render iframe for the non Flash games
-                 //render iframe for non flash games
-                 container.innerHTML = `
-                     <iframe class="embed" src="${decodeURIComponent(gameUrl)}"></iframe>
-                     <iframe id="game-iframe" class="embed" src="${decodeURIComponent(gameUrl)}"></iframe>
-                 `;
-             }
-         } else {
-             container.innerHTML = '<p style="color: white;">No game URL provided.</p>';
-             console.error('No game URL provided');
-         }
- 
-         // Fullscreen toggle functionality
-         function toggleFullscreen() {
-             const gameElement = document.querySelector('#game-iframe') || document.querySelector('#game-object');
-             if (gameElement) {
-                 if (!document.fullscreenElement) {
-                     gameElement.requestFullscreen().catch(err => {
-                         console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
-                     });
-                 } else {
-                     document.exitFullscreen();
-                 }
-             } else {
-                 console.error('No game element found to toggle fullscreen.');
-             }
-         }
-     </script>
-     <script src="../../shared/navbar.js" defer></script>
- </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Go to main site</title>
+  <style>
+    body {
+      background: #fff;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+    }
+    .large-btn {
+      display: inline-block;
+      padding: 40px 80px;
+      font-size: 2.5rem;
+      color: #fff;
+      background: #000;
+      border: none;
+      border-radius: 12px;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .large-btn:hover, .large-btn:focus {
+      background: #fff;
+      color: #000;
+      outline: 2px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <a class="large-btn" href="https://georgepickenssite.github.io/georgepickens/index.html">
+    GO TO SITE
+  </a>
+</body>
+</html>
