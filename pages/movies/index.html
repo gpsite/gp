@@ -202,27 +202,59 @@ function renderMovies(movies) {
   movies.forEach(movie => {
     const card = document.createElement("div");
     card.className = "movie-card";
+    card.setAttribute("data-imdb", movie.subs);
 
-    if (movie.poster) {
-      card.innerHTML = `
-        <h3>${movie.title}</h3>
-        <img src="${movie.poster}" alt="${movie.title}">
-        <p>${movie.genres.join(", ")}</p>
-      `;
-    } else {
-      card.innerHTML = `
-        <h3>${movie.title}</h3>
-        <div style="background:#444; color:#fff; padding:20px; border-radius:10px;">
-          Database Error
-        </div>
-        <p>${movie.genres.join(", ")}</p>
-      `;
-    }
+    // Render base info from Sheets
+    card.innerHTML = `
+      <h3>${movie.title || "Loading..."}</h3>
+      <img src="" alt="${movie.title || ""}" style="background:#444;height:200px;">
+      <p>Loading genres...</p>
+    `;
 
+    // Add event listener
     card.addEventListener("click", () => openOverlay(movie));
+
     movieGrid.appendChild(card);
+
+    // Now enhance the card with TMDB info (async)
+    enrichWithTMDB(movie.subs, card);
   });
 }
+
+async function enrichWithTMDB(imdbID, card) {
+  const url = `https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_API_KEY}&language=en-US&external_source=imdb_id`;
+
+  try {
+    const proxy = "https://corsproxy.io/?"; // Replace this with a real proxy later
+    const res = await fetch(proxy + encodeURIComponent(url));
+    const data = await res.json();
+
+    const movie = data.movie_results[0];
+    if (!movie) return;
+
+    const posterUrl = movie.poster_path
+      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+      : "";
+
+    const genres = movie.genre_ids.map(id => genreMap[id] || "Unknown");
+
+    // Update the card
+    card.querySelector("img").src = posterUrl;
+    card.querySelector("h3").textContent = movie.title;
+    card.querySelector("p").textContent = genres.join(", ");
+
+    // Optional: store the enriched movie object on the element for reuse
+    card._movie = {
+      ...movie,
+      poster: posterUrl,
+      genres,
+      imdbID
+    };
+  } catch (err) {
+    console.error("TMDB enrich failed:", imdbID, err);
+  }
+}
+
 
 // Build filter buttons
 function buildFilters() {
