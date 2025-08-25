@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Movie Catalog</title>
+  <title>Game Catalog</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
   <style>
     body {
       margin: 0;
@@ -52,6 +51,9 @@
       z-index: 9999;
     }
     .movie-overlay iframe, .movie-overlay object {
+      position: fixed;
+      justify-content: center;
+      align-items: center;
       width: 80vw;
       height: 80vh;
       border: none;
@@ -83,14 +85,13 @@
     <a class="circle-btn" id="homeBtn" href="../../index.html"><i class="fa fa-home"></i></a>
   </div>
 
-  <!-- Catalog -->
   <div class="catalog-frame">
-    <div class="catalog-inner" id="catalog">
+    <div class="catalog-inner" id="movieCatalog">
       <div class="movie-grid" id="movieGrid"></div>
     </div>
   </div>
-
-  <!-- Overlay -->
+  
+  <!-- Overlay for movies -->
   <div class="movie-overlay" id="movieOverlay">
     <div id="movieContainer"></div>
     <div class="overlay-controls">
@@ -99,169 +100,229 @@
     </div>
   </div>
 
-  <script>
-    const OMDB_API_KEY = '54d76e21';
-    const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
-    const catalog = document.getElementById("catalog");
-    const thumb = document.querySelector(".thumb");
-    const movieGrid = document.getElementById("movieGrid");
-    const track = document.querySelector(".track");
-    const searchBtn = document.getElementById("searchBtn");
-    const searchInput = document.getElementById("searchInput");
-    const filterBtn = document.getElementById("filterBtn");
-    const filterMenu = document.getElementById("filterMenu");
-    const overlay = document.getElementById("movieOverlay");
-    const movieContainer = document.getElementById("movieContainer");
+<script>
+const SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
+const TMDB_API_KEY = "3c3f3d758f294832457405350dda4f89";
 
-    let allMovies = [];
-    let categories = new Set();
+const catalog = document.getElementById("movieCatalog");
+const thumb = document.querySelector(".thumb");
+const movieGrid = document.getElementById("movieGrid");
+const track = document.querySelector(".track");
+const searchBtn = document.getElementById("searchBtn");
+const searchInput = document.getElementById("searchInput");
+const filterBtn = document.getElementById("filterBtn");
+const filterMenu = document.getElementById("filterMenu");
+const overlay = document.getElementById("movieOverlay");
+const movieContainer = document.getElementById("movieContainer");
 
-    // Fetch movie data from Google Sheets
-    async function fetchMovieData() {
-      try {
-        const response = await fetch(SHEET_URL);
-        const data = await response.json();
-        const rows = data.values;
-        const headers = rows.shift();
-        const urlIndex = headers.indexOf('URL');
-        const subtitlesIndex = headers.indexOf('Subtitles');
+let allMovies = [];
+let categories = new Set();
 
-        allMovies = rows.map(row => ({
-          title: row[titleIndex],
-          categories: row[categoryIndex] ? row[categoryIndex].split(',').map(c => c.trim()) : [],
-          url: row[urlIndex],
-          thumbnail: row[thumbnailIndex]
-        }));
+// TMDB genre mapping
+const genreMap = {
+  28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime",
+  99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History",
+  27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Science Fiction",
+  10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western"
+};
 
-        categories = new Set();
-        allMovies.forEach(g => g.categories.forEach(c => categories.add(c)));
-        buildFilters();
-        renderMovies(allMovies);
-      } catch (e) { console.error("Error fetching movie data", e); }
-    }
+// build long date string (yesterday + today + tomorrow)
+function getDateString() {
+  const d = new Date();
+  const fmt = dt => dt.toISOString().split("T")[0].replace(/-/g, "");
+  const y = new Date(d); y.setDate(d.getDate() - 1);
+  const t = new Date(d); t.setDate(d.getDate() + 1);
+  return fmt(y) + fmt(d) + fmt(t);
+}
 
-    // Render movie cards
-    function renderMovies(movies) {
-      movieGrid.innerHTML = "";
-      movies.forEach(movie => {
-        const card = document.createElement("div");
-        card.className = "movie-card";
-        card.innerHTML = `
-          <h3>${movie.title}</h3>
-          <img src="${movie.thumbnail}" alt="${movie.title}">
-          <p>${movie.categories.join(', ')}</p>
-        `;
-        card.addEventListener("click", () => openOverlay(movie));
-        movieGrid.appendChild(card);
-      });
-    }
+function buildMovieURL(base, imdbID) {
+  const longDate = getDateString();
+  return {
+    url: base + longDate,
+    subs: "https://rips.cc/subs/" + imdbID + ".vtt"
+  };
+}
 
-    // Build filter buttons
-    function buildFilters() {
-      filterMenu.innerHTML = "";
-      const allBtn = document.createElement("button");
-      allBtn.textContent = "All";
-      allBtn.onclick = () => renderMovies(allMovies);
-      filterMenu.appendChild(allBtn);
-      categories.forEach(cat => {
-        const btn = document.createElement("button");
-        btn.textContent = cat;
-        btn.onclick = () => renderMovies(allMovies.filter(g => g.categories.includes(cat)));
-        filterMenu.appendChild(btn);
-      });
-    }
+// Fetch movie data from TMDB using IMDb ID
+async function fetchMovieByImdb(imdbID) {
+  const url = `https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_API_KEY}&language=en-US&external_source=imdb_id`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const movie = data.movie_results[0];
+  if (!movie) return null;
+  return {
+    title: movie.title,
+    overview: movie.overview,
+    genres: movie.genre_ids.map(id => genreMap[id] || "Unknown"),
+    poster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "",
+    imdbID
+  };
+}
 
-    // Open movie overlay
-    function openOverlay(movie) {
-      movieContainer.innerHTML = "";
-      if (movie.url.endsWith(".swf")) {
-        movieContainer.innerHTML = `
-          <object id="movieObject" type="application/x-shockwave-flash" data="${movie.url}" width="800" height="600">
-            <param name="movie" value="${movie.url}">
-            <param name="quality" value="high">
-            <param name="wmode" value="transparent">
-          </object>
-        `;
-      } else {
-        movieContainer.innerHTML = `<iframe id="movieIframe" src="${movie.url}" class="embed"></iframe>`;
-      }
-      overlay.style.display = "flex";
-    }
+// Fetch multiple movies
+async function fetchMovies(imdbIDs) {
+  const promises = imdbIDs.map(id => fetchMovieByImdb(id));
+  const results = await Promise.all(promises);
+  return results.filter(m => m !== null);
+}
 
-    function closeOverlay() {
-      overlay.style.display = "none";
-      movieContainer.innerHTML = "";
-    }
+// Fetch movies and build catalog
+async function fetchMovieData() {
+  try {
+    const sheetRes = await fetch(SHEET_URL).then(r => r.json());
+    const rows = sheetRes.values;
+    const headers = rows.shift();
+    const urlIndex = headers.indexOf("URL");
+    const subsIndex = headers.indexOf("Subtitles");
 
-    function toggleFullscreen() {
-      const el = document.querySelector("#movieIframe") || document.querySelector("#movieObject");
-      if (!el) return;
-      if (!document.fullscreenElement) {
-        el.requestFullscreen().catch(err => console.error(err));
-      } else {
-        document.exitFullscreen();
-      }
-    }
+    const imdbIDs = rows.map(r => r[subsIndex]);
+    const moviesFromTMDB = await fetchMovies(imdbIDs);
 
-    fetchMovieData();
-
-    // Sync scrollbar thumb position
-    function syncThumb() {
-      const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
-      const trackHeight = track.clientHeight - thumb.clientHeight;
-      thumb.style.top = (track.offsetTop + ratio * trackHeight) + "px";
-    }
-    catalog.addEventListener("scroll", syncThumb);
-
-    let dragging = false;
-    let startY, startTop;
-    thumb.addEventListener("mousedown", e => {
-      dragging = true;
-      startY = e.clientY;
-      startTop = parseInt(thumb.style.top) || 0;
-      thumb.style.cursor = "grabbing";
-    });
-    document.addEventListener("mousemove", e => {
-      if (!dragging) return;
-      const dy = e.clientY - startY;
-      const trackHeight = track.clientHeight - thumb.clientHeight;
-      let newTop = Math.min(track.offsetTop + trackHeight, Math.max(track.offsetTop, startTop + dy));
-      thumb.style.top = newTop + "px";
-      const ratio = (newTop - track.offsetTop) / trackHeight;
-      catalog.scrollTop = ratio * (catalog.scrollHeight - catalog.clientHeight);
-    });
-    document.addEventListener("mouseup", () => {
-      dragging = false;
-      thumb.style.cursor = "grab";
+    allMovies = rows.map(r => {
+      const imdbID = r[subsIndex];
+      const baseURL = r[urlIndex];
+      const match = moviesFromTMDB.find(m => m.imdbID === imdbID);
+      if (match) return { ...match, baseURL, subs: imdbID };
+      else return { title: "Database Error", overview: "No data found for IMDb ID " + imdbID, genres: ["Database Error"], poster: "", baseURL, subs: imdbID };
     });
 
-    // --- Search functionality ---
-    searchBtn.addEventListener("click", () => {
-      searchBtn.classList.toggle("active");
-      if (searchBtn.classList.contains("active")) {
-        searchInput.focus();
-      } else {
-        searchInput.value = "";
-        renderMovies(allMovies);
-      }
-    });
-    searchInput.addEventListener("input", e => {
-      const term = e.target.value.toLowerCase();
-      renderMovies(allMovies.filter(g => g.title.toLowerCase().includes(term)));
-    });
+    categories = new Set();
+    allMovies.forEach(m => m.genres.forEach(g => categories.add(g)));
 
-    // --- Filter functionality ---
-    filterBtn.addEventListener("click", () => {
-      filterBtn.classList.toggle("active");
-    });
+    buildFilters();
+    renderMovies(allMovies);
+  } catch (e) {
+    console.error("Error fetching TMDB data", e);
+  }
+}
 
-    // --- Overlay escape key close ---
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && overlay.style.display === "flex") {
-        closeOverlay();
-      }
-    });
+// Render movie cards
+function renderMovies(movies) {
+  movieGrid.innerHTML = "";
+  movies.forEach(movie => {
+    const card = document.createElement("div");
+    card.className = "movie-card";
 
-  </script>
+    if (movie.poster) {
+      card.innerHTML = `
+        <h3>${movie.title}</h3>
+        <img src="${movie.poster}" alt="${movie.title}">
+        <p>${movie.genres.join(", ")}</p>
+      `;
+    } else {
+      card.innerHTML = `
+        <h3>${movie.title}</h3>
+        <div style="background:#444; color:#fff; padding:20px; border-radius:10px;">
+          Database Error
+        </div>
+        <p>${movie.genres.join(", ")}</p>
+      `;
+    }
+
+    card.addEventListener("click", () => openOverlay(movie));
+    movieGrid.appendChild(card);
+  });
+}
+
+// Build filter buttons
+function buildFilters() {
+  filterMenu.innerHTML = "";
+  const allBtn = document.createElement("button");
+  allBtn.textContent = "All";
+  allBtn.onclick = () => renderMovies(allMovies);
+  filterMenu.appendChild(allBtn);
+  categories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.textContent = cat;
+    btn.onclick = () => renderMovies(allMovies.filter(m => m.genres.includes(cat)));
+    filterMenu.appendChild(btn);
+  });
+}
+
+// Open movie overlay
+function openOverlay(movie) {
+  const links = buildMovieURL(movie.baseURL, movie.subs);
+  movieContainer.innerHTML = `
+    <video id="videoplayer" class="embed" controls>
+      <source id="vidsource" src="${links.url}" type="video/mp4">
+      <track id="subs" kind="subtitles" src="${links.subs}" srclang="en" default>
+    </video>
+    <h2 style="text-align:center;margin-top:10px;">${movie.title}</h2>
+    <p style="max-width:80%;margin:auto;text-align:center;white-space:normal;">${movie.overview}</p>
+  `;
+  overlay.style.display = "flex";
+}
+
+function closeOverlay() {
+  overlay.style.display = "none";
+  movieContainer.innerHTML = "";
+}
+
+function toggleFullscreen() {
+  const el = document.querySelector("#videoplayer");
+  if (!el) return;
+  if (!document.fullscreenElement) {
+    el.requestFullscreen().catch(err => console.error(err));
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// --- Sidebar behavior ---
+// Scrollbar thumb sync
+function syncThumb() {
+  const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
+  const trackHeight = track.clientHeight - thumb.clientHeight;
+  thumb.style.top = (track.offsetTop + ratio * trackHeight) + "px";
+}
+catalog.addEventListener("scroll", syncThumb);
+
+let dragging = false, startY, startTop;
+thumb.addEventListener("mousedown", e => {
+  dragging = true;
+  startY = e.clientY;
+  startTop = parseInt(thumb.style.top) || 0;
+  thumb.style.cursor = "grabbing";
+});
+document.addEventListener("mousemove", e => {
+  if (!dragging) return;
+  const dy = e.clientY - startY;
+  const trackHeight = track.clientHeight - thumb.clientHeight;
+  let newTop = Math.min(track.offsetTop + trackHeight, Math.max(track.offsetTop, startTop + dy));
+  thumb.style.top = newTop + "px";
+  const ratio = (newTop - track.offsetTop) / trackHeight;
+  catalog.scrollTop = ratio * (catalog.scrollHeight - catalog.clientHeight);
+});
+document.addEventListener("mouseup", () => { dragging = false; thumb.style.cursor = "grab"; });
+
+// Search
+searchBtn.addEventListener("click", () => {
+  searchBtn.classList.toggle("active");
+  if (searchBtn.classList.contains("active")) {
+    searchInput.focus();
+  } else {
+    searchInput.value = "";
+    renderMovies(allMovies);
+  }
+});
+searchInput.addEventListener("input", e => {
+  const term = e.target.value.toLowerCase();
+  renderMovies(allMovies.filter(m => m.title.toLowerCase().includes(term)));
+});
+
+// Filter toggle
+filterBtn.addEventListener("click", () => {
+  filterBtn.classList.toggle("active");
+});
+
+// Escape to close overlay
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && overlay.style.display === "flex") closeOverlay();
+});
+
+fetchMovieData();
+</script>
+
+
 </body>
 </html>
