@@ -202,14 +202,21 @@ function renderMovies(movies) {
   movies.forEach(movie => {
     const card = document.createElement("div");
     card.className = "movie-card";
-    card.setAttribute("data-imdb", movie.subs);
-
-    // Render base info from Sheets
-    card.innerHTML = `
-      <h3>${movie.title || "Loading..."}</h3>
-      <img src="" alt="${movie.title || ""}" style="background:#444;height:200px;">
-      <p>Loading genres...</p>
-    `;
+     if (movie.poster) {
+      card.innerHTML = `
+        <h3>${movie.title}</h3>
+        <img src="${movie.poster}" alt="${movie.title}">
+        <p>${movie.genres.join(", ")}</p>
+      `;
+    } else {
+      card.innerHTML = `
+        <h3>${movie.title}</h3>
+        <div style="background:#444; color:#fff; padding:20px; border-radius:10px;">
+          Database Error
+        </div>
+        <p>${movie.genres.join(", ")}</p>
+      `;
+    }
 
     // Add event listener
     card.addEventListener("click", () => openOverlay(movie));
