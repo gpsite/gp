@@ -147,7 +147,7 @@ async function fetchMovieData() {
 
     allMovies = rows.map(r => {
       return {
-        title: r[titleIndex] || "Untitled",
+        title: r[titleIndex] || "Data Error",
         overview: r[overviewIndex] || "",
         poster: r[posterIndex] || "",    // fallback handled below
         genres: r[genreIndex] ? [r[genreIndex]] : ["Unknown"],
