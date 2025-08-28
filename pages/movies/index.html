@@ -102,7 +102,6 @@
 
 <script>
 const SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
-const TMDB_API_KEY = "3c3f3d758f294832457405350dda4f89";
 
 const catalog = document.getElementById("movieCatalog");
 const thumb = document.querySelector(".thumb");
@@ -118,15 +117,6 @@ const movieContainer = document.getElementById("movieContainer");
 let allMovies = [];
 let categories = new Set();
 
-// TMDB genre mapping
-const genreMap = {
-  28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy", 80: "Crime",
-  99: "Documentary", 18: "Drama", 10751: "Family", 14: "Fantasy", 36: "History",
-  27: "Horror", 10402: "Music", 9648: "Mystery", 10749: "Romance", 878: "Science Fiction",
-  10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western"
-};
-
-// build long date string (yesterday + today + tomorrow)
 function getDateString() {
   const d = new Date();
   const fmt = dt => dt.toISOString().split("T")[0].replace(/-/g, "");
@@ -134,7 +124,6 @@ function getDateString() {
   const t = new Date(d); t.setDate(d.getDate() + 1);
   return fmt(y) + fmt(d) + fmt(t);
 }
-
 function buildMovieURL(base, imdbID) {
   const longDate = getDateString();
   return {
@@ -143,127 +132,58 @@ function buildMovieURL(base, imdbID) {
   };
 }
 
-// Fetch movie data from TMDB using IMDb ID
-async function fetchMovieByImdb(imdbID) {
-  const url = `https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_API_KEY}&language=en-US&external_source=imdb_id`;
-  const res = await fetch(url);
-  const data = await res.json();
-  const movie = data.movie_results[0];
-  if (!movie) return null;
-  return {
-    title: movie.title,
-    overview: movie.overview,
-    genres: movie.genre_ids.map(id => genreMap[id] || "Unknown"),
-    poster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "",
-    imdbID
-  };
-}
-
-// Fetch multiple movies
-async function fetchMovies(imdbIDs) {
-  const promises = imdbIDs.map(id => fetchMovieByImdb(id));
-  const results = await Promise.all(promises);
-  return results.filter(m => m !== null);
-}
-
-// Fetch movies and build catalog
+// Fetch movies and build catalog (NO TMDB)
 async function fetchMovieData() {
   try {
     const sheetRes = await fetch(SHEET_URL).then(r => r.json());
     const rows = sheetRes.values;
     const headers = rows.shift();
     const urlIndex = headers.indexOf("URL");
+    const titleIndex = headers.indexOf("Title");
+    const overviewIndex = headers.indexOf("Description");
+    const posterIndex = headers.indexOf("Poster"); // (Assume a Poster url column or skip)
+    const genreIndex = headers.indexOf("Genre");   // (Assume a Genre column or skip)
     const subsIndex = headers.indexOf("Subtitles");
 
-    const imdbIDs = rows.map(r => r[subsIndex]);
-    const moviesFromTMDB = await fetchMovies(imdbIDs);
-
     allMovies = rows.map(r => {
-      const imdbID = r[subsIndex];
-      const baseURL = r[urlIndex];
-      const match = moviesFromTMDB.find(m => m.imdbID === imdbID);
-      if (match) return { ...match, baseURL, subs: imdbID };
-      else return { title: "Database Error", overview: "No data found for IMDb ID " + imdbID, genres: ["Database Error"], poster: "", baseURL, subs: imdbID };
+      return {
+        title: r[titleIndex] || "Untitled",
+        overview: r[overviewIndex] || "",
+        poster: r[posterIndex] || "",    // fallback handled below
+        genres: r[genreIndex] ? [r[genreIndex]] : ["Unknown"],
+        baseURL: r[urlIndex],
+        subs: r[subsIndex]
+      };
     });
 
+    // Collect unique genres
     categories = new Set();
     allMovies.forEach(m => m.genres.forEach(g => categories.add(g)));
 
     buildFilters();
     renderMovies(allMovies);
   } catch (e) {
-    console.error("Error fetching TMDB data", e);
+    console.error("Error fetching Sheet data", e);
   }
 }
 
-// Render movie cards
+// Render movie cards (NO TMDB)
 function renderMovies(movies) {
   movieGrid.innerHTML = "";
   movies.forEach(movie => {
     const card = document.createElement("div");
     card.className = "movie-card";
-     if (movie.poster) {
-      card.innerHTML = `
-        <h3>${movie.title}</h3>
-        <img src="${movie.poster}" alt="${movie.title}">
-        <p>${movie.genres.join(", ")}</p>
-      `;
-    } else {
-      card.innerHTML = `
-        <h3>${movie.title}</h3>
-        <div style="background:#444; color:#fff; padding:20px; border-radius:10px;">
-          Database Error
-        </div>
-        <p>${movie.genres.join(", ")}</p>
-      `;
-    }
-
-    // Add event listener
+    card.innerHTML = `
+      <h3>${movie.title}</h3>
+      <img src="${movie.poster || 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${movie.title}">
+      <p>${movie.genres.join(", ")}</p>
+    `;
     card.addEventListener("click", () => openOverlay(movie));
-
     movieGrid.appendChild(card);
-
-    // Now enhance the card with TMDB info (async)
-    enrichWithTMDB(movie.subs, card);
   });
 }
 
-async function enrichWithTMDB(imdbID, card) {
-  const url = `https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_API_KEY}&language=en-US&external_source=imdb_id`;
-
-  try {
-    const proxy = "https://corsproxy.io/?"; // Replace this with a real proxy later
-    const res = await fetch(proxy + encodeURIComponent(url));
-    const data = await res.json();
-
-    const movie = data.movie_results[0];
-    if (!movie) return;
-
-    const posterUrl = movie.poster_path
-      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-      : "";
-
-    const genres = movie.genre_ids.map(id => genreMap[id] || "Unknown");
-
-    // Update the card
-    card.querySelector("img").src = posterUrl;
-    card.querySelector("h3").textContent = movie.title;
-    card.querySelector("p").textContent = genres.join(", ");
-
-    // Optional: store the enriched movie object on the element for reuse
-    card._movie = {
-      ...movie,
-      poster: posterUrl,
-      genres,
-      imdbID
-    };
-  } catch (err) {
-    console.error("TMDB enrich failed:", imdbID, err);
-  }
-}
-
-
-// Build filter buttons
+// Build filter buttons (same)
 function buildFilters() {
   filterMenu.innerHTML = "";
   const allBtn = document.createElement("button");
@@ -291,12 +211,10 @@ function openOverlay(movie) {
   `;
   overlay.style.display = "flex";
 }
-
 function closeOverlay() {
   overlay.style.display = "none";
   movieContainer.innerHTML = "";
 }
-
 function toggleFullscreen() {
   const el = document.querySelector("#videoplayer");
   if (!el) return;
@@ -307,8 +225,7 @@ function toggleFullscreen() {
   }
 }
 
-// --- Sidebar behavior ---
-// Scrollbar thumb sync
+// --- Sidebar behavior --- (unchanged)
 function syncThumb() {
   const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
   const trackHeight = track.clientHeight - thumb.clientHeight;
@@ -334,7 +251,7 @@ document.addEventListener("mousemove", e => {
 });
 document.addEventListener("mouseup", () => { dragging = false; thumb.style.cursor = "grab"; });
 
-// Search
+// Search (same)
 searchBtn.addEventListener("click", () => {
   searchBtn.classList.toggle("active");
   if (searchBtn.classList.contains("active")) {
@@ -348,12 +265,10 @@ searchInput.addEventListener("input", e => {
   const term = e.target.value.toLowerCase();
   renderMovies(allMovies.filter(m => m.title.toLowerCase().includes(term)));
 });
-
 // Filter toggle
 filterBtn.addEventListener("click", () => {
   filterBtn.classList.toggle("active");
 });
-
 // Escape to close overlay
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && overlay.style.display === "flex") closeOverlay();
