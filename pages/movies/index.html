@@ -102,6 +102,7 @@
 
 <script>
 const SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
+const TMDB_API_KEY = "3c3f3d758f294832457405350dda4f89";
 
 const catalog = document.getElementById("movieCatalog");
 const thumb = document.querySelector(".thumb");
@@ -173,10 +174,17 @@ function renderMovies(movies) {
   movies.forEach(movie => {
     const card = document.createElement("div");
     card.className = "movie-card";
+    const imdbID = movie.subs || "";
+    const tmdbTitleLink = imdbID
+      ? `<a href="https://www.themoviedb.org/find/${imdbID}" target="_blank" style="color:#fff;text-decoration:underline">${movie.title}</a>`
+      : movie.title;
+    const genreLinks = movie.genres.map(g =>
+      `<a href="https://www.themoviedb.org/search?query=${encodeURIComponent(g)}" target="_blank" style="color:#fff;text-decoration:underline">${g}</a>`
+    ).join(", ");
     card.innerHTML = `
-      <h3>${movie.title}</h3>
+      <h3>${tmdbTitleLink}</h3>
       <img src="${movie.poster || 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${movie.title}">
-      <p>${movie.genres.join(", ")}</p>
+      <p>${genreLinks}</p>
     `;
     card.addEventListener("click", () => openOverlay(movie));
     movieGrid.appendChild(card);
