@@ -1,290 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Movie Catalog</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    :root {
+      --bg: #000;
+      --panel: #0e0f13;
+      --inner: #13141a;
+      --chip: #222428;
+      --chip-2: #2b2e33;
+      --text: #ccc;
+      --text-strong: #fff;
+      --accent: #fff;
+    }
+
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #000;
-      color: #ccc;
-      font-family: sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
 
-    /* main comps */
-    .sidebar { width: 80px; background: #0e0f13; border-radius: 20px; margin: 20px; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 10px; }
-    .circle-btn { width: 45px; height: 45px; background: #222428; border-radius: 50%; margin: 10px 0; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 18px; cursor: pointer; position: relative; transition: all 0.3s ease; overflow: visible; }
-    .circle-btn input { position: absolute; left: 50px; width: 0; opacity: 0; border: none; outline: none; padding: 5px 10px; border-radius: 10px; background: #2b2e33; color: #fff; transition: all 0.3s ease; }
-    .circle-btn.active input { height: 20px; width: 200px; opacity: 1; }
-    .filter-menu { position: absolute; top: 0; left: 55px; background: #222428; border-radius: 10px; padding: 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px; max-width: 200px; overflow-x: hidden; overflow-y: visible; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1; }
-    .circle-btn.active .filter-menu { max-height: 400px; opacity: 1; padding: 10px; pointer-events: auto; user-select: auto; }
-    .filter-menu button { background: #2b2e33; color: #fff; border: none; padding: 5px; border-radius: 6px; white-space: nowrap; cursor: pointer; text-align: left;}
-    .filter-menu button:hover { background: #13141a; }
-    .scrollbar { flex: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; position: relative; }
-    .track { position: absolute; top: 10px; bottom: 10px; width: 10px; border-radius: 5px; background: #222428; }
-    .thumb { width: 55px; height: 35px; background: #222428; border-radius: 10px; position: absolute; top: 0; cursor: grab; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    .thumb div { width: 40%; height: 3px; background: #fff; margin: 2px 0; border-radius: 2px; }
-    .catalog-frame { flex: 1; margin: 20px; border-radius: 20px; background: #0e0f13; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
-    .catalog-inner { flex: 1; border-radius: 15px; background: #13141a; padding: 15px; overflow-y: scroll; scrollbar-width: none; }
-    .catalog-inner::-webkit-scrollbar { display: none; }
-    .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
-    .movie-card { background: #222428; border-radius: 15px; padding: 8px; text-align: center; cursor: pointer; }
-    .movie-card h3 { font-size: 13px; margin: 5px 0; color: #fff; }
-    .movie-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; background: #444; }
-    .movie-card p { font-size: 11px; color: #fff; margin: 5px 0 0; }
-    #homeBtn { margin-top: auto; }
-
-    /* overlay for movie iframe */
-    .movie-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 9999;
-    }
-    .movie-overlay iframe, .movie-overlay object {
-      position: fixed;
-      justify-content: center;
-      align-items: center;
-      width: 80vw;
-      height: 80vh;
-      border: none;
-      border-radius: 12px;
-      background: #000;
-    }
-    .overlay-controls {
-      margin-top: 10px;
+    /* Sidebar */
+    .sidebar {
+      width: 80px;
+      background: var(--panel);
+      border-radius: 20px;
+      margin: 20px;
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding: 10px 0 14px;
+      gap: 6px;
     }
-    .overlay-controls button {
-      background: #222428;
-      color: #fff;
+    .circle-btn {
+      width: 45px; height: 45px;
+      background: var(--chip);
+      border-radius: 50%;
+      margin: 6px 0;
+      display: flex; justify-content: center; align-items: center;
+      color: #fff; font-size: 18px; cursor: pointer; position: relative;
+      transition: transform .15s ease, background .15s ease;
+      overflow: visible;
       border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
     }
-    .overlay-controls button:hover { background: #2b2e33; }
+    .circle-btn:hover { background: var(--chip-2); transform: translateY(-1px); }
+    .circle-btn:active { transform: translateY(0); }
+
+    /* Search input that slides out of the search icon */
+    .circle-btn input {
+      position: absolute; left: 55px; top: 50%; transform: translateY(-50%);
+      width: 0; opacity: 0; height: 28px; border: none; outline: none;
+      padding: 0 10px; border-radius: 10px; background: var(--chip-2); color: #fff;
+      transition: width .2s ease, opacity .2s ease;
+    }
+    .circle-btn.active input { width: 210px; opacity: 1; }
+
+    /* Filter dropdown */
+    .filter-menu {
+      position: absolute; top: 0; left: 55px;
+      background: var(--chip); border-radius: 10px; padding: 0;
+      display: flex; flex-wrap: wrap; gap: 6px; max-width: 230px;
+      max-height: 0; overflow: hidden; opacity: 0; pointer-events: none;
+      transition: max-height .2s ease, opacity .2s ease, padding .2s ease;
+      z-index: 2;
+    }
+    .circle-btn.active .filter-menu { max-height: 420px; opacity: 1; padding: 10px; pointer-events: auto; }
+    .filter-menu button {
+      background: var(--chip-2); color: #fff; border: none; padding: 6px 8px; border-radius: 6px;
+      white-space: nowrap; cursor: pointer; text-align: left; font-size: 12px;
+    }
+    .filter-menu button:hover { background: #1b1d23; }
+
+    /* Custom vertical scrollbar */
+    .scrollbar { flex: 1; width: 100%; display: flex; justify-content: center; position: relative; }
+    .track {
+      position: absolute; top: 10px; bottom: 10px; width: 10px; border-radius: 5px; background: var(--chip);
+    }
+    .thumb {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: 55px; height: 35px; background: var(--chip);
+      border-radius: 10px; cursor: grab; display: flex; flex-direction: column; justify-content: center; align-items: center;
+      box-shadow: 0 1px 0 rgba(255,255,255,.06) inset;
+    }
+    .thumb:active { cursor: grabbing; }
+    .thumb div { width: 38%; height: 3px; background: var(--accent); margin: 2px 0; border-radius: 2px; opacity: .8; }
+
+    /* Main catalog */
+    .catalog-frame { flex: 1; margin: 20px; border-radius: 20px; background: var(--panel); padding: 15px; display: flex; flex-direction: column; }
+    .catalog-inner { flex: 1; border-radius: 15px; background: var(--inner); padding: 15px; overflow-y: auto; scrollbar-width: none; }
+    .catalog-inner::-webkit-scrollbar { display: none; }
+
+    .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px; }
+    .movie-card {
+      background: var(--chip); border-radius: 14px; padding: 8px; text-align: center; cursor: pointer; transition: transform .12s ease, background .12s ease;
+    }
+    .movie-card:hover { transform: translateY(-2px); background: var(--chip-2); }
+    .movie-card h3 { font-size: 13px; margin: 6px 0 6px; color: var(--text-strong); line-height: 1.2; }
+    .movie-card img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 10px; background: #444; }
+    .movie-card p { font-size: 11px; color: var(--text-strong); margin: 6px 0 0; opacity: .9; }
+
+    /* Overlay */
+    .movie-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.9);
+      display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; padding: 20px;
+    }
+    .movie-overlay.active { display: flex; }
+    .movie-overlay .video-wrap { position: relative; width: 84vw; max-width: 1400px; }
+    .movie-overlay video {
+      width: 100%; height: 78vh; max-height: 78vh; display: block; border-radius: 12px; background: #000; outline: none; border: none;
+    }
+    .overlay-controls { margin-top: 10px; display: flex; gap: 10px; }
+    .overlay-controls button {
+      background: var(--chip); color: #fff; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 14px;
+    }
+    .overlay-controls button:hover { background: var(--chip-2); }
+
+    .notice { font-size: 13px; opacity: .8; text-align: center; margin: 8px 0 0; }
+    .status { font-size: 12px; opacity: .8; margin: 10px 0; }
+    a.inline { color:#fff; text-decoration: underline; }
   </style>
 </head>
 <body>
   <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="circle-btn" id="searchBtn"><i class="fa fa-search"></i><input type="text" id="searchInput" placeholder="Search..."></div>
-    <div class="circle-btn" id="filterBtn"><i class="fa fa-filter"></i><div class="filter-menu" id="filterMenu"></div></div>
-    <div class="scrollbar"><div class="track"></div><div class="thumb"><div></div><div></div><div></div></div></div>
-    <a class="circle-btn" id="homeBtn" href="../../index.html"><i class="fa fa-home"></i></a>
+  <div class="sidebar" aria-label="Sidebar controls">
+    <button class="circle-btn" id="searchBtn" aria-label="Toggle search">
+      <i class="fa fa-search" aria-hidden="true"></i>
+      <input type="text" id="searchInput" placeholder="Search..." aria-label="Search movies" />
+    </button>
+
+    <button class="circle-btn" id="filterBtn" aria-label="Toggle filters">
+      <i class="fa fa-filter" aria-hidden="true"></i>
+      <div class="filter-menu" id="filterMenu" role="menu" aria-label="Filter by genre"></div>
+    </button>
+
+    <div class="scrollbar" aria-hidden="true">
+      <div class="track"></div>
+      <div class="thumb"><div></div><div></div><div></div></div>
+    </div>
+
+    <a class="circle-btn" id="homeBtn" href="../../index.html" aria-label="Home">
+      <i class="fa fa-home" aria-hidden="true"></i>
+    </a>
   </div>
 
+  <!-- Catalog -->
   <div class="catalog-frame">
+    <div class="status" id="status"></div>
     <div class="catalog-inner" id="movieCatalog">
       <div class="movie-grid" id="movieGrid"></div>
     </div>
   </div>
-  
-  <!-- Overlay for movies -->
-  <div class="movie-overlay" id="movieOverlay">
-    <div id="movieContainer"></div>
+
+  <!-- Overlay -->
+  <div class="movie-overlay" id="movieOverlay" aria-modal="true" role="dialog">
+    <div class="video-wrap">
+      <div id="movieContainer"></div>
+    </div>
     <div class="overlay-controls">
-      <button onclick="toggleFullscreen()">Fullscreen</button>
-      <button onclick="closeOverlay()">Close</button>
+      <button id="fsBtn" type="button">Fullscreen</button>
+      <button id="closeBtn" type="button">Close</button>
     </div>
   </div>
 
 <script>
+/*************************
+ * CONFIG
+ *************************/
 const SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
-const TMDB_API_KEY = "3c3f3d758f294832457405350dda4f89";
+const TMDB_KEY = "15d2ea6d0dc1d476efbca3eba2b9bbfb"; // your provided key
+const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
-const catalog = document.getElementById("movieCatalog");
-const thumb = document.querySelector(".thumb");
-const movieGrid = document.getElementById("movieGrid");
-const track = document.querySelector(".track");
-const searchBtn = document.getElementById("searchBtn");
-const searchInput = document.getElementById("searchInput");
-const filterBtn = document.getElementById("filterBtn");
-const filterMenu = document.getElementById("filterMenu");
-const overlay = document.getElementById("movieOverlay");
+// If your sheet only has two columns (URL, Subtitles) where Subtitles is actually an IMDb ID like tt1234567,
+// this file will still work. If you also include Title, Description, Poster, Genre columns, those will be used.
+
+/*************************
+ * ELEMENTS
+ *************************/
+const catalog      = document.getElementById("movieCatalog");
+const movieGrid    = document.getElementById("movieGrid");
+const statusEl     = document.getElementById("status");
+const track        = document.querySelector(".track");
+const thumb        = document.querySelector(".thumb");
+const searchBtn    = document.getElementById("searchBtn");
+const searchInput  = document.getElementById("searchInput");
+const filterBtn    = document.getElementById("filterBtn");
+const filterMenu   = document.getElementById("filterMenu");
+const overlay      = document.getElementById("movieOverlay");
 const movieContainer = document.getElementById("movieContainer");
+const fsBtn        = document.getElementById("fsBtn");
+const closeBtn     = document.getElementById("closeBtn");
 
-let allMovies = [];
-let categories = new Set();
+/*************************
+ * STATE
+ *************************/
+let ALL_MOVIES = [];
+let GENRES = new Set();
+
+/*************************
+ * UTILITIES
+ *************************/
+const byId = (id) => document.getElementById(id);
+const isVttUrl = (s) => typeof s === 'string' && /\.vtt($|\?)/i.test(s);
+const extractImdb = (s) => {
+  if (!s) return '';
+  const m = String(s).match(/tt\d{5,10}/i);
+  return m ? m[0] : '';
+};
+const titleFromUrl = (url) => {
+  try {
+    const u = new URL(url);
+    const last = u.pathname.split('/').filter(Boolean).pop() || '';
+    const raw = last.replace(/[-_.]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!raw) return 'Untitled';
+    // Title case-ish
+    return raw.replace(/\b\w/g, c => c.toUpperCase());
+  } catch { return 'Untitled'; }
+};
 
 function getDateString() {
+  // Matches your original behavior: yesterday + today + tomorrow yyyymmdd concatenated
   const d = new Date();
-  const fmt = dt => dt.toISOString().split("T")[0].replace(/-/g, "");
+  const fmt = (dt) => dt.toISOString().split('T')[0].replace(/-/g, '');
   const y = new Date(d); y.setDate(d.getDate() - 1);
   const t = new Date(d); t.setDate(d.getDate() + 1);
   return fmt(y) + fmt(d) + fmt(t);
 }
-function buildMovieURL(base, imdbID) {
+
+function buildFinalUrls(baseURL, imdbID, subsUrlMaybe) {
   const longDate = getDateString();
-  return {
-    url: base + longDate,
-    subs: "https://rips.cc/subs/" + imdbID + ".vtt"
-  };
+  const videoUrl = baseURL ? String(baseURL) + longDate : '';
+  // If sheet already provided a .vtt URL, use it. Else if we have an IMDb id, use rips pattern.
+  let subsUrl = '';
+  if (isVttUrl(subsUrlMaybe)) subsUrl = subsUrlMaybe;
+  else if (imdbID) subsUrl = `https://rips.cc/subs/${imdbID}.vtt`;
+  return { videoUrl, subsUrl };
 }
 
-// Fetch movies and build catalog (NO TMDB)
-async function fetchMovieData() {
-  try {
-    const sheetRes = await fetch(SHEET_URL).then(r => r.json());
-    const rows = sheetRes.values;
-    const headers = rows.shift();
-    const urlIndex = headers.indexOf("URL");
-    const titleIndex = headers.indexOf("Title");
-    const overviewIndex = headers.indexOf("Description");
-    const posterIndex = headers.indexOf("Poster"); // (Assume a Poster url column or skip)
-    const genreIndex = headers.indexOf("Genre");   // (Assume a Genre column or skip)
-    const subsIndex = headers.indexOf("Subtitles");
+function idx(headers, name) {
+  const target = String(name).toLowerCase();
+  for (let i = 0; i < headers.length; i++) {
+    if (String(headers[i]).toLowerCase().trim() === target) return i;
+  }
+  return -1;
+}
 
-    allMovies = rows.map(r => {
-      return {
-        title: r[titleIndex] || "Data Error",
-        overview: r[overviewIndex] || "",
-        poster: r[posterIndex] || "",    // fallback handled below
-        genres: r[genreIndex] ? [r[genreIndex]] : ["Unknown"],
-        baseURL: r[urlIndex],
-        subs: r[subsIndex]
-      };
+/*************************
+ * DATA FETCH + NORMALIZE
+ *************************/
+async function fetchMovieData() {
+  statusEl.textContent = 'Loading movies…';
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+
+    const rows = json && Array.isArray(json.values) ? json.values : [];
+    if (!rows.length) {
+      statusEl.textContent = 'No rows returned from the Google Sheet.';
+      return;
+    }
+
+    // Header row
+    const headers = rows.shift().map(h => String(h).trim());
+
+    // Flexible column mapping
+    let URL_I  = idx(headers, 'url');
+    let TTL_I  = idx(headers, 'title');
+    let DSC_I  = idx(headers, 'description');
+    let PST_I  = idx(headers, 'poster');
+    let GEN_I  = idx(headers, 'genre');
+    let SUB_I  = idx(headers, 'subtitles'); // Can be IMDb id OR a .vtt URL
+
+    // Common fallback when only two columns exist: URL, Subtitles(IMDb)
+    if (URL_I === -1 && headers.length >= 1) URL_I = 0;
+    if (SUB_I === -1 && headers.length >= 2) SUB_I = 1;
+
+    const placeholderPoster = 'https://via.placeholder.com/300x450?text=No+Image';
+
+    ALL_MOVIES = rows.map((r) => {
+      const baseURL = r[URL_I] || '';
+      const sheetSubsField = r[SUB_I] || '';
+      const imdbID = extractImdb(sheetSubsField);
+      const subsUrlMaybe = sheetSubsField; // could already be a VTT URL
+
+      const title = r[TTL_I] || titleFromUrl(baseURL);
+      const overview = r[DSC_I] || '';
+      const poster = r[PST_I] || placeholderPoster;
+      const genres = r[GEN_I] ? String(r[GEN_I]).split(',').map(s => s.trim()).filter(Boolean) : ['Unknown'];
+
+      const { videoUrl, subsUrl } = buildFinalUrls(baseURL, imdbID, subsUrlMaybe);
+
+      return { title, overview, poster, genres, baseURL, imdbID, videoUrl, subsUrl };
     });
 
-    // Collect unique genres
-    categories = new Set();
-    allMovies.forEach(m => m.genres.forEach(g => categories.add(g)));
+    // Build genre set
+    GENRES = new Set();
+    ALL_MOVIES.forEach(m => m.genres.forEach(g => GENRES.add(g)));
 
     buildFilters();
-    renderMovies(allMovies);
-  } catch (e) {
-    console.error("Error fetching Sheet data", e);
+    renderMovies(ALL_MOVIES);
+
+    statusEl.textContent = '';
+    updateThumb(); // initialize scrollbar thumb
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = 'Failed to load from Google Sheets. Check API key, sharing settings, and range name.';
+  }
+}
+async function enrichFromTMDB(movie, cardEl) {
+  if (!movie.imdbID) return;
+
+  try {
+    // Get TMDB ID from IMDb
+    const resId = await fetch(`https://api.themoviedb.org/3/find/${movie.imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`);
+    const jsonId = await resId.json();
+    const tmdbMovie = (jsonId.movie_results && jsonId.movie_results[0]) || null;
+    if (!tmdbMovie) return;
+
+    // Update movie data
+    movie.title    = tmdbMovie.title || movie.title;
+    movie.overview = tmdbMovie.overview || movie.overview;
+    movie.poster   = tmdbMovie.poster_path ? TMDB_IMG + tmdbMovie.poster_path : movie.poster;
+    movie.genres   = [];
+
+    // Get genres separately (needs /movie/{id})
+    if (tmdbMovie.id) {
+      const resDet = await fetch(`https://api.themoviedb.org/3/movie/${tmdbMovie.id}?api_key=${TMDB_KEY}`);
+      const det = await resDet.json();
+      if (det && Array.isArray(det.genres)) {
+        movie.genres = det.genres.map(g => g.name);
+      }
+    }
+
+    // Update DOM card
+    const img = cardEl.querySelector("img");
+    if (img) img.src = movie.poster;
+    const titleEl = cardEl.querySelector("h3");
+    if (titleEl) titleEl.innerHTML = movie.imdbID
+      ? `<a class="inline" href="https://www.imdb.com/title/${movie.imdbID}/" target="_blank" rel="noopener">${escapeHtml(movie.title)}</a>`
+      : escapeHtml(movie.title);
+    const p = cardEl.querySelector("p");
+    if (p) p.textContent = movie.genres.length ? movie.genres.join(", ") : "Unknown";
+  } catch (err) {
+    console.warn("TMDB enrichment failed for", movie.imdbID, err);
   }
 }
 
-// Render movie cards (NO TMDB)
-function renderMovies(movies) {
-  movieGrid.innerHTML = "";
-  movies.forEach(movie => {
-    const card = document.createElement("div");
-    card.className = "movie-card";
-    const imdbID = movie.subs || "";
-    const tmdbTitleLink = imdbID
-      ? `<a href="https://www.themoviedb.org/find/${imdbID}" target="_blank" style="color:#fff;text-decoration:underline">${movie.title}</a>`
-      : movie.title;
-    const genreLinks = movie.genres.map(g =>
-      `<a href="https://www.themoviedb.org/search?query=${encodeURIComponent(g)}" target="_blank" style="color:#fff;text-decoration:underline">${g}</a>`
-    ).join(", ");
+/*************************
+ * RENDER
+ *************************/
+function renderMovies(list) {
+  movieGrid.innerHTML = '';
+  if (!list.length) {
+    movieGrid.innerHTML = `<p class="notice">No movies match your filters.</p>`;
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  for (const movie of list) {
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+
+    const titleHtml = movie.imdbID
+      ? `<a class="inline" href="https://www.imdb.com/title/${movie.imdbID}/" target="_blank" rel="noopener">${escapeHtml(movie.title)}</a>`
+      : escapeHtml(movie.title);
+
+    const genresHtml = movie.genres.map(g => `<span>${escapeHtml(g)}</span>`).join(', ');
+
     card.innerHTML = `
-      <h3>${tmdbTitleLink}</h3>
-      <img src="${movie.poster || 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${movie.title}">
-      <p>${genreLinks}</p>
+      <h3>${titleHtml}</h3>
+      <img src="${movie.poster}" alt="${escapeHtml(movie.title)} poster" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+      <p>${genresHtml}</p>
     `;
-    card.addEventListener("click", () => openOverlay(movie));
-    movieGrid.appendChild(card);
-  });
+
+    card.addEventListener('click', () => openOverlay(movie));
+    frag.appendChild(card);
+
+    // Enrich from TMDB *after* card is on screen
+    enrichFromTMDB(movie, card);
+  }
+  movieGrid.appendChild(frag);
 }
 
-// Build filter buttons (same)
 function buildFilters() {
-  filterMenu.innerHTML = "";
-  const allBtn = document.createElement("button");
-  allBtn.textContent = "All";
-  allBtn.onclick = () => renderMovies(allMovies);
-  filterMenu.appendChild(allBtn);
-  categories.forEach(cat => {
-    const btn = document.createElement("button");
-    btn.textContent = cat;
-    btn.onclick = () => renderMovies(allMovies.filter(m => m.genres.includes(cat)));
-    filterMenu.appendChild(btn);
-  });
+  filterMenu.innerHTML = '';
+
+  const addBtn = (label, handler) => {
+    const b = document.createElement('button');
+    b.textContent = label; b.type = 'button'; b.addEventListener('click', handler);
+    filterMenu.appendChild(b);
+  };
+
+  addBtn('All', () => renderMovies(ALL_MOVIES));
+  [...GENRES].sort().forEach(cat => addBtn(cat, () => renderMovies(ALL_MOVIES.filter(m => m.genres.includes(cat)))));
 }
 
-// Open movie overlay
+/*************************
+ * OVERLAY PLAYER
+ *************************/
 function openOverlay(movie) {
-  const links = buildMovieURL(movie.baseURL, movie.subs);
-  movieContainer.innerHTML = `
-    <video id="videoplayer" class="embed" controls>
-      <source id="vidsource" src="${links.url}" type="video/mp4">
-      <track id="subs" kind="subtitles" src="${links.subs}" srclang="en" default>
-    </video>
-    <h2 style="text-align:center;margin-top:10px;">${movie.title}</h2>
-    <p style="max-width:80%;margin:auto;text-align:center;white-space:normal;">${movie.overview}</p>
+  const hasVideo = Boolean(movie.videoUrl);
+
+  const videoEl = document.createElement('video');
+  videoEl.id = 'videoplayer';
+  videoEl.controls = true;
+  videoEl.playsInline = true;
+  videoEl.setAttribute('webkit-playsinline', '');
+  videoEl.setAttribute('controlsList', 'nodownload');
+
+  if (hasVideo) {
+    const src = document.createElement('source');
+    src.id = 'vidsource';
+    src.src = movie.videoUrl;
+    src.type = 'video/mp4';
+    videoEl.appendChild(src);
+  }
+
+  if (movie.subsUrl) {
+    const tr = document.createElement('track');
+    tr.id = 'subs';
+    tr.kind = 'subtitles';
+    tr.src = movie.subsUrl;
+    tr.srclang = 'en';
+    tr.default = true;
+    videoEl.appendChild(tr);
+  }
+
+  const meta = document.createElement('div');
+  meta.innerHTML = `
+    <h2 style="text-align:center;margin:10px 0 6px;">${escapeHtml(movie.title)}</h2>
+    ${movie.overview ? `<p style="max-width:84ch;margin:0 auto;text-align:center;white-space:normal;">${escapeHtml(movie.overview)}</p>` : ''}
   `;
-  overlay.style.display = "flex";
+
+  movieContainer.innerHTML = '';
+  movieContainer.appendChild(videoEl);
+  movieContainer.appendChild(meta);
+
+  overlay.classList.add('active');
+
+  // Clicking outside the video closes overlay
+  overlay.addEventListener('click', overlayClickClose);
 }
+
+function overlayClickClose(e) {
+  // Only close if background or the controls area is clicked
+  const wrap = e.target.closest('.video-wrap');
+  const isControls = e.target.closest('.overlay-controls');
+  if (!wrap && !isControls) closeOverlay();
+}
+
 function closeOverlay() {
-  overlay.style.display = "none";
-  movieContainer.innerHTML = "";
+  overlay.classList.remove('active');
+  movieContainer.innerHTML = '';
+  overlay.removeEventListener('click', overlayClickClose);
 }
+
 function toggleFullscreen() {
-  const el = document.querySelector("#videoplayer");
+  const el = document.getElementById('videoplayer');
   if (!el) return;
-  if (!document.fullscreenElement) {
-    el.requestFullscreen().catch(err => console.error(err));
+  const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+  if (!isFs) {
+    (el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen)?.call(el);
   } else {
-    document.exitFullscreen();
+    (document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen)?.call(document);
   }
 }
 
-// --- Sidebar behavior --- (unchanged)
-function syncThumb() {
+/*************************
+ * CUSTOM SCROLLBAR SYNC
+ *************************/
+function updateThumb() {
   const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
   const trackHeight = track.clientHeight - thumb.clientHeight;
-  thumb.style.top = (track.offsetTop + ratio * trackHeight) + "px";
+  thumb.style.top = ratio * trackHeight + "px";
 }
-catalog.addEventListener("scroll", syncThumb);
 
-let dragging = false, startY, startTop;
-thumb.addEventListener("mousedown", e => {
-  dragging = true;
-  startY = e.clientY;
-  startTop = parseInt(thumb.style.top) || 0;
-  thumb.style.cursor = "grabbing";
+function onCatalogScroll() { updateThumb(); }
+
+let dragging = false, startY = 0, startTop = 0;
+thumb.addEventListener('mousedown', (e) => {
+  dragging = true; startY = e.clientY; startTop = parseInt(thumb.style.top || '0', 10) - track.offsetTop; thumb.style.cursor = 'grabbing';
+  e.preventDefault();
 });
-document.addEventListener("mousemove", e => {
+document.addEventListener('mousemove', (e) => {
   if (!dragging) return;
-  const dy = e.clientY - startY;
-  const trackHeight = track.clientHeight - thumb.clientHeight;
-  let newTop = Math.min(track.offsetTop + trackHeight, Math.max(track.offsetTop, startTop + dy));
-  thumb.style.top = newTop + "px";
-  const ratio = (newTop - track.offsetTop) / trackHeight;
-  catalog.scrollTop = ratio * (catalog.scrollHeight - catalog.clientHeight);
-});
-document.addEventListener("mouseup", () => { dragging = false; thumb.style.cursor = "grab"; });
+  const trackHeight = track.clientHeight;
+  const thumbHeight = thumb.clientHeight;
+  const maxTop = trackHeight - thumbHeight;
+  let newTop = Math.min(maxTop, Math.max(0, startTop + (e.clientY - startY)));
+  thumb.style.top = (track.offsetTop + newTop) + 'px';
 
-// Search (same)
-searchBtn.addEventListener("click", () => {
-  searchBtn.classList.toggle("active");
-  if (searchBtn.classList.contains("active")) {
-    searchInput.focus();
+  // Map back to scrollTop
+  const scrollable = catalog.scrollHeight - catalog.clientHeight;
+  catalog.scrollTop = (newTop / maxTop) * scrollable;
+});
+document.addEventListener('mouseup', () => { dragging = false; thumb.style.cursor = 'grab'; });
+
+/*************************
+ * SEARCH + FILTER UI
+ *************************/
+searchBtn.addEventListener('click', () => {
+  searchBtn.classList.toggle('active');
+  if (searchBtn.classList.contains('active')) {
+    setTimeout(() => searchInput.focus(), 0);
   } else {
-    searchInput.value = "";
-    renderMovies(allMovies);
+    searchInput.value = '';
+    renderMovies(ALL_MOVIES);
   }
 });
-searchInput.addEventListener("input", e => {
+
+searchInput.addEventListener('input', (e) => {
   const term = e.target.value.toLowerCase();
-  renderMovies(allMovies.filter(m => m.title.toLowerCase().includes(term)));
-});
-// Filter toggle
-filterBtn.addEventListener("click", () => {
-  filterBtn.classList.toggle("active");
-});
-// Escape to close overlay
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && overlay.style.display === "flex") closeOverlay();
+  const filtered = ALL_MOVIES.filter(m => m.title.toLowerCase().includes(term));
+  renderMovies(filtered);
 });
 
+filterBtn.addEventListener('click', () => {
+  filterBtn.classList.toggle('active');
+});
+
+// Keyboard: Escape closes overlay
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && overlay.classList.contains('active')) closeOverlay();
+});
+
+// Controls buttons
+fsBtn.addEventListener('click', toggleFullscreen);
+closeBtn.addEventListener('click', closeOverlay);
+
+// Sync scrollbar
+catalog.addEventListener('scroll', onCatalogScroll);
+window.addEventListener('resize', updateThumb);
+
+/*************************
+ * HELPERS
+ *************************/
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+/*************************
+ * INIT
+ *************************/
 fetchMovieData();
 </script>
-
-
 </body>
 </html>
