@@ -284,7 +284,7 @@ async function fetchMovieData() {
     if (URL_I === -1 && headers.length >= 1) URL_I = 0;
     if (SUB_I === -1 && headers.length >= 2) SUB_I = 1;
 
-    const placeholderPoster = 'https://via.placeholder.com/300x450?text=No+Image';
+    const placeholderPoster = 'https://placehold.co/300x450/transparent/F00/?text=Database+Error';
 
     ALL_MOVIES = rows.map((r) => {
       const baseURL = r[URL_I] || '';
@@ -378,7 +378,7 @@ function renderMovies(list) {
 
     card.innerHTML = `
       <h3>${titleHtml}</h3>
-      <img src="${movie.poster}" alt="${escapeHtml(movie.title)} poster" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+      <img src="${movie.poster}" alt="${escapeHtml(movie.title)} poster" onerror="this.src='https://placehold.co/300x450/transparent/F00/?text=Database+Error'">
       <p>${genresHtml}</p>
     `;
 
