@@ -37,7 +37,7 @@
       width: 70vw;
       min-width: 480px;
       max-width: 1300px;
-      opacity: 0.19; /* Increased visibility */
+      opacity: 0.19;
       pointer-events: none;
       filter: blur(1px) drop-shadow(0 4px 44px #FFD90099);
       user-select: none;
@@ -45,13 +45,21 @@
     }
 
     /* ======= Alt Servers Button ======= */
+    .alt-btn-wrapper {
+      position: absolute;
+      top: 44px;
+      right: 54px;
+      z-index: 10;
+      user-select: none;
+    }
     .alt-btn {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      position: relative;
       text-decoration: none;
       color: #FFD900;
-      background: rgba(16, 21, 32, 0.14); /* Slightly clear */
+      background: rgba(16, 21, 32, 0.14);
       padding: 14px 38px;
       border-radius: 18px;
       font-size: 1.4rem;
@@ -62,16 +70,63 @@
       outline: none;
       backdrop-filter: blur(6px);
       transition: background .15s, color .18s, transform .12s, box-shadow .18s;
+      cursor: not-allowed;
+      opacity: 0.85;
+      pointer-events: auto;
+    }
+    /* Lock SVG overlay */
+    .alt-btn .lock-overlay {
       position: absolute;
-      top: 44px;
-      right: 54px;
-      z-index: 10;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-59%);
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.93;
+      background: none;
+      border-radius: 50%;
+      box-shadow: 0 8px 32px #FFD90055;
+    }
+    .alt-btn .lock-overlay svg {
+      width: 34px;
+      height: 34px;
+      display: block;
+    }
+    .alt-btn .btn-text {
+      opacity: 0.52;
+      filter: blur(0.5px);
+      pointer-events: none;
     }
     .alt-btn:hover {
       background: rgba(255,217,0,0.18);
       color: #101520;
       transform: scale(1.07);
       box-shadow: 0 2px 28px #FFD90044;
+    }
+    /* Tooltip styling */
+    .alt-btn-wrapper .tooltip {
+      display: block;
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      left: 50%;
+      top: 110%;
+      transform: translateX(-50%);
+      background: rgba(30,32,40,0.94);
+      color: #FFD900;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 14px;
+      margin-top: 8px;
+      white-space: nowrap;
+      box-shadow: 0 2px 18px #FFD90044;
+      transition: opacity .21s;
+      z-index: 100;
+    }
+    .alt-btn-wrapper:hover .tooltip,
+    .alt-btn:focus + .tooltip {
+      opacity: 1;
     }
 
     /* ======= Main Content & Menu ======= */
@@ -106,7 +161,7 @@
       gap: 16px;
       text-decoration: none;
       color: #FFD900;
-      background: rgba(30,32,40,0.22); /* Slightly clear background */
+      background: rgba(30,32,40,0.22);
       padding: 28px 70px;
       border-radius: 28px;
       font-size: 2.4rem;
@@ -117,7 +172,7 @@
       outline: none;
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(10px); /* Smooth glass feel */
+      backdrop-filter: blur(10px);
       transition: 
         transform .14s, 
         box-shadow .18s, 
@@ -150,7 +205,7 @@
 
     @media(max-width:900px){
       .gp-bg-logo { width: 90vw; min-width: 280px;}
-      .alt-btn { top: unset; right: unset; left: 50%; bottom: 20px; transform: translateX(-50%);}
+      .alt-btn-wrapper { top: unset; right: unset; left: 50%; bottom: 20px; transform: translateX(-50%);}
       .main-content { padding-top: 84px; gap: 38px;}
       .menu { flex-direction: column; gap: 36px; }
     }
@@ -159,6 +214,14 @@
       .alt-btn { font-size: 1rem; padding: 8px 16px;}
       .menu .btn { font-size: 1.13rem; padding: 14px 22px; border-radius: 14px;}
       .main-content { gap: 20px; padding-top: 62px;}
+      .alt-btn-wrapper .tooltip {
+        font-size: 0.95rem;
+        padding: 6px 13px;
+      }
+      .alt-btn .lock-overlay svg {
+        width: 22px;
+        height: 22px;
+      }
     }
   </style>
 </head>
@@ -168,15 +231,28 @@
     <svg viewBox="0 0 1200 500" width="100%" height="100%" aria-label="GP Logo">
       <defs>
         <linearGradient id="gp-grad" x1="0%" y1="30%" x2="100%" y2="70%">
-          <stop offset="0%" stop-color="#FFD900" stop-opacity="0.44"/>
-          <stop offset="100%" stop-color="#FFD900" stop-opacity="0.24"/>
+          <stop offset="0%" stop-color="#FFD900" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#FFD900" stop-opacity="0.35"/>
         </linearGradient>
       </defs>
       <text x="50%" y="58%" text-anchor="middle" font-size="400" font-family="Montserrat, Impact, Arial, sans-serif" font-weight="900" 
-        fill="url(#gp-grad)" stroke="#FFD900" stroke-width="16" opacity="1">GP</text>
+        fill="url(#gp-grad)" stroke="#FFD900" stroke-width="20" opacity="1">GP</text>
     </svg>
   </div>
-  <a class="alt-btn" href="pages/alt-servers/index.html">🛰️ Alt Servers</a>
+  <div class="alt-btn-wrapper">
+    <button class="alt-btn" tabindex="0" title="Coming soon..." disabled>
+      <span class="lock-overlay">
+        <svg viewBox="0 0 34 34" fill="none">
+          <ellipse cx="17" cy="17" rx="15" ry="15" fill="#FFD900" fill-opacity="0.28" stroke="#FFD900" stroke-width="2"/>
+          <rect x="10" y="15" width="14" height="8.5" rx="3.5" fill="#FFD900" stroke="#232323" stroke-width="2"/>
+          <rect x="16" y="21" width="2" height="4" rx="1" fill="#232323"/>
+          <ellipse cx="17" cy="13" rx="5" ry="5.2" fill="none" stroke="#FFD900" stroke-width="2.2"/>
+        </svg>
+      </span>
+      <span class="btn-text">🛰️ Alt Servers</span>
+    </button>
+    <span class="tooltip">Coming soon...</span>
+  </div>
   <canvas id="bg-canvas"></canvas>
   <div class="main-content">
     <nav class="menu">
