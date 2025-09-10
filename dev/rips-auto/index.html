@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSX App Import Example</title>
+</head>
+<body>
+  <div id="root"></div>
+  <!-- Import React and ReactDOM from a CDN for demonstration -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Import Babel to enable JSX in the browser (for development/demo only) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Import your JSX app file (adjust the path as needed) -->
+  <script type="text/babel" src="index.jsx"></script>
+  <script type="text/babel">
+    // Render the imported App component
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
