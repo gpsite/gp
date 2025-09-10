@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const TMDB_API_KEY = "YOUR_TMDB_API_KEY";
+const TMDB_API_KEY = "15d2ea6d0dc1d476efbca3eba2b9bbfb";
 const LAMBDA_ENDPOINT = "YOUR_LAMBDA_API_GATEWAY_URL";
 
 function App() {
@@ -37,28 +37,4 @@ function App() {
     setLambdaResult(lambdaData.line); // or whatever key you use
     setLoading(false);
   };
-
-  return (
-    <div>
-      <h1>Movie Search</h1>
-      <input value={search} onChange={e => setSearch(e.target.value)} />
-      <button onClick={searchMovies}>Search</button>
-      {loading && <p>Loading...</p>}
-      <ul>
-        {results.map(movie => (
-          <li key={movie.id}>
-            <span>{movie.title}</span>
-            <button onClick={() => handleSelect(movie)}>Select</button>
-          </li>
-        ))}
-      </ul>
-      {lambdaResult && (
-        <div>
-          <h2>Result from Lambda:</h2>
-          <pre>{lambdaResult}</pre>
-        </div>
-      )}
-    </div>
-  );
 }
-export default App;
