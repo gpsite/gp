@@ -1,21 +1,85 @@
-<head><script src="index.js"></script></head>
-<div>
-      <h1>Movie Search</h1>
-      <input value={search} onChange={e => setSearch(e.target.value)} />
-      <button onClick={searchMovies}>Search</button>
-      {loading && <p>Loading...</p>}
-      <ul>
-       <script> {results.map(movie => (
-          <li key={movie.id}>
-            <span>{movie.title}</span>
-            <button onClick={() => handleSelect(movie)}>Select</button>
-          </li>
-        ))}</script>
-      </ul>
-      {lambdaResult && (
-        <div>
-          <h2>Result from Lambda:</h2>
-          <pre>{lambdaResult}</pre>
-        </div>
-      )}
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Search + Lambda</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.5rem 0; }
+    .result { margin-top: 2rem; background: #f7f7f7; padding: 1rem; border-radius: 4px; }
+    button { margin-left: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Movie Search (TMDB)</h1>
+  <input id="searchInput" type="text" placeholder="Search for a movie..." />
+  <button id="searchBtn">Search</button>
+  <div id="loading" style="display:none;">Loading...</div>
+  <ul id="results"></ul>
+  <div id="lambdaResult" class="result" style="display:none;">
+    <h2>Result from Lambda:</h2>
+    <pre id="lambdaOutput"></pre>
+  </div>
+  <script>
+    const TMDB_API_KEY = "YOUR_TMDB_API_KEY";
+    const LAMBDA_ENDPOINT = "YOUR_LAMBDA_API_GATEWAY_URL";
+
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const results = document.getElementById('results');
+    const loading = document.getElementById('loading');
+    const lambdaResult = document.getElementById('lambdaResult');
+    const lambdaOutput = document.getElementById('lambdaOutput');
+
+    searchBtn.onclick = async () => {
+      const query = searchInput.value.trim();
+      if (!query) return;
+      results.innerHTML = "";
+      lambdaResult.style.display = "none";
+      loading.style.display = "block";
+      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      loading.style.display = "none";
+      if (!data.results || data.results.length === 0) {
+        results.innerHTML = "<li>No results.</li>";
+        return;
+      }
+      results.innerHTML = "";
+      data.results.forEach(movie => {
+        const li = document.createElement("li");
+        li.textContent = movie.title + (movie.release_date ? ` (${movie.release_date.slice(0, 4)})` : "");
+        const btn = document.createElement("button");
+        btn.textContent = "Select";
+        btn.onclick = () => handleSelect(movie.id);
+        li.appendChild(btn);
+        results.appendChild(li);
+      });
+    };
+
+    async function handleSelect(movieId) {
+      loading.style.display = "block";
+      lambdaResult.style.display = "none";
+      // Fetch movie details for exact title
+      const detailRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}`);
+      const details = await detailRes.json();
+      const exactTitle = details.title;
+      // Call Lambda
+      const lambdaRes = await fetch(LAMBDA_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: exactTitle }),
+      });
+      let lambdaData;
+      try {
+        lambdaData = await lambdaRes.json();
+      } catch(e) {
+        lambdaData = { error: "Invalid JSON from Lambda." };
+      }
+      loading.style.display = "none";
+      lambdaResult.style.display = "block";
+      lambdaOutput.textContent = lambdaData.line || lambdaData.result || lambdaData.body || JSON.stringify(lambdaData, null, 2);
+    }
+  </script>
+</body>
+</html>
