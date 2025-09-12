@@ -73,6 +73,21 @@
       cursor: pointer;
     }
     .overlay-controls button:hover { background: #2b2e33; }
+
+
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;           /* always fill viewport width */
+      height: 100vh;          /* always fill viewport height */
+      min-width: 100vw;
+      min-height: 100vh;
+      z-index: 0;             /* stay behind everything */
+      pointer-events: none;   /* don't block clicks */
+      display: block;
+    }
+
   </style>
 </head>
 <body>
