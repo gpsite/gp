@@ -9,24 +9,12 @@
   <style>
     body {
       margin: 0;
+      background: #000;
       color: #ccc;
       font-family: sans-serif;
       display: flex;
       height: 100vh;
       overflow: hidden;
-    }
-
-    #bg-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;           /* always fill viewport width */
-      height: 100vh;          /* always fill viewport height */
-      min-width: 100vw;
-      min-height: 100vh;
-      z-index: 0;             /* stay behind everything */
-      pointer-events: none;   /* don't block clicks */
-      display: block;
     }
 
     /* main comps */
@@ -85,15 +73,9 @@
       cursor: pointer;
     }
     .overlay-controls button:hover { background: #2b2e33; }
-
-
-
-
   </style>
 </head>
 <body>
-
-  <canvas id="bg-canvas"></canvas>
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="circle-btn" id="searchBtn"><i class="fa fa-search"></i><input type="text" id="searchInput" placeholder="Search..."></div>
@@ -118,11 +100,6 @@
     </div>
   </div>
 
-  <script type="module">
-  import { setupStarryBackground } from '/scripts/starry-background.js';
-  setupStarryBackground();
-  </script>
-
   <script>
     const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
     const catalog = document.getElementById("catalog");
@@ -138,8 +115,6 @@
 
     let allGames = [];
     let categories = new Set();
-
-    setupStarryBackground();
 
     // Fetch game data from Google Sheets
     async function fetchGameData() {
