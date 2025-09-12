@@ -1,5 +1,4 @@
 // scripts/starry-background.js
-// Advanced Galaxy/Star Field with swirling nebula, parallax, and shooting stars
 (function () {
   // Accept either an existing <canvas> element or create one
   function setupStarryBackground(options = {}) {
