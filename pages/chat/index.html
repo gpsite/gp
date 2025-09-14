@@ -720,7 +720,7 @@ function watchFriendRequests() {
     if (!supported) return;
 
     // Service worker must be at site root: /firebase-messaging-sw.js
-    await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+    await navigator.serviceWorker.register('/firebase-messaging-sw.js');
 
     messaging = getMessaging(app);
 
