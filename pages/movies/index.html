@@ -292,7 +292,7 @@ async function enrichFromOMDb(movie, cardEl) {
       movie.poster = (omdbData.Poster && omdbData.Poster !== "N/A") ? omdbData.Poster : movie.poster;
       movie.genres = omdbData.Genre ? omdbData.Genre.split(',').map(s => s.trim()) : movie.genres;
     }
-    // Update DOM card (same as before)
+    // Update DOM card
     const img = cardEl.querySelector("img");
     if (img) img.src = movie.poster;
     const titleEl = cardEl.querySelector("h3");
@@ -301,6 +301,13 @@ async function enrichFromOMDb(movie, cardEl) {
       : escapeHtml(movie.title);
     const p = cardEl.querySelector("p");
     if (p) p.textContent = movie.genres.length ? movie.genres.join(", ") : "Unknown";
+
+    // --- FIX: After enrichment, update genre set and filters ---
+    GENRES = new Set();
+    ALL_MOVIES.forEach(m => m.genres.forEach(g => GENRES.add(g)));
+    buildFilters();
+    // ----------------------------------------------------------
+
   } catch (err) {
     console.warn("OMDb enrichment failed for", movie.imdbID, err);
   }
