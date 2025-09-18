@@ -157,6 +157,11 @@
  *************************/
 const SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
 
+const OMDB_API_KEYS = [
+  "321a04fd",
+  "c6a43a55"
+];
+
 /*************************
  * ELEMENTS
  *************************/
@@ -183,6 +188,11 @@ let GENRES = new Set();
 /*************************
  * UTILITIES
  *************************/
+
+ function getRandomOmdbKey() {
+  return OMDB_API_KEYS[Math.floor(Math.random() * OMDB_API_KEYS.length)];
+}
+
 const byId = (id) => document.getElementById(id);
 const isVttUrl = (s) => typeof s === 'string' && /\.vtt($|\?)/i.test(s);
 const extractImdb = (s) => {
@@ -284,7 +294,8 @@ async function fetchMovieData() {
 async function enrichFromOMDb(movie, cardEl) {
   if (!movie.imdbID) return;
   try {
-    const omdbRes = await fetch(`https://www.omdbapi.com/?apikey=321a04fd&i=${movie.imdbID}`);
+    const apiKey = getRandomOmdbKey();
+    const omdbRes = await fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${movie.imdbID}`);
     const omdbData = await omdbRes.json();
     if (omdbData && omdbData.Response !== "False") {
       movie.title = omdbData.Title || movie.title;
