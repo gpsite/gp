@@ -434,34 +434,29 @@ function toggleFullscreen() {
 /*************************
  * CUSTOM SCROLLBAR SYNC
  *************************/
-function syncThumb() {
-      const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
-      const trackHeight = track.clientHeight - thumb.clientHeight;
-      thumb.style.top = (track.offsetTop + ratio * trackHeight) + "px";
-    }
-    catalog.addEventListener("scroll", syncThumb);
+function updateThumb() {
+  const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
+  const trackHeight = track.clientHeight - thumb.clientHeight;
+  thumb.style.top = ratio * trackHeight + "px";
+}
+function onCatalogScroll() { updateThumb(); }
+let dragging = false, startY = 0, startTop = 0;
+thumb.addEventListener('mousedown', (e) => {
+  dragging = true; startY = e.clientY; startTop = parseInt(thumb.style.top || '0', 10) - track.offsetTop; thumb.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+document.addEventListener('mousemove', (e) => {
+  if (!dragging) return;
+  const trackHeight = track.clientHeight;
+  const thumbHeight = thumb.clientHeight;
+  const maxTop = trackHeight - thumbHeight;
+  let newTop = Math.min(maxTop, Math.max(0, startTop + (e.clientY - startY)));
+  thumb.style.top = (track.offsetTop + newTop) + 'px';
+  const scrollable = catalog.scrollHeight - catalog.clientHeight;
+  catalog.scrollTop = (newTop / maxTop) * scrollable;
+});
+document.addEventListener('mouseup', () => { dragging = false; thumb.style.cursor = 'grab'; });
 
-    let dragging = false;
-    let startY, startTop;
-    thumb.addEventListener("mousedown", e => {
-      dragging = true;
-      startY = e.clientY;
-      startTop = parseInt(thumb.style.top) || 0;
-      thumb.style.cursor = "grabbing";
-    });
-    document.addEventListener("mousemove", e => {
-      if (!dragging) return;
-      const dy = e.clientY - startY;
-      const trackHeight = track.clientHeight - thumb.clientHeight;
-      let newTop = Math.min(track.offsetTop + trackHeight, Math.max(track.offsetTop, startTop + dy));
-      thumb.style.top = newTop + "px";
-      const ratio = (newTop - track.offsetTop) / trackHeight;
-      catalog.scrollTop = ratio * (catalog.scrollHeight - catalog.clientHeight);
-    });
-    document.addEventListener("mouseup", () => {
-      dragging = false;
-      thumb.style.cursor = "grab";
-    });
 /*************************
  * SEARCH + FILTER UI
  *************************/
