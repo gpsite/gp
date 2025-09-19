@@ -2,44 +2,56 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>WebLLM (ESM Import)</title>
+  <title>WebLLM (Global)</title>
   <style>
     body { font-family: system-ui; margin: 2rem; max-width: 780px; }
     textarea { width:100%; min-height:120px; }
     pre { background:#111; color:#eee; padding:1rem; white-space:pre-wrap; }
-    button { padding:0.6rem 1rem; }
   </style>
+  <!-- IMPORTANT: Correct CDN path (version pinned) -->
+  <script
+    src="https://unpkg.com/@mlc-ai/web-llm@0.2.61/dist/index.js"
+    defer
+    id="webllm-script"></script>
 </head>
 <body>
-  <h1>WebLLM Demo (ESM)</h1>
-  <p>Runs a quantized model locally. First load may take time (downloads weights).</p>
-  <label>Prompt:</label><br>
-  <textarea id="prompt">Explain what a transformer model is in simple terms.</textarea><br>
-  <button id="runBtn">Run</button>
-  <pre id="out">Loading module...</pre>
+  <h1>WebLLM Demo (Global)</h1>
+  <textarea id="prompt">Give me 3 creative uses for a paperclip.</textarea><br>
+  <button id="runBtn" disabled>Loading...</button>
+  <pre id="out">Loading script...</pre>
 
-  <script type="module">
-    // Import everything under an alias so we know exactly what we have.
-    import * as webllm from "https://unpkg.com/@mlc-ai/web-llm@0.2.61/dist/index.js";
-
+  <script>
     const out = document.getElementById('out');
     const runBtn = document.getElementById('runBtn');
-
-    // Pick a model that exists in the release. (Adjust for newer versions if needed.)
     const MODEL = 'Mistral-7B-Instruct-q4f16_1';
-
     let engine;
+
+    // Wait until the script actually defines webllm
+    async function waitForWebLLM(timeoutMs = 10000) {
+      const start = performance.now();
+      while (!window.webllm) {
+        if (performance.now() - start > timeoutMs) {
+          throw new Error('Timeout waiting for webllm global (script failed to load?)');
+        }
+        await new Promise(r => setTimeout(r, 50));
+      }
+      return window.webllm;
+    }
+
     async function init() {
       try {
-        out.textContent = 'Initializing model (this triggers weight downloads)...';
-        engine = await webllm.CreateMLCEngine(MODEL, {
+        const lib = await waitForWebLLM();
+        out.textContent = 'Initializing model...';
+        engine = await lib.CreateMLCEngine(MODEL, {
           initProgressCallback: (p) => {
             out.textContent = `Loading: ${(p.progress * 100).toFixed(1)}% - ${p.text}`;
           }
         });
-        out.textContent = 'Model ready. Enter a prompt and click Run.';
+        out.textContent = 'Model ready.';
+        runBtn.disabled = false;
+        runBtn.textContent = 'Run';
       } catch (e) {
-        out.textContent = 'Init error: ' + e.message + '\n(Check DevTools Network tab.)';
+        out.textContent = 'Init error: ' + e.message;
       }
     }
 
@@ -54,14 +66,14 @@
           messages: [{ role: 'user', content: prompt }],
           stream: true,
           temperature: 0.7,
-          max_tokens: 300
+          max_tokens: 250
         });
         for await (const part of stream) {
           const delta = part?.choices?.[0]?.delta?.content;
-            if (delta) {
-              result += delta;
-              out.textContent = result;
-            }
+          if (delta) {
+            result += delta;
+            out.textContent = result;
+          }
         }
       } catch (e) {
         out.textContent = 'Generation error: ' + e.message;
