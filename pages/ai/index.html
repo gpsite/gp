@@ -159,6 +159,16 @@ body {
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: #2b2e33; border-radius: 3px; }
+
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
 </style>
 </head>
 <body>
@@ -234,8 +244,8 @@ function addMessage(role, text) {
             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" 
                  fill="none" stroke="currentColor" stroke-linecap="round" 
                  stroke-linejoin="round" stroke-width="1.5" width="18" height="18">
-              <path d="M1.75 5.75h12.5v7.5H1.75z"/>
-              <path d="M10.75 8.75v1.5m-5.5-1.5v1.5m-.5-7.5 3.25 3 3.25-3"/>
+              <rect height="7.5" width="12.5" y="5.75" x="1.75"/>
+              <path d="m10.75 8.75v1.5m-5.5-1.5v1.5m-.5-7.5 3.25 3 3.25-3"/>
             </svg>
           <div><strong>GP-Clanker:</strong><br>${safeHtml}</div>`;
     } else {
