@@ -214,11 +214,8 @@ function renderChats() {
         titleSpan.onclick = () => loadChat(i);
 
         const delBtn = document.createElement("button");
-        delBtn.textContent = "❌";
-        delBtn.style.background = "transparent";
-        delBtn.style.border = "none";
-        delBtn.style.cursor = "pointer";
-        delBtn.style.color = "#888";
+        delBtn.textContent = "✕";
+        delBtn.className = "del-btn";
         delBtn.onclick = (e) => {
             e.stopPropagation();
             deleteChat(i);
@@ -244,7 +241,7 @@ function deleteChat(index) {
             newChat();
         }
     } else if (currentChat > index) {
-        currentChat--; // shift currentChat index back
+        currentChat--; 
     }
     saveChats();
     renderChats();
@@ -295,9 +292,13 @@ function addMessage(role, text, save = true) {
     if (save && currentChat !== null && chats[currentChat]) {
         chats[currentChat].messages.push({ role, text });
 
-        // If it's the *first* user message in this chat, set title
+        
         if (role === "user" && chats[currentChat].messages.length === 1) {
-            chats[currentChat].title = text.split(" ").slice(0, 4).join(" ");
+            let title = text.trim();
+            if (title.length > 25) {
+                title = title.slice(0, 25) + "...";
+            }
+            chats[currentChat].title = title;
         }
 
         saveChats();
