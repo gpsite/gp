@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GP CLANKER</title>
+<title>GP-Clanker</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
@@ -11,15 +11,21 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
-body {
+html, body {
     margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* prevent body scroll */
+}
+
+body {
     font-family: Arial, sans-serif;
     background: #000;
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
 .container {
     display: flex;
@@ -69,6 +75,8 @@ body {
     flex: 1;
     padding: 16px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 .msg {
     margin-bottom: 12px;
@@ -147,7 +155,7 @@ body {
 
 <script type="module">
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
-const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA";
+const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA"; // we know, its just here, don't be weird, im too lazy to hide it
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -191,7 +199,7 @@ function addMessage(role, text) {
     const safeHtml = marked.parse(text);
     const div = document.createElement("div");
     div.className = "msg " + role;
-    div.innerHTML = `<strong>${role==="user"?"You":"GP-CLANKER"}:</strong><br>` + safeHtml;
+    div.innerHTML = `<strong>${role==="user"?"You":"GP-Clanker"}:</strong><br>` + safeHtml;
     messagesDiv.appendChild(div);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
     renderMathInElement(div, {
