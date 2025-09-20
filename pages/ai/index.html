@@ -16,7 +16,7 @@ html, body {
     padding: 0;
     height: 100%;
     width: 100%;
-    overflow: hidden; /* prevent body scroll */
+    overflow: hidden;
 }
 
 body {
@@ -79,14 +79,37 @@ body {
     flex-direction: column;
 }
 .msg {
+    display: inline-block;
+    max-width: 70%;
     margin-bottom: 12px;
-    padding: 12px;
-    border-radius: 6px;
-    background: #40414f;
+    padding: 10px 14px;
+    border-radius: 12px;
     word-break: break-word;
+    line-height: 1.4;
 }
-.msg.user { background: #0e0f13; text-align: right; }
-.msg.ai { background: #13141a; text-align: left; }
+.msg.user {
+    background: #0e0f13;
+    align-self: flex-end;
+    text-align: right;
+    color: #fff;
+}
+.msg.ai {
+    background: #1e1f29;
+    align-self: flex-start;
+    text-align: left;
+    color: #9fd1ff;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+.msg.ai svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    fill: #9fd1ff;
+}
+
 .input-row {
     display: flex;
     padding: 12px;
@@ -199,7 +222,17 @@ function addMessage(role, text) {
     const safeHtml = marked.parse(text);
     const div = document.createElement("div");
     div.className = "msg " + role;
-    div.innerHTML = `<strong>${role==="user"?"You":"GP-Clanker"}:</strong><br>` + safeHtml;
+
+    if (role === "ai") {
+        div.innerHTML = `
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2a7 7 0 0 0-7 7v3H4v2h2v3a7 7 0 0 0 14 0v-3h2v-2h-2V9a7 7 0 0 0-7-7zM9 9a3 3 0 0 1 6 0v3H9V9z"/>
+          </svg>
+          <div><strong>GP-Clanker:</strong><br>${safeHtml}</div>`;
+    } else {
+        div.innerHTML = `<strong>You:</strong><br>${safeHtml}`;
+    }
+
     messagesDiv.appendChild(div);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
     renderMathInElement(div, {
@@ -216,7 +249,7 @@ async function sendMessage() {
   input.value = "";
 
   const thinkingDiv = document.createElement("div");
-  thinkingDiv.className = "ai";
+  thinkingDiv.className = "msg ai";
   thinkingDiv.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
   messagesDiv.appendChild(thinkingDiv);
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
