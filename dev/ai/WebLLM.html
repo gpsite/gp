@@ -1,509 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Gemini Chat</title>
-  <style>
-    body {
-      background: #343541;
-      color: #ececf1;
-      font-family: Arial, Helvetica, sans-serif;
-      margin: 0;
-      height: 100vh;
-    }
-    .container {
-      display: flex;
-      height: 100vh;
-    }
-    .sidebar {
-      background: #202123;
-      width: 240px;
-      padding: 16px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .sidebar button {
-      background: #40414f;
-      color: #ececf1;
-      border: none;
-      border-radius: 6px;
-      padding: 10px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-    .chat-list {
-      flex: 1;
-      overflow-y: auto;
-      margin-top: 16px;
-    }
-    .chat-item {
-      padding: 8px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 4px;
-      background: none;
-      color: #ececf1;
-    }
-    .chat-item.active, .chat-item:hover {
-      background: #2a2b32;
-    }
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      background: #343541;
-    }
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 0 0 0;
-      width: 100%;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    .msg {
-      margin-bottom: 18px;
-      padding: 12px 18px;
-      border-radius: 6px;
-      background: #40414f;
-      word-break: break-word;
-    }
-    .msg.user {
-      background: #3e3f4b;
-      text-align: right;
-    }
-    .msg.ai {
-      background: #40414f;
-      text-align: left;
-    }
-    .input-row {
-      display: flex;
-      gap: 8px;
-      padding: 18px;
-      background: #343541;
-      border-top: 1px solid #23242a;
-      max-width: 700px;
-      margin: 0 auto;
-      width: 100%;
-    }
-    .input-row input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #23242a;
-      color: #ececf1;
-      font-size: 15px;
-    }
-    .input-row button {
-      background: #19c37d;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 0 18px;
-      font-size: 15px;
-      cursor: pointer;
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+<meta charset="UTF-8">
+<title>Gemini Chat</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
     onload="renderMathInElement(document.body);"
     data-delimiters='[{"left":"$","right":"$","display":false},{"left":"$$","right":"$$","display":true}]'>
-  </script>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #2f2f38;
+    color: #ececf1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    display: flex;
+    width: 900px;
+    height: 600px;
+    background: #343541;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+.sidebar {
+    background: #202123;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+}
+.sidebar button {
+    background: #40414f;
+    color: #ececf1;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+}
+.chat-list {
+    flex: 1;
+    overflow-y: auto;
+}
+.chat-item {
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 4px;
+}
+.chat-item.active, .chat-item:hover {
+    background: #2a2b32;
+}
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #343541;
+}
+.messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+.msg {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 6px;
+    background: #40414f;
+    word-break: break-word;
+}
+.msg.user { background: #3e3f4b; text-align: right; }
+.msg.ai { background: #40414f; text-align: left; }
+.input-row {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #23242a;
+}
+.input-row input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: #23242a;
+    color: #ececf1;
+}
+.input-row input:focus { outline: none; }
+.input-row button {
+    margin-left: 8px;
+    background: #19c37d;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    cursor: pointer;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+</style>
 </head>
 <body>
-  <div class="container">
+<div class="container">
     <div class="sidebar">
-      <button id="newChatBtn">+ New Chat</button>
-      <div class="chat-list" id="chats"></div>
+        <button id="newChatBtn">+ New Chat</button>
+        <div class="chat-list" id="chats"></div>
     </div>
     <div class="main">
-      <div class="messages" id="messages"></div>
-      <div class="input-row">
-        <input id="userInput" type="text" placeholder="Type your message..." autocomplete="off" />
-        <button id="sendBtn">Send</button>
-      </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-row">
+            <input id="userInput" type="text" placeholder="Type your message..." autocomplete="off" />
+            <button id="sendBtn">Send</button>
+        </div>
     </div>
-  </div>
-  <script type="module">
-    import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
-    const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA";
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+</div>
 
-    let chats = JSON.parse(localStorage.getItem("chats") || "[]");
-    let currentChat = null;
+<script type="module">
+import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
+const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA";
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const chatsDiv = document.getElementById("chats");
-    const messagesDiv = document.getElementById("messages");
+let chats = JSON.parse(localStorage.getItem("chats") || "[]");
+let currentChat = null;
 
-    function renderChats() {
-      chatsDiv.innerHTML = "";
-      chats.forEach((c, i) => {
+const chatsDiv = document.getElementById("chats");
+const messagesDiv = document.getElementById("messages");
+
+function renderChats() {
+    chatsDiv.innerHTML = "";
+    chats.forEach((c, i) => {
         const div = document.createElement("div");
         div.className = "chat-item" + (i === currentChat ? " active" : "");
         div.textContent = c.title || "Chat " + (i + 1);
         div.onclick = () => loadChat(i);
         chatsDiv.appendChild(div);
-      });
-    }
+    });
+}
 
-    function loadChat(index) {
-      currentChat = index;
-      renderChats();
-      messagesDiv.innerHTML = "";
-      chats[index].messages.forEach(m => addMessage(m.role, m.text));
-      renderMathInElement(messagesDiv);
-    }
+function loadChat(index) {
+    currentChat = index;
+    renderChats();
+    messagesDiv.innerHTML = "";
+    chats[index].messages.forEach(m => addMessage(m.role, m.text));
+    renderMathInElement(messagesDiv);
+}
 
-    function newChat() {
-      const chat = { title: "New Chat", messages: [] };
-      chats.unshift(chat);
-      currentChat = 0;
-      saveChats();
-      renderChats();
-      loadChat(0);
-    }
+function newChat() {
+    const chat = { title: "New Chat", messages: [] };
+    chats.unshift(chat);
+    currentChat = 0;
+    saveChats();
+    renderChats();
+    loadChat(0);
+}
 
-    function saveChats() {
-      localStorage.setItem("chats", JSON.stringify(chats));
-    }
+function saveChats() { localStorage.setItem("chats", JSON.stringify(chats)); }
 
-    function addMessage(role, text) {
-      const safeHtml = marked.parse(text);
-      const div = document.createElement("div");
-      div.className = "msg " + (role === "user" ? "user" : "ai");
-      div.innerHTML = `<strong>${role === "user" ? "You" : "Gemini"}:</strong><br>` + safeHtml;
-      messagesDiv.appendChild(div);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      renderMathInElement(div, {
-        delimiters: [
-          { left: "$$", right: "$$", display: true },
-          { left: "$", right: "$", display: false }
-        ]
-      });
-    }
+function addMessage(role, text) {
+    const safeHtml = marked.parse(text);
+    const div = document.createElement("div");
+    div.className = "msg " + role;
+    div.innerHTML = `<strong>${role==="user"?"You":"Gemini"}:</strong><br>` + safeHtml;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    renderMathInElement(div, {
+        delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }]
+    });
+}
 
-    async function sendMessage() {
-      const input = document.getElementById("userInput");
-      const text = input.value.trim();
-      if (!text || currentChat === null) return;
-      addMessage("user", text);
-      chats[currentChat].messages.push({ role: "user", text });
-      input.value = "";
-      saveChats();
-      try {
+async function sendMessage() {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text || currentChat === null) return;
+    addMessage("user", text);
+    chats[currentChat].messages.push({ role: "user", text });
+    input.value = ""; saveChats();
+
+    try {
         const result = await model.generateContent(text);
         const reply = result.response.text();
         addMessage("ai", reply);
         chats[currentChat].messages.push({ role: "ai", text: reply });
-        if (!chats[currentChat].title || chats[currentChat].title === "New Chat") {
-          chats[currentChat].title = chats[currentChat].messages[0].text.slice(0, 20) + "...";
-        }
-        saveChats();
-        renderChats();
-      } catch (err) {
+        chats[currentChat].title = chats[currentChat].messages[0].text.slice(0,20)+"...";
+        saveChats(); renderChats();
+    } catch {
         addMessage("ai", "[Error fetching reply]");
-      }
     }
+}
 
-    document.getElementById("sendBtn").onclick = sendMessage;
-    document.getElementById("userInput").addEventListener("keypress", e => {
-      if (e.key === "Enter") sendMessage();
-    });
-    document.getElementById("newChatBtn").onclick = newChat;
+document.getElementById("sendBtn").onclick = sendMessage;
+document.getElementById("userInput").addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+document.getElementById("newChatBtn").onclick = newChat;
 
-    renderChats();
-    if (chats.length > 0) loadChat(0);
-    else newChat();
-  </script>
-</body>
-</html>
-    }
-
-    input:focus {
-        outline: none;
-    }
-
-    ::placeholder {
-        color: #8E8EA0;
-    }
-
-    .final p{
-        font-size: 12px;
-        color: #C5C5D2;
-    }
-    u{
-        font-size: 12px;
-        color: #C5C5D2;
-    }
-  </style>
-
-
-  <!-- Markdown parser -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-  <!-- KaTeX for math rendering -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.body);"
-    data-delimiters='[{"left":"$","right":"$","display":false},{"left":"$$","right":"$$","display":true}]'>
-  </script>
-</head>
-<<body>
-    <div class="container">
-
-        <div class="sideBar">
-
-            <div class="btn">
-                <a class="new-chat-btn">New chat</a>
-                <a class="close-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm5-2v16" />
-                    </svg>
-                </a>
-            </div>
-
-            </div>
-
-        </div>
-
-        <div class="content">
-            </div>
-
-            <div class="gpt-text">
-                <div class="gpt">
-                    <h1>ChatGPT</h1>
-                </div>
-            </div>
-
-            <div class="default-chat">
-                <div class="test">
-                    <div>
-                        <svg height="15" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                            fill="currentColor" class="w-6 h-6">
-                            <path fill-rule="evenodd"
-                                d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 010 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 01-1.422 0l-.395-1.183a1.5 1.5 0 00-.948-.948l-1.183-.395a.75.75 0 010-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0116.5 15z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <p>Examples</p>
-                    </div>
-                    <div>
-                        <svg height="15" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <p>Capabilities</p>
-                    </div>
-                    <div>
-                        <svg height="15" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                            fill="currentColor" class="w-6 h-6">
-                            <path fill-rule="evenodd"
-                                d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 010 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 01-1.422 0l-.395-1.183a1.5 1.5 0 00-.948-.948l-1.183-.395a.75.75 0 010-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0116.5 15z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <p>Limitations</p>
-                    </div>
-                </div>
-
-
-
-            </div>
-            <div class="def-promt">
-                <div class="prompt-A">
-                    <p>"Explain quantum computing in simple terms"&#8594</p>
-                </div>
-                <div class="prompt-A">
-                    <p>Remembers what user said earlier in the conversation</p>
-                </div>
-                <div class="prompt-A">
-                    <p>May occasionally generate incorrect information</p>
-                </div>
-
-            </div>
-
-            <div class="def-promt">
-                <div class="prompt-A">
-                    <p>"Got any creative ideas for a 10 year old's birthday?"&#8594</p>
-                </div>
-                <div class="prompt-A">
-                    <p>Allows user to provide follow-up corrections</p>
-                </div>
-                <div class="prompt-A">
-                    <p>May occasionally produce harmful instructions or biased content</p>
-                </div>
-
-            </div>
-
-            <div class="def-promt">
-                <div class="prompt-A">
-                    <p>"How do I make an HTTP request in Javascript?"&#8594</p>
-                </div>
-                <div class="prompt-A">
-                    <p>Trained to decline inappropriate requests</p>
-                </div>
-                <div class="prompt-A">
-                    <p>Limited knowledge of world and events after 2021</p>
-                </div>
-
-            </div>
-
-            <div class="final">
-                <div class="prompt-form">
-                    <input type="text" placeholder="Send a messages">
-                </div>
-                <div>
-                    <p>Free Research Preview. ChatGPT may produce inaccurate information about people, places, or facts.
-                        <u>ChatGPT
-                            July 20 Version</u>
-                    </p>
-                </div>
-            </div>
-
-
-        </div>
-    </div>
-
-  <script type="module">
-    import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
-
-    const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA"; // dev only
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    let chats = JSON.parse(localStorage.getItem("chats") || "[]");
-    let currentChat = null;
-
-    const chatsDiv = document.getElementById("chats");
-    const messagesDiv = document.getElementById("messages");
-
-    function renderChats() {
-      chatsDiv.innerHTML = "";
-      chats.forEach((c, i) => {
-        const div = document.createElement("div");
-        div.className = "chat-item";
-        div.textContent = c.title || "Chat " + (i + 1);
-        div.onclick = () => loadChat(i);
-        chatsDiv.appendChild(div);
-      });
-    }
-
-    function loadChat(index) {
-      currentChat = index;
-      messagesDiv.innerHTML = "";
-      chats[index].messages.forEach(m => addMessage(m.role, m.text));
-      renderMathInElement(messagesDiv);
-    }
-
-    function newChat() {
-      const chat = { title: "New Chat", messages: [] };
-      chats.unshift(chat);
-      currentChat = 0;
-      saveChats();
-      renderChats();
-      loadChat(0);
-    }
-
-    function saveChats() {
-      localStorage.setItem("chats", JSON.stringify(chats));
-    }
-
-    function cleanAIText(text) {
-      // Step 1: remove extra spaces around math symbols
-      text = text.replace(/\s*([=+\-*/^<>\(\)\\{}\[\]])\s*/g, '$1');
-        
-      // Step 2: collapse line breaks inside math blocks
-      // Inline math $...$
-      text = text.replace(/\$(.*?)\$/gs, (m, p1) => `$${p1.replace(/\n/g,'')} $`);
-      // Display math $$...$$
-      text = text.replace(/\$\$(.*?)\$\$/gs, (m, p1) => `$$${p1.replace(/\n/g,'')}$$`);
-      // LaTeX environments
-      text = text.replace(/\\begin\{([a-z*]+)\}(.*?)\\end\{\1\}/gs, (m,p1,p2) => `\\begin{${p1}}${p2.replace(/\n/g,'')}\\end{${p1}}`);
-        
-      // Step 3: remove repeated lines
-      const lines = text.split('\n');
-      const uniqueLines = lines.filter((line,i)=>line.trim() && line.trim() !== lines[i-1]?.trim());
-      text = uniqueLines.join('\n');
-        
-      // Step 4: collapse multiple empty lines to one
-      text = text.replace(/\n{2,}/g, '\n\n');
-        
-      // Step 5: trim lines
-      text = text.split('\n').map(l => l.trim()).join('\n');
-        
-      return text;
-    }
-
-    function addMessage(role, text) {
-      // Step 1: split into paragraphs
-      const paragraphs = text.split(/\n{2,}/).map(p => {
-        const lines = p.split('\n');
-        const uniqueLines = lines.filter((line, i) => line.trim() && line.trim() !== lines[i-1]?.trim());
-        return uniqueLines.map(l => l.trim()).join('\n');
-      });
-
-      // Step 2: join paragraphs with double line breaks to preserve spacing
-      const cleanedText = paragraphs.join('\n\n');
-
-      // Step 3: convert Markdown → HTML
-      const safeHtml = marked.parse(cleanedText);
-
-      const div = document.createElement("div");
-      div.className = "msg " + role;
-      div.innerHTML = `<strong>${role === "user" ? "You" : "Gemini"}:</strong><br>` + safeHtml;
-      messagesDiv.appendChild(div);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-      // Step 4: render math
-      renderMathInElement(div, {
-        delimiters: [
-          { left: "$$", right: "$$", display: true },
-          { left: "$", right: "$", display: false }
-        ]
-      });
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById("userInput");
-      const text = input.value.trim();
-      if (!text || currentChat === null) return;
-
-      addMessage("user", text);
-      chats[currentChat].messages.push({ role: "user", text });
-      input.value = "";
-      saveChats();
-
-      try {
-        const result = await model.generateContent(text);
-        const reply = result.response.text();
-        addMessage("ai", reply);
-        chats[currentChat].messages.push({ role: "ai", text: reply });
-        chats[currentChat].title = chats[currentChat].messages[0].text.slice(0, 20) + "...";
-        saveChats();
-        renderChats();
-      } catch (err) {
-        console.error(err);
-        addMessage("ai", "[Error fetching reply]");
-      }
-    }
-
-    document.getElementById("sendBtn").onclick = sendMessage;
-    document.getElementById("userInput").addEventListener("keypress", e => {
-      if (e.key === "Enter") sendMessage();
-    });
-    document.getElementById("newChatBtn").onclick = newChat;
-
-    renderChats();
-    if (chats.length > 0) loadChat(0);
-  </script>
+renderChats();
+if(chats.length>0) loadChat(0);
+else newChat();
+</script>
 </body>
 </html>
