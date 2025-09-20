@@ -9,25 +9,29 @@
       font-family: Arial, sans-serif;
       display: flex;
       height: 100vh;
+      background: #1e1e1e;
+      color: #ddd;
     }
     #sidebar {
       width: 220px;
-      background: #f5f5f5;
-      border-right: 1px solid #ddd;
+      background: #2a2a2a;
+      border-right: 1px solid #444;
       display: flex;
       flex-direction: column;
     }
     #sidebar h2 {
       margin: 10px;
       font-size: 16px;
+      color: #fff;
     }
     #chats { flex: 1; overflow-y: auto; }
     .chat-item {
       padding: 10px;
       cursor: pointer;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #444;
+      color: #ddd;
     }
-    .chat-item:hover { background: #eaeaea; }
+    .chat-item:hover { background: #3a3a3a; }
     #newChatBtn {
       margin: 10px;
       padding: 8px;
@@ -47,18 +51,20 @@
       padding: 15px;
       overflow-y: auto;
     }
-    .msg { margin: 8px 0; }
-    .user strong { color: blue; }
-    .ai strong { color: green; }
+    .msg { margin: 12px 0; }
+    .user strong { color: #4fc3f7; }
+    .ai strong { color: #81c784; }
     #inputBar {
       display: flex;
-      border-top: 1px solid #ddd;
+      border-top: 1px solid #444;
     }
     #userInput {
       flex: 1;
       padding: 10px;
       border: none;
       outline: none;
+      background: #2a2a2a;
+      color: #ddd;
     }
     #sendBtn {
       padding: 10px;
@@ -67,6 +73,16 @@
       color: white;
       cursor: pointer;
     }
+    /* Optional: code blocks styling */
+    pre {
+      background: #333;
+      color: #fff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    code { background: #333; padding: 2px 4px; border-radius: 4px; }
+    a { color: #4fc3f7; }
   </style>
 
   <!-- Markdown parser -->
@@ -97,8 +113,7 @@
   <script type="module">
     import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 
-    // ⚠️ For dev only — don’t push public with this key
-    const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA";
+    const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA"; // dev only
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -123,7 +138,7 @@
       currentChat = index;
       messagesDiv.innerHTML = "";
       chats[index].messages.forEach(m => addMessage(m.role, m.text));
-      renderMathInElement(messagesDiv); // re-render math
+      renderMathInElement(messagesDiv);
     }
 
     function newChat() {
@@ -140,27 +155,26 @@
     }
 
     function addMessage(role, text) {
-      // Step 1: remove repeated lines
-      const lines = text.split('\n');
-      const uniqueLines = lines.filter((line, i) => line.trim() && line.trim() !== lines[i-1]?.trim());
-      let cleanedText = uniqueLines.join('\n');
-        
-      // Step 2: collapse multiple newlines
-      cleanedText = cleanedText.replace(/\n{2,}/g, '\n');
-        
-      // Step 3: trim leading/trailing spaces
-      cleanedText = cleanedText.split('\n').map(l => l.trim()).join('\n');
-        
-      // Step 4: convert markdown → HTML
+      // Step 1: split into paragraphs
+      const paragraphs = text.split(/\n{2,}/).map(p => {
+        const lines = p.split('\n');
+        const uniqueLines = lines.filter((line, i) => line.trim() && line.trim() !== lines[i-1]?.trim());
+        return uniqueLines.map(l => l.trim()).join('\n');
+      });
+
+      // Step 2: join paragraphs with double line breaks to preserve spacing
+      const cleanedText = paragraphs.join('\n\n');
+
+      // Step 3: convert Markdown → HTML
       const safeHtml = marked.parse(cleanedText);
-        
+
       const div = document.createElement("div");
       div.className = "msg " + role;
       div.innerHTML = `<strong>${role === "user" ? "You" : "Gemini"}:</strong><br>` + safeHtml;
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        
-      // Step 5: render math
+
+      // Step 4: render math
       renderMathInElement(div, {
         delimiters: [
           { left: "$$", right: "$$", display: true },
