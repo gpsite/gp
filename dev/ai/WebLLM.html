@@ -6,40 +6,40 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
       display: flex;
       height: 100vh;
-      background: #1e1e1e;
-      color: #ddd;
+      background: #121212;
+      color: #e0e0e0;
     }
     #sidebar {
-      width: 220px;
-      background: #2a2a2a;
-      border-right: 1px solid #444;
+      width: 250px;
+      background: #1f1f1f;
+      border-right: 1px solid #333;
       display: flex;
       flex-direction: column;
     }
     #sidebar h2 {
-      margin: 10px;
-      font-size: 16px;
+      margin: 15px;
+      font-size: 18px;
       color: #fff;
     }
     #chats { flex: 1; overflow-y: auto; }
     .chat-item {
-      padding: 10px;
+      padding: 12px;
       cursor: pointer;
-      border-bottom: 1px solid #444;
-      color: #ddd;
+      border-bottom: 1px solid #333;
+      color: #e0e0e0;
     }
-    .chat-item:hover { background: #3a3a3a; }
+    .chat-item:hover { background: #2a2a2a; }
     #newChatBtn {
       margin: 10px;
       padding: 8px;
-      background: #4285f4;
+      background: #4a90e2;
       color: #fff;
       border: none;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 5px;
     }
     #main {
       flex: 1;
@@ -51,37 +51,36 @@
       padding: 15px;
       overflow-y: auto;
     }
-    .msg { margin: 12px 0; }
+    .msg { margin: 12px 0; line-height: 1.5; }
     .user strong { color: #4fc3f7; }
     .ai strong { color: #81c784; }
     #inputBar {
       display: flex;
-      border-top: 1px solid #444;
+      border-top: 1px solid #333;
     }
     #userInput {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       border: none;
       outline: none;
-      background: #2a2a2a;
-      color: #ddd;
+      background: #1f1f1f;
+      color: #e0e0e0;
     }
     #sendBtn {
-      padding: 10px;
+      padding: 12px;
       border: none;
-      background: #4285f4;
-      color: white;
+      background: #4a90e2;
+      color: #fff;
       cursor: pointer;
     }
-    /* Optional: code blocks styling */
     pre {
-      background: #333;
+      background: #2a2a2a;
       color: #fff;
-      padding: 8px;
-      border-radius: 4px;
+      padding: 10px;
+      border-radius: 5px;
       overflow-x: auto;
     }
-    code { background: #333; padding: 2px 4px; border-radius: 4px; }
+    code { background: #2a2a2a; padding: 2px 4px; border-radius: 4px; }
     a { color: #4fc3f7; }
   </style>
 
@@ -154,27 +153,51 @@
       localStorage.setItem("chats", JSON.stringify(chats));
     }
 
+    // Clean AI text to fix line breaks and formatting
+    function cleanAIText(text) {
+      // Remove extra spaces around symbols
+      text = text.replace(/\s*([=+\-*/^<>\(\)\\{}\[\]])\s*/g, '$1');
+
+      // Collapse line breaks inside inline math
+      text = text.replace(/\$(.*?)\$/gs, (m,p1) => `$${p1.replace(/\n/g,'')}$`);
+      // Collapse line breaks inside display math
+      text = text.replace(/\$\$(.*?)\$\$/gs, (m,p1) => `$$${p1.replace(/\n/g,'')}$$`);
+      // Collapse line breaks inside LaTeX environments
+      text = text.replace(/\\begin\{([a-z*]+)\}(.*?)\\end\{\1\}/gs, (m,p1,p2) => `\\begin{${p1}}${p2.replace(/\n/g,'')}\\end{${p1}}`);
+
+      // Remove repeated lines
+      const lines = text.split('\n');
+      const uniqueLines = lines.filter((line,i)=>line.trim() && line.trim() !== lines[i-1]?.trim());
+      text = uniqueLines.join('\n');
+
+      // Collapse multiple empty lines to one
+      text = text.replace(/\n{2,}/g, '\n\n');
+
+      // Trim lines
+      text = text.split('\n').map(l => l.trim()).join('\n');
+
+      return text;
+    }
+
     function addMessage(role, text) {
-      // Step 1: split into paragraphs
-      const paragraphs = text.split(/\n{2,}/).map(p => {
-        const lines = p.split('\n');
-        const uniqueLines = lines.filter((line, i) => line.trim() && line.trim() !== lines[i-1]?.trim());
-        return uniqueLines.map(l => l.trim()).join('\n');
-      });
+      if (role === "ai") text = cleanAIText(text);
 
-      // Step 2: join paragraphs with double line breaks to preserve spacing
-      const cleanedText = paragraphs.join('\n\n');
-
-      // Step 3: convert Markdown → HTML
-      const safeHtml = marked.parse(cleanedText);
+      const safeHtml = marked.parse(text);
 
       const div = document.createElement("div");
       div.className = "msg " + role;
       div.innerHTML = `<strong>${role === "user" ? "You" : "Gemini"}:</strong><br>` + safeHtml;
+
+      // Highlight AI messages
+      if (role === "ai") {
+        div.style.background = "#1c1c1c";
+        div.style.padding = "10px";
+        div.style.borderRadius = "6px";
+      }
+
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-      // Step 4: render math
       renderMathInElement(div, {
         delimiters: [
           { left: "$$", right: "$$", display: true },
