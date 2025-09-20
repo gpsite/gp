@@ -1,455 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Local Chat UI — New Chats & Saved Chats</title>
-<style>
-  :root{
-    --bg:#0f1724; --panel:#0b1220; --muted:#94a3b8; --accent:#10b981; --msg-user:#dbeafe;
-    --msg-ai:#e6fffa;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:linear-gradient(180deg,var(--bg),#071028);color:#e6eef8;min-height:100vh;display:flex}
-  .app{margin:auto; width:100%; max-width:1100px; height:80vh; display:grid; grid-template-columns:260px 1fr; gap:18px; padding:18px}
-  .sidebar{background:linear-gradient(180deg,#071026,#08122a); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:12px; box-shadow:0 6px 18px rgba(2,6,23,.6)}
-  .brand{display:flex;align-items:center;gap:10px}
-  .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#02111a}
-  .new-btn{background:#07172a;border:1px solid rgba(255,255,255,.04);color:var(--accent);padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600}
-  .chats{overflow:auto;flex:1;padding-right:6px}
-  .chat-item{padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;color:var(--muted);margin-bottom:6px}
-  .chat-item.active{background:rgba(255,255,255,.03);color:#e6eef8}
-  .chat-title{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px}
-  .chat-controls{display:flex;gap:6px}
-  .small-btn{background:transparent;border:0;color:var(--muted);cursor:pointer;padding:6px;border-radius:6px}
-  .panel{background:linear-gradient(180deg,#081426,#021020);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:0 6px 18px rgba(2,6,23,.6)}
-  .header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-  .title-input{background:transparent;border:0;color:inherit;font-size:18px;font-weight:700;outline:none}
-  .meta{color:var(--muted);font-size:13px}
-  .messages{flex:1;overflow:auto;padding:12px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.01),transparent)}
-  .msg{max-width:78%;padding:10px;border-radius:12px;margin:8px 0;line-height:1.3;word-wrap:break-word}
-  .msg.user{margin-left:auto;background:linear-gradient(180deg,var(--msg-user),#90cdf4);color:#02111a;border-bottom-right-radius:4px}
-  .msg.ai{margin-right:auto;background:linear-gradient(180deg,var(--msg-ai),#bff4ea);color:#02111a;border-bottom-left-radius:4px}
-  .input-row{display:flex;gap:8px;align-items:center}
-  textarea{resize:none;border-radius:10px;padding:10px;border:1px solid rgba(255,255,255,.04);background:transparent;color:inherit;flex:1;min-height:52px;outline:none}
-  .send-btn{background:var(--accent);border:0;padding:10px 14px;border-radius:10px;color:#02111a;font-weight:700;cursor:pointer}
-  .muted{color:var(--muted);font-size:13px}
-  .controls{display:flex;gap:8px;align-items:center}
-  .settings-btn{background:transparent;border:1px solid rgba(255,255,255,.04);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
-  .tiny{font-size:12px;padding:6px 8px}
-  .footer{color:var(--muted);font-size:12px;text-align:center}
-  /* simple modal */
-  .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.6);z-index:40}
-  .modal .box{width:520px;background:#071827;padding:16px;border-radius:10px}
-  .row{display:flex;gap:8px;align-items:center}
-  label{font-size:13px;color:var(--muted);min-width:100px}
-  input[type="text"], input[type="url"]{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.04);background:transparent;color:inherit}
-  .danger{color:#ff7b7b}
-  @media (max-width:900px){.app{grid-template-columns:1fr; height:92vh}.sidebar{order:2}.panel{order:1}}
-</style>
+  <meta charset="UTF-8">
+  <title>Gemini Chat</title>
+  <style>
+    body {
+      margin: 0; 
+      font-family: Arial, sans-serif; 
+      display: flex; 
+      height: 100vh;
+    }
+    #sidebar {
+      width: 220px; 
+      background: #f5f5f5; 
+      border-right: 1px solid #ddd; 
+      display: flex; 
+      flex-direction: column;
+    }
+    #sidebar h2 {
+      margin: 10px; 
+      font-size: 16px;
+    }
+    #chats { flex: 1; overflow-y: auto; }
+    .chat-item {
+      padding: 10px; 
+      cursor: pointer; 
+      border-bottom: 1px solid #eee;
+    }
+    .chat-item:hover { background: #eaeaea; }
+    #newChatBtn {
+      margin: 10px; 
+      padding: 8px; 
+      background: #4285f4; 
+      color: #fff; 
+      border: none; 
+      cursor: pointer; 
+      border-radius: 4px;
+    }
+    #main {
+      flex: 1; 
+      display: flex; 
+      flex-direction: column;
+    }
+    #messages {
+      flex: 1; 
+      padding: 15px; 
+      overflow-y: auto;
+    }
+    .msg { margin: 8px 0; }
+    .user { color: blue; }
+    .ai { color: green; }
+    #inputBar {
+      display: flex; 
+      border-top: 1px solid #ddd;
+    }
+    #userInput {
+      flex: 1; 
+      padding: 10px; 
+      border: none; 
+      outline: none;
+    }
+    #sendBtn {
+      padding: 10px; 
+      border: none; 
+      background: #4285f4; 
+      color: white; 
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="Local Chat UI">
-    <aside class="sidebar panel" id="sidebar">
-      <div class="brand">
-        <div class="logo">AI</div>
-        <div>
-          <div style="font-weight:800">Local Chat</div>
-          <div class="muted" style="font-size:12px">New chats · Saved locally</div>
-        </div>
-      </div>
-
-      <button id="newChatBtn" class="new-btn">+ New chat</button>
-
-      <div class="chats" id="chatList" aria-label="Saved chats"></div>
-
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="exportBtn" class="small-btn tiny" title="Export all chats">Export</button>
-        <button id="importBtn" class="small-btn tiny" title="Import chats">Import</button>
-        <button id="settingsBtn" class="settings-btn tiny">Settings</button>
-      </div>
-    </aside>
-
-    <main class="panel" id="mainPanel">
-      <div class="header">
-        <input id="chatTitle" class="title-input" value="New chat" />
-        <div class="controls">
-          <div id="status" class="meta">Idle</div>
-          <button id="renameBtn" class="small-btn" title="Rename">Rename</button>
-          <button id="deleteBtn" class="small-btn danger" title="Delete chat">Delete</button>
-        </div>
-      </div>
-
-      <div class="messages" id="messages" aria-live="polite"></div>
-
-      <div>
-        <div class="input-row">
-          <textarea id="inputBox" placeholder="Type a message and press Send (or Ctrl+Enter)"></textarea>
-          <button id="sendBtn" class="send-btn">Send</button>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:8px">
-          <div class="muted">Press Ctrl+Enter to send</div>
-          <div class="muted"><span id="msgCount">0</span> messages</div>
-        </div>
-      </div>
-      <div class="footer">Local-only demo. For real LLM replies, add a local proxy endpoint in Settings.</div>
-    </main>
+  <div id="sidebar">
+    <h2>Chats</h2>
+    <button id="newChatBtn">+ New Chat</button>
+    <div id="chats"></div>
+  </div>
+  <div id="main">
+    <div id="messages"></div>
+    <div id="inputBar">
+      <input id="userInput" placeholder="Type a message..." />
+      <button id="sendBtn">Send</button>
+    </div>
   </div>
 
-  <!-- Modal skeleton -->
-  <div id="modalRoot" aria-hidden="true"></div>
+  <script type="module">
+    import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 
-<script>
-/*
-  Local Chat UI
-  - Stores chats in localStorage under key "local.chat_ui.v1"
-  - Chat structure: {id, title, createdAt, messages: [{role:'user'|'assistant'|'system', text, ts}]}
-  - No external libs. Pure HTML+JS.
-  - Optional: set backendUrl in settings to forward messages to a local proxy that talks to Gemini,
-    or leave blank to use the built-in mock responder.
-*/
+    // ⚠️ For development only, don’t push public with the key included
+    const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA";
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-const STORE_KEY = 'local.chat_ui.v1';
-const defaultModel = 'local-mock';
+    let chats = JSON.parse(localStorage.getItem("chats") || "[]");
+    let currentChat = null;
 
-// Utilities
-const $ = id => document.getElementById(id);
-const uid = () => Math.random().toString(36).slice(2,10);
-const now = () => new Date().toISOString();
-const loadStore = () => JSON.parse(localStorage.getItem(STORE_KEY) || 'null') || {chats:[], settings:{}};
-const saveStore = s => localStorage.setItem(STORE_KEY, JSON.stringify(s));
+    const chatsDiv = document.getElementById("chats");
+    const messagesDiv = document.getElementById("messages");
 
-let store = loadStore();
-if(!store.chats || !Array.isArray(store.chats)) store.chats=[];
-
-// State
-let activeChatId = null;
-let sending = false;
-
-// Initializers
-function ensureDefaultChat(){
-  if(store.chats.length === 0){
-    const c = {id:uid(), title:'Welcome', createdAt:now(), messages:[
-      {role:'system', text:'This is a local chat UI. Type a message to begin.', ts:now()}
-    ]};
-    store.chats.push(c);
-    activeChatId = c.id;
-    saveStore(store);
-  } else {
-    activeChatId = store.chats[0].id;
-  }
-}
-ensureDefaultChat();
-
-// UI rendering
-function renderChatList(){
-  const list = $('chatList');
-  list.innerHTML = '';
-  store.chats.forEach(chat=>{
-    const div = document.createElement('div');
-    div.className = 'chat-item' + (chat.id === activeChatId ? ' active' : '');
-    div.dataset.id = chat.id;
-    const title = document.createElement('div');
-    title.className='chat-title';
-    title.textContent = chat.title || 'Untitled';
-    const ctrls = document.createElement('div');
-    ctrls.className='chat-controls';
-    const time = document.createElement('div');
-    time.className='muted';
-    const last = chat.messages.slice(-1)[0];
-    time.textContent = last ? new Date(last.ts).toLocaleString() : '';
-    const openBtn = document.createElement('button');
-    openBtn.className='small-btn';
-    openBtn.textContent='Open';
-    openBtn.onclick = (e)=>{ e.stopPropagation(); openChat(chat.id); };
-    const delBtn = document.createElement('button');
-    delBtn.className='small-btn';
-    delBtn.textContent='X';
-    delBtn.title='Delete';
-    delBtn.onclick = (e)=>{ e.stopPropagation(); deleteChat(chat.id); };
-    div.appendChild(title);
-    ctrls.appendChild(time);
-    ctrls.appendChild(openBtn);
-    ctrls.appendChild(delBtn);
-    div.appendChild(ctrls);
-    div.onclick = ()=> openChat(chat.id);
-    list.appendChild(div);
-  });
-}
-
-function renderMessages(){
-  const area = $('messages');
-  area.innerHTML = '';
-  const chat = store.chats.find(c=>c.id===activeChatId);
-  if(!chat) return;
-  $('chatTitle').value = chat.title || 'New chat';
-  chat.messages.forEach(m=>{
-    const d = document.createElement('div');
-    d.className = 'msg ' + (m.role === 'user' ? 'user' : (m.role === 'assistant' ? 'ai' : 'ai'));
-    d.textContent = m.text;
-    area.appendChild(d);
-  });
-  $('msgCount').textContent = chat.messages.length;
-  area.scrollTop = area.scrollHeight;
-  updateStatus('Idle');
-}
-
-function openChat(id){
-  activeChatId = id;
-  renderChatList();
-  renderMessages();
-}
-
-function newChat(){
-  const c = {id:uid(), title:'New chat', createdAt:now(), messages:[]};
-  store.chats.unshift(c);
-  activeChatId = c.id;
-  saveStore(store);
-  renderChatList();
-  renderMessages();
-}
-
-function deleteChat(id){
-  if(!confirm('Delete this chat?')) return;
-  store.chats = store.chats.filter(c=>c.id !== id);
-  if(store.chats.length === 0) {
-    ensureDefaultChat();
-  }
-  activeChatId = store.chats[0].id;
-  saveStore(store);
-  renderChatList();
-  renderMessages();
-}
-
-// chat editing
-$('chatTitle').addEventListener('change', (e)=>{
-  const chat = store.chats.find(c=>c.id===activeChatId);
-  if(!chat) return;
-  chat.title = e.target.value || 'Untitled';
-  saveStore(store);
-  renderChatList();
-});
-
-$('renameBtn').addEventListener('click', ()=>{
-  const chat = store.chats.find(c=>c.id===activeChatId);
-  if(!chat) return;
-  const n = prompt('New chat title', chat.title || '');
-  if(n !== null){ chat.title = n; saveStore(store); renderChatList(); $('chatTitle').value = n; }
-});
-
-$('deleteBtn').addEventListener('click', ()=>{
-  deleteChat(activeChatId);
-});
-
-// input / send
-$('sendBtn').addEventListener('click', sendMessage);
-$('inputBox').addEventListener('keydown', (e)=>{
-  if(e.ctrlKey && e.key === 'Enter'){ sendMessage(); }
-});
-
-function appendLocalMessage(role, text){
-  const chat = store.chats.find(c=>c.id===activeChatId);
-  if(!chat) return;
-  chat.messages.push({role, text, ts:now()});
-  saveStore(store);
-  renderMessages();
-}
-
-// status
-function updateStatus(text){
-  $('status').textContent = text;
-}
-
-// simple backoff retry helper
-async function fetchWithRetries(fetchFn, maxRetries=3){
-  let attempt = 0;
-  while(true){
-    try{ return await fetchFn(); } catch(e){
-      attempt++;
-      if(attempt > maxRetries) throw e;
-      await new Promise(r=>setTimeout(r, 500 * Math.pow(2, attempt)));
+    function renderChats() {
+      chatsDiv.innerHTML = "";
+      chats.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "chat-item";
+        div.textContent = c.title || "Chat " + (i + 1);
+        div.onclick = () => loadChat(i);
+        chatsDiv.appendChild(div);
+      });
     }
-  }
-}
 
-// Send logic: If settings.backendUrl is set, POST to it with chat messages.
-// Otherwise use a simple mock responder to keep the demo fully offline.
-async function sendMessage(){
-  if(sending) return;
-  const text = $('inputBox').value.trim();
-  if(!text) return;
-  $('inputBox').value = '';
-  appendLocalMessage('user', text);
-  sending = true;
-  updateStatus('Sending...');
-  try{
-    const chat = store.chats.find(c=>c.id===activeChatId);
-    // prepare payload
-    const payload = {
-      chatId: chat.id,
-      messages: chat.messages.slice(-20), // send recent context
-      settings: store.settings || {}
-    };
+    function loadChat(index) {
+      currentChat = index;
+      messagesDiv.innerHTML = "";
+      chats[index].messages.forEach(m => addMessage(m.role, m.text));
+    }
 
-    let replyText = '';
-    if(store.settings && store.settings.backendUrl){
-      // Forward to user-provided backend. The backend should accept JSON {messages, chatId}
-      // and return {reply: "..."}. This avoids embedding keys in this UI.
-      const url = store.settings.backendUrl;
-      const res = await fetchWithRetries(()=>fetch(url, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      }), 2);
-      if(!res.ok) throw new Error('Bad response: ' + res.status);
-      const data = await res.json();
-      replyText = data.reply || data.text || '[no reply]';
-    } else if(store.settings && store.settings.useGeminiDirect){
-      // Direct browser-to-Gemini attempt (only for local/experiment; not recommended for public use).
-      // This expects the user to have set apiKey and model in settings and that CORS allows it.
-      const apiKey = store.settings.apiKey || '';
-      const model = store.settings.model || 'gemini-1.5-flash';
-      if(!apiKey) throw new Error('No API key configured in settings.');
-      // Minimal example using the v1 "generate" endpoint. Real schema may differ.
-      const endpoint = `https://api.generativeai.googleapis.com/v1/models/${encodeURIComponent(model)}:generate`;
-      const body = {
-        prompt: {
-          text: chat.messages.map(m=> (m.role === 'user' ? 'User: ' : (m.role === 'assistant' ? 'Assistant: ' : 'System: ')) + m.text).join('\\n') + '\\nAssistant:'
-        },
-        temperature: 0.2
-      };
-      const res = await fetchWithRetries(()=>fetch(endpoint, {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization': 'Bearer ' + apiKey
-        },
-        body: JSON.stringify(body)
-      }), 2);
-      if(!res.ok){
-        const txt = await res.text();
-        throw new Error('Gemini error: ' + res.status + ' ' + txt);
+    function newChat() {
+      const chat = { title: "New Chat", messages: [] };
+      chats.unshift(chat);
+      currentChat = 0;
+      saveChats();
+      renderChats();
+      loadChat(0);
+    }
+
+    function saveChats() {
+      localStorage.setItem("chats", JSON.stringify(chats));
+    }
+
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + role;
+      div.textContent = `${role === "user" ? "You" : "Gemini"}: ${text}`;
+      messagesDiv.appendChild(div);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text || currentChat === null) return;
+
+      addMessage("user", text);
+      chats[currentChat].messages.push({ role: "user", text });
+      input.value = "";
+      saveChats();
+
+      try {
+        const result = await model.generateContent(text);
+        const reply = result.response.text();
+        addMessage("ai", reply);
+        chats[currentChat].messages.push({ role: "ai", text: reply });
+        chats[currentChat].title = chats[currentChat].messages[0].text.slice(0, 20) + "...";
+        saveChats();
+        renderChats();
+      } catch (err) {
+        console.error(err);
+        addMessage("ai", "[Error fetching reply]");
       }
-      const data = await res.json();
-      // Attempt common response fields
-      replyText = (data?.candidates && data.candidates[0]?.content) ||
-                  (data?.output && data.output[0]?.content) ||
-                  JSON.stringify(data).slice(0,800);
-    } else {
-      // Offline mock responder
-      replyText = mockResponder(payload.messages);
     }
 
-    appendLocalMessage('assistant', replyText);
-  } catch(err){
-    console.error(err);
-    appendLocalMessage('assistant', '[Error: ' + (err.message || err) + ']');
-  } finally {
-    sending = false;
-    updateStatus('Idle');
-  }
-}
+    document.getElementById("sendBtn").onclick = sendMessage;
+    document.getElementById("userInput").addEventListener("keypress", e => {
+      if (e.key === "Enter") sendMessage();
+    });
+    document.getElementById("newChatBtn").onclick = newChat;
 
-// Small mock response so UI feels live when offline
-function mockResponder(messages){
-  const last = messages.slice().reverse().find(m=>m.role==='user');
-  if(!last) return "Say something and I'll respond. This is a local demo.";
-  const text = last.text;
-  // Very simple canned behavior
-  if(/help|how|what|why|explain/i.test(text)) return "This is a local demo. To get real AI replies add a backend URL in Settings.";
-  if(text.length < 40) return "You said: " + text + ". Try asking for an explanation or set up a backend for real replies.";
-  return "Got it. I received your message and would reply if a backend was configured. This mock response shows the saved chat flow.";
-}
-
-// Settings modal
-function openSettings(){
-  const root = $('modalRoot');
-  root.innerHTML = `
-    <div class="modal" role="dialog" aria-modal="true">
-      <div class="box">
-        <h3 style="margin:0 0 8px 0">Settings</h3>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="row"><label>Backend URL</label><input id="setBackend" type="url" placeholder="http://localhost:3000/chat (recommended)"></div>
-          <div class="row"><label>Direct Gemini (risky)</label>
-            <input id="setUseGemini" type="checkbox"> Use direct browser -> Gemini (only for local experiments)
-          </div>
-          <div class="row"><label>Gemini API Key</label><input id="setKey" type="text" placeholder="Paste API key (stored only locally)">
-          </div>
-          <div class="row"><label>Model</label><input id="setModel" type="text" value="gemini-1.5-flash"></div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-            <button id="closeModal" class="small-btn">Close</button>
-            <button id="saveSettings" class="new-btn">Save</button>
-          </div>
-          <div class="muted" style="margin-top:8px">Security note: do not paste secrets if you plan to share this file. Backend URL is the recommended pattern.</div>
-        </div>
-      </div>
-    </div>
-  `;
-  root.setAttribute('aria-hidden','false');
-  // populate current
-  $('setBackend').value = store.settings.backendUrl || '';
-  $('setKey').value = store.settings.apiKey || '';
-  $('setModel').value = store.settings.model || 'gemini-1.5-flash';
-  $('setUseGemini').checked = !!store.settings.useGeminiDirect;
-
-  $('closeModal').onclick = ()=>{ root.innerHTML=''; root.setAttribute('aria-hidden','true'); };
-  $('saveSettings').onclick = ()=>{
-    store.settings.backendUrl = $('setBackend').value.trim() || '';
-    store.settings.apiKey = $('setKey').value.trim() || '';
-    store.settings.model = $('setModel').value.trim() || '';
-    store.settings.useGeminiDirect = !!$('setUseGemini').checked;
-    saveStore(store);
-    root.innerHTML=''; root.setAttribute('aria-hidden','true');
-    alert('Settings saved locally.');
-  };
-}
-
-// import / export
-$('exportBtn').addEventListener('click', ()=>{
-  const data = JSON.stringify(store, null, 2);
-  const blob = new Blob([data], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'local-chats.json';
-  a.click();
-  URL.revokeObjectURL(url);
-});
-$('importBtn').addEventListener('click', ()=>{
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'application/json';
-  input.onchange = e=>{
-    const f = e.target.files[0];
-    if(!f) return;
-    const reader = new FileReader();
-    reader.onload = ev=>{
-      try{
-        const obj = JSON.parse(ev.target.result);
-        if(obj && obj.chats) {
-          store = obj;
-          saveStore(store);
-          activeChatId = store.chats[0]?.id || null;
-          renderChatList();
-          renderMessages();
-          alert('Imported chats.');
-        } else throw new Error('Invalid file');
-      }catch(err){ alert('Import failed: ' + err.message); }
-    };
-    reader.readAsText(f);
-  };
-  input.click();
-});
-
-// wire UI buttons
-$('newChatBtn').addEventListener('click', ()=>{
-  newChat();
-});
-$('settingsBtn').addEventListener('click', openSettings);
-
-// initial render
-renderChatList();
-renderMessages();
-</script>
+    renderChats();
+    if (chats.length > 0) loadChat(0);
+  </script>
 </body>
 </html>
