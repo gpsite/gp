@@ -99,7 +99,7 @@ body {
     background: #1e1f29;
     align-self: flex-start;
     text-align: left;
-    color: #9fd1ff;
+    color: #ffffff;
     display: flex;
     align-items: flex-start;
     gap: 6px;
@@ -109,7 +109,7 @@ body {
     width: 18px;
     height: 18px;
     margin-top: 2px;
-    fill: #9fd1ff;
+    fill: #ffffff;
 }
 
 .input-row {
@@ -296,7 +296,7 @@ function addMessage(role, text, save = true) {
         if (role === "user" && chats[currentChat].messages.length === 1) {
             let title = text.trim();
             if (title.length > 25) {
-                title = title.slice(0, 25) + "...";
+                title = title.slice(0, 16) + "...";
             }
             chats[currentChat].title = title;
         }
