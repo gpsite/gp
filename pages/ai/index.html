@@ -213,7 +213,6 @@ function renderChats() {
         titleSpan.textContent = c.title || "Chat " + (i + 1);
         titleSpan.style.flex = "1";
         titleSpan.onclick = () => loadChat(i);
-A
         const delBtn = document.createElement("button");
         delBtn.textContent = "✕";
         delBtn.className = "del-btn";
