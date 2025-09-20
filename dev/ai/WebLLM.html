@@ -5,69 +5,80 @@
   <title>Gemini Chat</title>
   <style>
     body {
-      margin: 0; 
-      font-family: Arial, sans-serif; 
-      display: flex; 
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
       height: 100vh;
     }
     #sidebar {
-      width: 220px; 
-      background: #f5f5f5; 
-      border-right: 1px solid #ddd; 
-      display: flex; 
+      width: 220px;
+      background: #f5f5f5;
+      border-right: 1px solid #ddd;
+      display: flex;
       flex-direction: column;
     }
     #sidebar h2 {
-      margin: 10px; 
+      margin: 10px;
       font-size: 16px;
     }
     #chats { flex: 1; overflow-y: auto; }
     .chat-item {
-      padding: 10px; 
-      cursor: pointer; 
+      padding: 10px;
+      cursor: pointer;
       border-bottom: 1px solid #eee;
     }
     .chat-item:hover { background: #eaeaea; }
     #newChatBtn {
-      margin: 10px; 
-      padding: 8px; 
-      background: #4285f4; 
-      color: #fff; 
-      border: none; 
-      cursor: pointer; 
+      margin: 10px;
+      padding: 8px;
+      background: #4285f4;
+      color: #fff;
+      border: none;
+      cursor: pointer;
       border-radius: 4px;
     }
     #main {
-      flex: 1; 
-      display: flex; 
+      flex: 1;
+      display: flex;
       flex-direction: column;
     }
     #messages {
-      flex: 1; 
-      padding: 15px; 
+      flex: 1;
+      padding: 15px;
       overflow-y: auto;
     }
     .msg { margin: 8px 0; }
-    .user { color: blue; }
-    .ai { color: green; }
+    .user strong { color: blue; }
+    .ai strong { color: green; }
     #inputBar {
-      display: flex; 
+      display: flex;
       border-top: 1px solid #ddd;
     }
     #userInput {
-      flex: 1; 
-      padding: 10px; 
-      border: none; 
+      flex: 1;
+      padding: 10px;
+      border: none;
       outline: none;
     }
     #sendBtn {
-      padding: 10px; 
-      border: none; 
-      background: #4285f4; 
-      color: white; 
+      padding: 10px;
+      border: none;
+      background: #4285f4;
+      color: white;
       cursor: pointer;
     }
   </style>
+
+  <!-- Markdown parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- KaTeX for math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"
+    data-delimiters='[{"left":"$","right":"$","display":false},{"left":"$$","right":"$$","display":true}]'>
+  </script>
 </head>
 <body>
   <div id="sidebar">
@@ -86,7 +97,7 @@
   <script type="module">
     import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 
-    // ⚠️ For development only, don’t push public with the key included
+    // ⚠️ For dev only — don’t push public with this key
     const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA";
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -112,6 +123,7 @@
       currentChat = index;
       messagesDiv.innerHTML = "";
       chats[index].messages.forEach(m => addMessage(m.role, m.text));
+      renderMathInElement(messagesDiv); // re-render math
     }
 
     function newChat() {
@@ -130,9 +142,11 @@
     function addMessage(role, text) {
       const div = document.createElement("div");
       div.className = "msg " + role;
-      div.textContent = `${role === "user" ? "You" : "Gemini"}: ${text}`;
+      const safeHtml = marked.parse(text); // markdown → HTML
+      div.innerHTML = `<strong>${role === "user" ? "You" : "Gemini"}:</strong><br>` + safeHtml;
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      renderMathInElement(div); // render math just for this message
     }
 
     async function sendMessage() {
