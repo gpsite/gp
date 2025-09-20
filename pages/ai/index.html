@@ -86,6 +86,7 @@ body {
     margin-bottom: 12px;
     padding: 10px 14px;
     border-radius: 12px;
+    white-space: pre-wrap;
     word-break: break-word;
     line-height: 1.4;
 }
@@ -99,6 +100,7 @@ body {
     background: #1e1f29;
     align-self: flex-start;
     text-align: left;
+    flex-wrap: wrap;
     color: #ffffff;
     display: flex;
     align-items: flex-start;
@@ -213,7 +215,7 @@ function renderChats() {
         titleSpan.textContent = c.title || "Chat " + (i + 1);
         titleSpan.style.flex = "1";
         titleSpan.onclick = () => loadChat(i);
-
+A
         const delBtn = document.createElement("button");
         delBtn.textContent = "✕";
         delBtn.className = "del-btn";
