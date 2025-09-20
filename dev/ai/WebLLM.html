@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Gemini Chat</title>
+<title>GP CLANKER</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
@@ -102,6 +102,30 @@ body {
     padding: 0 16px;
     cursor: pointer;
 }
+
+.thinking {
+  display: inline-block;
+  width: 50px;
+  text-align: left;
+}
+.thinking span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 2px;
+  background: #2b2e33;
+  border-radius: 50%;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.thinking span:nth-child(1) { animation-delay: 0s; }
+.thinking span:nth-child(2) { animation-delay: 0.2s; }
+.thinking span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: #2b2e33; border-radius: 3px; }
 </style>
@@ -167,7 +191,7 @@ function addMessage(role, text) {
     const safeHtml = marked.parse(text);
     const div = document.createElement("div");
     div.className = "msg " + role;
-    div.innerHTML = `<strong>${role==="user"?"You":"Gemini"}:</strong><br>` + safeHtml;
+    div.innerHTML = `<strong>${role==="user"?"You":"GP-CLANKER"}:</strong><br>` + safeHtml;
     messagesDiv.appendChild(div);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
     renderMathInElement(div, {
@@ -176,23 +200,31 @@ function addMessage(role, text) {
 }
 
 async function sendMessage() {
-    const input = document.getElementById("userInput");
-    const text = input.value.trim();
-    if (!text || currentChat === null) return;
-    addMessage("user", text);
-    chats[currentChat].messages.push({ role: "user", text });
-    input.value = ""; saveChats();
+  const input = document.getElementById("userInput");
+  const text = input.value.trim();
+  if (!text) return;
 
-    try {
-        const result = await model.generateContent(text);
-        const reply = result.response.text();
-        addMessage("ai", reply);
-        chats[currentChat].messages.push({ role: "ai", text: reply });
-        chats[currentChat].title = chats[currentChat].messages[0].text.slice(0,20)+"...";
-        saveChats(); renderChats();
-    } catch {
-        addMessage("ai", "[Error fetching reply]");
-    }
+  addMessage("user", text);
+  input.value = "";
+
+  const thinkingDiv = document.createElement("div");
+  thinkingDiv.className = "ai";
+  thinkingDiv.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
+  messagesDiv.appendChild(thinkingDiv);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+  try {
+    const result = await model.generateContent(text);
+    const reply = result.response.text();
+
+    messagesDiv.removeChild(thinkingDiv);
+    addMessage("ai", reply);
+
+  } catch (err) {
+    console.error(err);
+    messagesDiv.removeChild(thinkingDiv);
+    addMessage("ai", "[Error fetching reply]");
+  }
 }
 
 document.getElementById("sendBtn").onclick = sendMessage;
