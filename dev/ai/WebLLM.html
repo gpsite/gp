@@ -140,13 +140,33 @@
     }
 
     function addMessage(role, text) {
+      // Step 1: remove repeated lines
+      const lines = text.split('\n');
+      const uniqueLines = lines.filter((line, i) => line.trim() && line.trim() !== lines[i-1]?.trim());
+      let cleanedText = uniqueLines.join('\n');
+        
+      // Step 2: collapse multiple newlines
+      cleanedText = cleanedText.replace(/\n{2,}/g, '\n');
+        
+      // Step 3: trim leading/trailing spaces
+      cleanedText = cleanedText.split('\n').map(l => l.trim()).join('\n');
+        
+      // Step 4: convert markdown → HTML
+      const safeHtml = marked.parse(cleanedText);
+        
       const div = document.createElement("div");
       div.className = "msg " + role;
-      const safeHtml = marked.parse(text); // markdown → HTML
       div.innerHTML = `<strong>${role === "user" ? "You" : "Gemini"}:</strong><br>` + safeHtml;
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      renderMathInElement(div); // render math just for this message
+        
+      // Step 5: render math
+      renderMathInElement(div, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ]
+      });
     }
 
     async function sendMessage() {
