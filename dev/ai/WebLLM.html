@@ -1,85 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>WebLLM Chat Example</title>
+  <meta charset="UTF-8">
+  <title>Gemini Local Chat</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
     #chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto; }
-    .message { margin: 5px 0; }
+    .msg { margin: 5px 0; }
     .user { color: blue; }
-    .assistant { color: green; }
-    #inputSection { margin-top: 10px; }
+    .ai { color: green; }
+    #controls { margin-top: 10px; }
     #userInput { width: 80%; }
     #sendBtn { width: 18%; }
   </style>
 </head>
 <body>
-
-  <h1>WebLLM Chat</h1>
-
+  <h1>Gemini Chat (Local)</h1>
   <div id="chat"></div>
-
-  <div id="inputSection">
+  <div id="controls">
     <input type="text" id="userInput" placeholder="Type a message" />
     <button id="sendBtn">Send</button>
   </div>
 
   <script type="module">
-    import * as webllm from 'https://esm.run/@mlc-ai/web-llm';
+    import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 
-    async function initEngine() {
-      const selectedModel = 'Llama-3.1-8B-Instruct-q4f32_1-MLC';  
-      // You can use any model supported by WebLLM. :contentReference[oaicite:0]{index=0}
+    // ⚠️ For local/private use only. Don’t expose a real key on the public web.
+    const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA";
 
-      const engine = await webllm.CreateMLCEngine(selectedModel, {
-        initProgressCallback: (progress) => {
-          console.log('Loading model:', progress);
-          // optionally show loading UI
-        },
-      });
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      return engine;
-    }
+    const chatDiv = document.getElementById("chat");
 
-    function appendMessage(role, text) {
-      const chatDiv = document.getElementById('chat');
-      const msgDiv = document.createElement('div');
-      msgDiv.classList.add('message', role);
-      msgDiv.textContent = `${role === 'user' ? 'You' : 'AI'}: ${text}`;
-      chatDiv.appendChild(msgDiv);
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + role;
+      div.textContent = `${role === "user" ? "You" : "Gemini"}: ${text}`;
+      chatDiv.appendChild(div);
       chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 
-    async function main() {
-      const engine = await initEngine();
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
 
-      document.getElementById('sendBtn').addEventListener('click', async () => {
-        const inputEl = document.getElementById('userInput');
-        const userText = inputEl.value.trim();
-        if (!userText) return;
-        appendMessage('user', userText);
-        inputEl.value = '';
+      addMessage("user", text);
+      input.value = "";
 
-        // Prepare messages in WebLLM / OpenAI style
-        const messages = [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: userText }
-        ];
-
-        try {
-          const result = await engine.chat.completions.create({ messages });
-          const assistantText = result.choices[0].message.content;
-          appendMessage('assistant', assistantText);
-        } catch (err) {
-          console.error('Error during chat:', err);
-          appendMessage('assistant', '[Error getting response]');
-        }
-      });
-    }
-
-    main();
+      try {
+        const result = await model.generateContent(text);
+        const reply = result.response.text();
+        addMessage("ai", reply);
+      } catch (err) {
+        console.error(err);
+        addMessage("ai", "[Error fetching reply]");
+      }
+    });
   </script>
-
 </body>
 </html>
