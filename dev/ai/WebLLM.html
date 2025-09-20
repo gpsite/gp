@@ -6,84 +6,173 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       height: 100vh;
-      background: #1e1e1e;
-      color: #ddd;
+      background: #121212;
+      color: #e0e0e0;
     }
+  
     #sidebar {
-      width: 220px;
-      background: #2a2a2a;
-      border-right: 1px solid #444;
+      width: 240px;
+      background: #1f1f1f;
+      border-right: 1px solid #333;
       display: flex;
       flex-direction: column;
     }
+  
     #sidebar h2 {
-      margin: 10px;
-      font-size: 16px;
+      margin: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #f5f5f5;
+    }
+  
+    #chats {
+      flex: 1;
+      overflow-y: auto;
+    }
+  
+    .chat-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #2c2c2c;
+      color: #ccc;
+      transition: background 0.2s, color 0.2s;
+    }
+  
+    .chat-item:hover {
+      background: #2a2a2a;
       color: #fff;
     }
-    #chats { flex: 1; overflow-y: auto; }
-    .chat-item {
-      padding: 10px;
-      cursor: pointer;
-      border-bottom: 1px solid #444;
-      color: #ddd;
-    }
-    .chat-item:hover { background: #3a3a3a; }
+  
     #newChatBtn {
-      margin: 10px;
-      padding: 8px;
-      background: #4285f4;
+      margin: 16px;
+      padding: 10px;
+      background: #4a90e2;
       color: #fff;
       border: none;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.2s;
     }
+  
+    #newChatBtn:hover {
+      background: #357abd;
+    }
+  
     #main {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
+  
     #messages {
       flex: 1;
-      padding: 15px;
+      padding: 20px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .msg { margin: 12px 0; }
-    .user strong { color: #4fc3f7; }
-    .ai strong { color: #81c784; }
+  
+    .msg {
+      padding: 12px 16px;
+      border-radius: 10px;
+      max-width: 70%;
+      line-height: 1.5;
+      word-wrap: break-word;
+      background: #1f1f1f;
+    }
+  
+    .user {
+      align-self: flex-end;
+      background: #0d47a1;
+      color: #e0f7fa;
+    }
+  
+    .ai {
+      align-self: flex-start;
+      background: #2e7d32;
+      color: #e8f5e9;
+    }
+  
+    .user strong, .ai strong {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+  
     #inputBar {
       display: flex;
-      border-top: 1px solid #444;
+      border-top: 1px solid #333;
+      background: #1f1f1f;
     }
+  
     #userInput {
       flex: 1;
-      padding: 10px;
+      padding: 12px 16px;
       border: none;
       outline: none;
       background: #2a2a2a;
-      color: #ddd;
+      color: #e0e0e0;
+      font-size: 14px;
     }
+  
     #sendBtn {
-      padding: 10px;
+      padding: 12px 20px;
       border: none;
-      background: #4285f4;
-      color: white;
-      cursor: pointer;
-    }
-    /* Optional: code blocks styling */
-    pre {
-      background: #333;
+      background: #4a90e2;
       color: #fff;
-      padding: 8px;
-      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      border-radius: 0 6px 6px 0;
+      transition: background 0.2s;
+    }
+  
+    #sendBtn:hover {
+      background: #357abd;
+    }
+  
+    pre {
+      background: #262626;
+      color: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px;
       overflow-x: auto;
     }
-    code { background: #333; padding: 2px 4px; border-radius: 4px; }
-    a { color: #4fc3f7; }
+  
+    code {
+      background: #333;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+  
+    a {
+      color: #4a90e2;
+      text-decoration: underline;
+    }
+  
+    /* Scrollbar tweaks */
+    #chats::-webkit-scrollbar,
+    #messages::-webkit-scrollbar {
+      width: 8px;
+    }
+  
+    #chats::-webkit-scrollbar-thumb,
+    #messages::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+  
+    #chats::-webkit-scrollbar-track,
+    #messages::-webkit-scrollbar-track {
+      background: #1f1f1f;
+    }
   </style>
+
 
   <!-- Markdown parser -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
