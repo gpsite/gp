@@ -173,6 +173,8 @@ body {
 </style>
 </head>
 <body>
+<canvas id="bg-canvas"></canvas>
+
 <div class="container">
     <div class="sidebar">
         <button id="newChatBtn">+ New Chat</button>
@@ -186,12 +188,6 @@ body {
         </div>
     </div>
 </div>
-<canvas id="bg-canvas"></canvas>
-
-<script src="/gp/scripts/starry-background.js"></script>
-<script>
-    setupStarryBackground();
-</script>
 
 <script type="module">
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
@@ -295,6 +291,11 @@ document.getElementById("newChatBtn").onclick = newChat;
 renderChats();
 if(chats.length>0) loadChat(0);
 else newChat();
+</script>
+
+<script src="/gp/scripts/starry-background.js"></script>
+<script>
+    setupStarryBackground();
 </script>
 </body>
 </html>
