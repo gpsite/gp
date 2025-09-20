@@ -192,7 +192,7 @@ body {
 
 <script type="module">
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
-const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA"; // i know, its just here, don't be weird, im too lazy to hide it
+const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA"; 
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -207,17 +207,54 @@ function renderChats() {
     chats.forEach((c, i) => {
         const div = document.createElement("div");
         div.className = "chat-item" + (i === currentChat ? " active" : "");
-        div.textContent = c.title || "Chat " + (i + 1);
-        div.onclick = () => loadChat(i);
+
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = c.title || "Chat " + (i + 1);
+        titleSpan.style.flex = "1";
+        titleSpan.onclick = () => loadChat(i);
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "❌";
+        delBtn.style.background = "transparent";
+        delBtn.style.border = "none";
+        delBtn.style.cursor = "pointer";
+        delBtn.style.color = "#888";
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteChat(i);
+        };
+
+        div.style.display = "flex";
+        div.style.justifyContent = "space-between";
+        div.style.alignItems = "center";
+
+        div.appendChild(titleSpan);
+        div.appendChild(delBtn);
         chatsDiv.appendChild(div);
     });
+}
+
+function deleteChat(index) {
+    chats.splice(index, 1);
+    if (currentChat === index) {
+        if (chats.length > 0) {
+            currentChat = 0;
+            loadChat(0);
+        } else {
+            newChat();
+        }
+    } else if (currentChat > index) {
+        currentChat--; // shift currentChat index back
+    }
+    saveChats();
+    renderChats();
 }
 
 function loadChat(index) {
     currentChat = index;
     renderChats();
     messagesDiv.innerHTML = "";
-    chats[index].messages.forEach(m => addMessage(m.role, m.text));
+    chats[index].messages.forEach(m => addMessage(m.role, m.text, false));
     renderMathInElement(messagesDiv);
 }
 
@@ -230,9 +267,11 @@ function newChat() {
     loadChat(0);
 }
 
-function saveChats() { localStorage.setItem("chats", JSON.stringify(chats)); }
+function saveChats() { 
+    localStorage.setItem("chats", JSON.stringify(chats)); 
+}
 
-function addMessage(role, text) {
+function addMessage(role, text, save = true) {
     const safeHtml = marked.parse(text);
     const div = document.createElement("div");
     div.className = "msg " + role;
@@ -252,8 +291,24 @@ function addMessage(role, text) {
 
     messagesDiv.appendChild(div);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    if (save && currentChat !== null && chats[currentChat]) {
+        chats[currentChat].messages.push({ role, text });
+
+        // If it's the *first* user message in this chat, set title
+        if (role === "user" && chats[currentChat].messages.length === 1) {
+            chats[currentChat].title = text.split(" ").slice(0, 4).join(" ");
+        }
+
+        saveChats();
+        renderChats();
+    }
+
     renderMathInElement(div, {
-        delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }]
+        delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+        ]
     });
 }
 
