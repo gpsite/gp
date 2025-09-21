@@ -10,10 +10,6 @@
   --bg:#000;
   --chip:#222428;
   --chip-hover:#2b2e33;
-  --blue:#74aef6;
-  --green:#7ed321;
-  --yellow:#f8e71c;
-  --red:#ff3b2f;
 }
 
 html, body {
@@ -22,6 +18,9 @@ html, body {
   background: var(--bg);
   color: #fff;
   font-family: "Segoe UI", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #bg-canvas, .bubble-container {
@@ -30,122 +29,85 @@ html, body {
   z-index: 0;
 }
 
-/* Layout */
+/* Wrapper */
 .interface {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
-}
-
-/* Top bar */
-.topbar {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
-  background: var(--chip);
-  border-bottom: 2px solid var(--chip-hover);
-}
-.topbar img {
-  height: 48px;
-  width: auto;
-}
-.topbar h1 {
-  font-size: 20px;
-  letter-spacing: 2px;
-  margin: 0;
-  font-weight: 500;
+  gap: 28px;
+  max-width: 700px;
+  width: 92%;
+  text-align: center;
 }
 
-/* Main content */
-.main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  flex: 1;
-  gap: 20px;
-  padding: 20px;
-  box-sizing: border-box;
+/* Logo */
+.logo {
+  max-width: 200px;
+}
+.logo img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-/* Menu panel */
+/* Buttons grid */
 .menu {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
+  width: 100%;
 }
 .btn {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display: block;
   text-decoration: none;
   color: #fff;
   background: var(--chip);
-  padding: 18px 22px;
-  border-radius: 12px;
-  font-size: 22px;
-  letter-spacing: 1px;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 500;
   transition: background .2s ease, transform .1s ease;
 }
 .btn:hover {
   background: var(--chip-hover);
   transform: translateY(-2px);
 }
-.quad {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  width: 28px;
-  height: 28px;
-  padding: 2px;
-  background: #111;
-  border-radius: 6px;
-}
-.sq { border-radius: 2px; }
-.sq.blue { background: var(--blue); }
-.sq.green { background: var(--green); }
-.sq.yellow { background: var(--yellow); }
-.sq.red { background: var(--red); }
 
-/* Announcements panel */
+/* Announcements */
 .announcements {
   background: var(--chip);
-  border-radius: 12px;
-  padding: 20px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  line-height: 1.4;
+  width: 100%;
+  max-height: 160px;
   overflow-y: auto;
+  text-align: left;
 }
 .announcements h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  font-size: 20px;
+  margin: 0 0 8px;
+  font-size: 16px;
   border-bottom: 1px solid var(--chip-hover);
-  padding-bottom: 6px;
+  padding-bottom: 4px;
 }
 .announcements ul {
   margin: 0;
   padding-left: 18px;
 }
 .announcements li {
-  margin-bottom: 12px;
-  line-height: 1.5;
-  font-size: 16px;
+  margin-bottom: 8px;
 }
 
 /* Scrollbar styling */
 .announcements::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 .announcements::-webkit-scrollbar-thumb {
   background: var(--chip-hover);
-  border-radius: 4px;
-}
-
-/* Responsive */
-@media(max-width: 800px) {
-  .main {
-    grid-template-columns: 1fr;
-  }
+  border-radius: 3px;
 }
 </style>
 </head>
@@ -155,54 +117,25 @@ html, body {
 <div class="bubble-container" id="bubble-container"></div>
 
 <div class="interface">
-
-  <div class="topbar">
+  <div class="logo">
     <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo">
-    <h1>GEORGE PICKENS SYSTEM</h1>
   </div>
 
-  <div class="main">
-    <nav class="menu">
-      <a class="btn" href="pages/games/index.html">
-        <span class="quad">
-          <span class="sq blue"></span><span class="sq green"></span>
-          <span class="sq yellow"></span><span class="sq red"></span>
-        </span>
-        GAMES
-      </a>
-      <a class="btn" href="pages/movies/index.html">
-        <span class="quad">
-          <span class="sq blue"></span><span class="sq green"></span>
-          <span class="sq yellow"></span><span class="sq red"></span>
-        </span>
-        MOVIES
-      </a>
-      <a class="btn" href="pages/chat/index.html">
-        <span class="quad">
-          <span class="sq blue"></span><span class="sq green"></span>
-          <span class="sq yellow"></span><span class="sq red"></span>
-        </span>
-        CHAT (BETA)
-      </a>
-      <a class="btn" href="pages/ai/index.html">
-        <span class="quad">
-          <span class="sq blue"></span><span class="sq green"></span>
-          <span class="sq yellow"></span><span class="sq red"></span>
-        </span>
-        GP-CLANKER (AI)
-      </a>
-    </nav>
+  <nav class="menu">
+    <a class="btn" href="pages/games/index.html">GAMES</a>
+    <a class="btn" href="pages/movies/index.html">MOVIES</a>
+    <a class="btn" href="pages/chat/index.html">CHAT (BETA)</a>
+    <a class="btn" href="pages/ai/index.html">GP-CLANKER (AI)</a>
+  </nav>
 
-    <section class="announcements">
-      <h2>Announcements</h2>
-      <ul>
-        <li>We’ve added GP-Clanker (AI) to the system. Explore it in the menu.</li>
-        <li>Performance updates are live — smoother transitions across pages.</li>
-        <li>Next update will include new categories for both games and movies.</li>
-      </ul>
-    </section>
-  </div>
-
+  <section class="announcements">
+    <h2>Announcements</h2>
+    <ul>
+      <li>GP-Clanker (AI) is now available. Try it in the menu above.</li>
+      <li>Performance improvements rolled out for games and movies.</li>
+      <li>Next release will bring new categories and features.</li>
+    </ul>
+  </section>
 </div>
 
 <script src="scripts/starry-background.js"></script>
