@@ -6,11 +6,10 @@
   <style>
     :root {
       --bg: #000;
-      --panel-bg: #161b22;
-      --panel-border: #30363d;
-      --item-bg: #21262d;
-      --item-hover: #2d333b;
-      --accent: #58a6ff;
+      --chip: #222428;
+      --chip-hover: #2b2e33;
+      --border: #30363d;
+      --accent: #74aef6;
     }
 
     html, body {
@@ -18,16 +17,14 @@
       height: 100%;
       overflow: hidden;
       font-family: "Segoe UI", sans-serif;
-      color: #f0f0f0;
+      color: #fff;
       background: var(--bg);
     }
 
-    /* Background layers */
     #bg-canvas,
     #bubble-container {
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
       z-index: 0;
@@ -38,146 +35,147 @@
       z-index: 1;
     }
 
-    header {
-      font-size: 2.2rem;
-      font-weight: bold;
-      color: var(--accent);
-      margin: 20px 0;
-      letter-spacing: 2px;
-      text-align: center;
-      text-shadow: 0 0 8px rgba(88, 166, 255, 0.5);
+    .center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 40px;
     }
 
-    .dashboard {
+    .logo {
+      width: 200px;
+      height: auto;
+    }
+
+    .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      max-width: 1200px;
-      width: 90%;
-      margin: auto;
+      gap: 40px;
+      align-items: start;
     }
 
     .panel {
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
+      background: var(--chip);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-      min-height: 300px;
-      max-height: 500px;
-      overflow-y: auto;
-      position: relative;
+      min-width: 260px;
+      max-width: 320px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
     }
 
     .panel h2 {
-      margin: 0;
-      font-size: 1.3rem;
+      margin: 0 0 10px;
+      font-size: 1.2rem;
       color: var(--accent);
-      border-bottom: 1px solid var(--panel-border);
+      border-bottom: 1px solid var(--border);
       padding-bottom: 6px;
       text-align: center;
     }
 
     .apps-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
-    .app {
-      background: var(--item-bg);
+    .app, .contact-btn, .announcement {
+      background: var(--chip-hover);
       border-radius: 8px;
       padding: 12px;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    .app:hover {
-      background: var(--item-hover);
-      transform: scale(1.05);
+    .app:hover, .contact-btn:hover {
+      background: #34363c;
+      transform: translateY(-2px);
     }
 
     .announcement {
-      background: var(--item-bg);
-      border-radius: 6px;
-      padding: 10px;
-      font-size: 0.9rem;
-      line-height: 1.4;
+      cursor: default;
+      text-align: left;
+      font-size: 0.85rem;
+      line-height: 1.3;
     }
 
-    .contact-btn {
-      background: var(--item-bg);
-      border: 1px solid var(--panel-border);
-      border-radius: 8px;
-      padding: 12px;
-      text-align: center;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-
-    .contact-btn:hover {
-      background: var(--item-hover);
-      transform: scale(1.05);
-    }
-
-    /* Neon panel glow */
-    .panel::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 12px;
-      padding: 2px;
-      background: linear-gradient(135deg, #58a6ff44, transparent);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-              mask-composite: exclude;
-      pointer-events: none;
+    /* SVG icons small + consistent */
+    .icon {
+      width: 18px;
+      height: 18px;
+      fill: var(--accent);
+      flex-shrink: 0;
     }
   </style>
 </head>
 <body>
-  <!-- Background layers -->
   <canvas id="bg-canvas"></canvas>
-  <div class="bubble-container" id="bubble-container"></div>
+  <div id="bubble-container"></div>
 
-  <!-- UI content -->
-  <header>
-    <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo" style="height:80px;vertical-align:middle;">
-    <span>GP-Clanker</span>
-  </header>
+  <div class="center">
+    <!-- Logo in center -->
+    <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo" class="logo">
 
-  <div class="dashboard">
-    <!-- Apps Panel -->
-    <div class="panel">
-      <h2>Apps</h2>
-      <div class="apps-grid">
-        <div class="app">🎮 Games</div>
-        <div class="app">🎬 Movies</div>
-        <div class="app">💬 Chat (Beta)</div>
-        <div class="app">🤖 GP-Clanker (AI)</div>
+    <!-- Panels orbiting around logo -->
+    <div class="grid">
+      <!-- Apps -->
+      <div class="panel">
+        <h2>Apps</h2>
+        <div class="apps-grid">
+          <div class="app">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/></svg>
+            Games
+          </div>
+          <div class="app">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>
+            Movies
+          </div>
+          <div class="app">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v18m9-9H3"/></svg>
+            Chat (Beta)
+          </div>
+          <div class="app">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M2 12l9 9 11-18"/></svg>
+            GP-Clanker (AI)
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Announcements Panel -->
-    <div class="panel">
-      <h2>Announcements</h2>
-      <div class="announcement">🚀 Welcome to GP-Clanker!</div>
-      <div class="announcement">📢 New game update available soon.</div>
-      <div class="announcement">🎉 Movie section redesign complete.</div>
-    </div>
+      <!-- Announcements -->
+      <div class="panel">
+        <h2>Announcements</h2>
+        <div class="announcement">• Welcome to GP-Clanker!</div>
+        <div class="announcement">• New game update available soon with added levels.</div>
+        <div class="announcement">• Movie section redesign complete — check it out now.</div>
+      </div>
 
-    <!-- Contact Panel -->
-    <div class="panel">
-      <h2>Contact</h2>
-      <div class="contact-btn">🐞 Bug Reports</div>
-      <div class="contact-btn">🎮 Game Requests</div>
-      <div class="contact-btn">🎬 Movie Requests</div>
+      <!-- Contact -->
+      <div class="panel">
+        <h2>Contact</h2>
+        <div class="contact-btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l4 20-4-2-4 2z"/></svg>
+          Bug Reports
+        </div>
+        <div class="contact-btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></svg>
+          Game Requests
+        </div>
+        <div class="contact-btn">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/></svg>
+          Movie Requests
+        </div>
+      </div>
     </div>
   </div>
 
