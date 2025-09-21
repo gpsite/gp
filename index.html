@@ -3,35 +3,28 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>George Pickens</title>
+<title>George Pickens Interface</title>
 <link rel="icon" type="image/gif" href="https://gp-site.github.io/gp/img/logo.png">
 <style>
 :root {
   --bg:#000;
-  --chip:#222428;
-  --chip-hover:#2b2e33;
-  --icon-border:#000;
+  --chip:#1b1d22;
+  --chip-hover:#24272e;
   --blue:#74aef6;
   --green:#7ed321;
   --yellow:#f8e71c;
   --red:#ff3b2f;
+  --glow:#74aef6;
 }
 
 html, body {
-  height: 100%;
   margin: 0;
-  overflow: hidden;
-}
-
-body {
+  padding: 0;
+  height: 100%;
   background: var(--bg);
   color: #fff;
-  font-family: "Segoe UI", sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px;
+  font-family: "Consolas", "Courier New", monospace;
+  overflow: hidden;
 }
 
 #bg-canvas, .bubble-container {
@@ -40,95 +33,127 @@ body {
   z-index: 0;
 }
 
-header {
-  margin-top: 20px;
-  margin-bottom: 30px;
-  text-align: center;
+/* Main grid */
+.interface {
+  position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "logo header"
+    "menu main";
+  height: 100vh;
+  gap: 12px;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
-header img {
-  width: 200px;
-  height: auto;
-  border-radius: 20px;
-}
-
-nav.menu {
+/* Panels */
+.panel {
+  background: var(--chip);
+  border: 2px solid var(--glow);
+  border-radius: 10px;
+  box-shadow: 0 0 12px var(--glow);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: min(500px, 90%);
-  margin-bottom: 40px;
-  z-index: 1;
 }
 
-.btn {
+/* Logo */
+.logo-panel {
+  grid-area: logo;
+  align-items: center;
+  justify-content: center;
+}
+.logo-panel img {
+  width: 100%;
+  max-width: 160px;
+  height: auto;
+  filter: drop-shadow(0 0 8px var(--glow));
+}
+
+/* Header (optional, could show system info later) */
+.header-panel {
+  grid-area: header;
+  justify-content: center;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+/* Menu */
+.menu-panel {
+  grid-area: menu;
+  gap: 18px;
+}
+.menu-panel a {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   text-decoration: none;
   color: #fff;
-  background: var(--chip);
-  padding: 18px 24px;
-  border-radius: 16px;
-  font-size: 26px;
-  letter-spacing: 2px;
+  background: var(--chip-hover);
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--glow);
+  font-size: 18px;
   transition: transform .1s ease, background .2s ease;
 }
-.btn:hover {
-  background: var(--chip-hover);
-  transform: translateY(-2px);
+.menu-panel a:hover {
+  background: var(--chip);
+  transform: translateX(4px);
 }
-
 .quad {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  width: 36px;
-  height: 36px;
-  padding: 4px;
-  background: #222428;
-  border-radius: 8px;
-  box-shadow: 0 0 0 2px var(--icon-border) inset;
+  gap: 2px;
+  width: 28px;
+  height: 28px;
+  padding: 2px;
+  background: #111;
+  border-radius: 4px;
 }
-
-.sq { border-radius: 4px; }
+.sq { border-radius: 2px; }
 .sq.blue { background: var(--blue); }
 .sq.green { background: var(--green); }
 .sq.yellow { background: var(--yellow); }
 .sq.red { background: var(--red); }
 
+/* Announcements */
+.main-panel {
+  grid-area: main;
+  overflow: hidden;
+}
 .announcements {
-  background: var(--chip);
-  padding: 20px 24px;
-  border-radius: 16px;
-  width: min(700px, 92%);
-  max-height: 250px;
+  flex: 1;
   overflow-y: auto;
-  line-height: 1.5;
-  z-index: 1;
+  font-size: 15px;
+  line-height: 1.6;
 }
 .announcements h2 {
   margin-top: 0;
-  font-size: 24px;
   margin-bottom: 12px;
+  font-size: 18px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--glow);
+  padding-bottom: 6px;
 }
 .announcements ul {
+  padding-left: 18px;
   margin: 0;
-  padding-left: 22px;
 }
 .announcements li {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
-@media(max-width: 600px) {
-  .btn {
-    font-size: 20px;
-    padding: 14px 18px;
-  }
-  header img {
-    width: 150px;
-  }
+/* Scrollbar styling */
+.announcements::-webkit-scrollbar {
+  width: 8px;
+}
+.announcements::-webkit-scrollbar-thumb {
+  background: var(--glow);
+  border-radius: 4px;
 }
 </style>
 </head>
@@ -137,49 +162,59 @@ nav.menu {
 <canvas id="bg-canvas"></canvas>
 <div class="bubble-container" id="bubble-container"></div>
 
-<header>
-  <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo">
-</header>
+<div class="interface">
 
-<nav class="menu">
-  <a class="btn" href="pages/games/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>GAMES</span>
-  </a>
-  <a class="btn" href="pages/movies/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>MOVIES</span>
-  </a>
-  <a class="btn" href="pages/chat/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>CHAT (BETA)</span>
-  </a>
-  <a class="btn" href="pages/ai/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>GP-CLANKER (AI)</span>
-  </a>
-</nav>
+  <div class="panel logo-panel">
+    <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo">
+  </div>
 
-<section class="announcements">
-  <h2>Announcements</h2>
-  <ul>
-    <li>Example update: We’ve added GP-Clanker (AI) to the site. Try it out now!</li>
-    <li>Site performance improvements are ongoing, expect smoother loading.</li>
-    <li>Upcoming: New movie and game categories arriving next month.</li>
-  </ul>
-</section>
+  <div class="panel header-panel">
+    GP SYSTEM INTERFACE v1.0
+  </div>
+
+  <div class="panel menu-panel">
+    <a href="pages/games/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      GAMES
+    </a>
+    <a href="pages/movies/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      MOVIES
+    </a>
+    <a href="pages/chat/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      CHAT (BETA)
+    </a>
+    <a href="pages/ai/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      GP-CLANKER (AI)
+    </a>
+  </div>
+
+  <div class="panel main-panel">
+    <div class="announcements">
+      <h2>Announcements</h2>
+      <ul>
+        <li>[09/20] GP-Clanker (AI) module integrated. Ready for use.</li>
+        <li>[09/15] Performance updates applied to games and movies panels.</li>
+        <li>[09/10] New categories scheduled for next release cycle.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
 
 <script src="scripts/starry-background.js"></script>
 <script>
