@@ -1,147 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>George Pickens Interface</title>
-<link rel="icon" type="image/gif" href="https://gp-site.github.io/gp/img/logo.png">
-<style>
-:root {
-  --bg:#000;
-  --chip:#222428;
-  --chip-hover:#2b2e33;
-}
+  <meta charset="UTF-8">
+  <title>GP-Clanker</title>
+  <style>
+    :root {
+      --bg: #000;
+      --panel-bg: #161b22;
+      --panel-border: #30363d;
+      --item-bg: #21262d;
+      --item-hover: #2d333b;
+      --accent: #58a6ff;
+    }
 
-html, body {
-  margin: 0;
-  height: 100%;
-  background: var(--bg);
-  color: #fff;
-  font-family: "Segoe UI", sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Segoe UI", sans-serif;
+      color: #f0f0f0;
+      background: var(--bg);
+    }
 
-#bg-canvas, .bubble-container {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-}
+    /* Background layers */
+    #bg-canvas,
+    #bubble-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
 
-/* Wrapper */
-.interface {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 28px;
-  max-width: 700px;
-  width: 92%;
-  text-align: center;
-}
+    body > *:not(#bg-canvas):not(#bubble-container) {
+      position: relative;
+      z-index: 1;
+    }
 
-/* Logo */
-.logo {
-  max-width: 200px;
-}
-.logo img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+    header {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 20px 0;
+      letter-spacing: 2px;
+      text-align: center;
+      text-shadow: 0 0 8px rgba(88, 166, 255, 0.5);
+    }
 
-/* Buttons grid */
-.menu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  width: 100%;
-}
-.btn {
-  display: block;
-  text-decoration: none;
-  color: #fff;
-  background: var(--chip);
-  padding: 14px;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: 500;
-  transition: background .2s ease, transform .1s ease;
-}
-.btn:hover {
-  background: var(--chip-hover);
-  transform: translateY(-2px);
-}
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1200px;
+      width: 90%;
+      margin: auto;
+    }
 
-/* Announcements */
-.announcements {
-  background: var(--chip);
-  padding: 14px 18px;
-  border-radius: 10px;
-  font-size: 15px;
-  line-height: 1.4;
-  width: 100%;
-  max-height: 160px;
-  overflow-y: auto;
-  text-align: left;
-}
-.announcements h2 {
-  margin: 0 0 8px;
-  font-size: 16px;
-  border-bottom: 1px solid var(--chip-hover);
-  padding-bottom: 4px;
-}
-.announcements ul {
-  margin: 0;
-  padding-left: 18px;
-}
-.announcements li {
-  margin-bottom: 8px;
-}
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+      min-height: 300px;
+      max-height: 500px;
+      overflow-y: auto;
+      position: relative;
+    }
 
-/* Scrollbar styling */
-.announcements::-webkit-scrollbar {
-  width: 6px;
-}
-.announcements::-webkit-scrollbar-thumb {
-  background: var(--chip-hover);
-  border-radius: 3px;
-}
-</style>
+    .panel h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: var(--accent);
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 6px;
+      text-align: center;
+    }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 10px;
+    }
+
+    .app {
+      background: var(--item-bg);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .app:hover {
+      background: var(--item-hover);
+      transform: scale(1.05);
+    }
+
+    .announcement {
+      background: var(--item-bg);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .contact-btn {
+      background: var(--item-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .contact-btn:hover {
+      background: var(--item-hover);
+      transform: scale(1.05);
+    }
+
+    /* Neon panel glow */
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      padding: 2px;
+      background: linear-gradient(135deg, #58a6ff44, transparent);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
+  <!-- Background layers -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="bubble-container" id="bubble-container"></div>
 
-<canvas id="bg-canvas"></canvas>
-<div class="bubble-container" id="bubble-container"></div>
+  <!-- UI content -->
+  <header>
+    <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo" style="height:80px;vertical-align:middle;">
+    <span>GP-Clanker</span>
+  </header>
 
-<div class="interface">
-  <div class="logo">
-    <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo">
+  <div class="dashboard">
+    <!-- Apps Panel -->
+    <div class="panel">
+      <h2>Apps</h2>
+      <div class="apps-grid">
+        <div class="app">🎮 Games</div>
+        <div class="app">🎬 Movies</div>
+        <div class="app">💬 Chat (Beta)</div>
+        <div class="app">🤖 GP-Clanker (AI)</div>
+      </div>
+    </div>
+
+    <!-- Announcements Panel -->
+    <div class="panel">
+      <h2>Announcements</h2>
+      <div class="announcement">🚀 Welcome to GP-Clanker!</div>
+      <div class="announcement">📢 New game update available soon.</div>
+      <div class="announcement">🎉 Movie section redesign complete.</div>
+    </div>
+
+    <!-- Contact Panel -->
+    <div class="panel">
+      <h2>Contact</h2>
+      <div class="contact-btn">🐞 Bug Reports</div>
+      <div class="contact-btn">🎮 Game Requests</div>
+      <div class="contact-btn">🎬 Movie Requests</div>
+    </div>
   </div>
 
-  <nav class="menu">
-    <a class="btn" href="pages/games/index.html">GAMES</a>
-    <a class="btn" href="pages/movies/index.html">MOVIES</a>
-    <a class="btn" href="pages/chat/index.html">CHAT (BETA)</a>
-    <a class="btn" href="pages/ai/index.html">GP-CLANKER (AI)</a>
-  </nav>
-
-  <section class="announcements">
-    <h2>Announcements</h2>
-    <ul>
-      <li>GP-Clanker (AI) is now available. Try it in the menu above.</li>
-      <li>Performance improvements rolled out for games and movies.</li>
-      <li>Next release will bring new categories and features.</li>
-    </ul>
-  </section>
-</div>
-
-<script src="scripts/starry-background.js"></script>
-<script>
-  setupStarryBackground();
-</script>
-
+  <script src="scripts/starry-background.js"></script>
+  <script>
+    setupStarryBackground();
+  </script>
 </body>
 </html>
