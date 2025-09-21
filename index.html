@@ -6,149 +6,184 @@
 <title>George Pickens</title>
 <link rel="icon" type="image/gif" href="https://gp-site.github.io/gp/img/logo.png">
 <style>
-:root{
---bg:#000;
---chip:#222428;
---chip-hover:#2b2e33;
---icon-border:#000;
---blue:#74aef6;
---green:#7ed321;
---yellow:#f8e71c;
---red:#ff3b2f;
+:root {
+  --bg:#000;
+  --chip:#222428;
+  --chip-hover:#2b2e33;
+  --icon-border:#000;
+  --blue:#74aef6;
+  --green:#7ed321;
+  --yellow:#f8e71c;
+  --red:#ff3b2f;
 }
 
 html, body {
-height: 100%;
-margin: 0;
-overflow: hidden; /* prevent scrolling */
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
 body {
-background: var(--bg);
-color: #fff;
-display: flex;
-align-items: center;
-justify-content: center;
-font-family: sans-serif;
+  background: var(--bg);
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
 }
 
-.wrap {
-width: min(1200px, 92vw);
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 6vw;
-position: relative;
-z-index: 1; /* keep above bubbles */
+#bg-canvas, .bubble-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
 }
 
-.menu {
-display: flex;
-flex-direction: column;
-gap: 28px;
-min-width: 520px;
+header {
+  margin-top: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+  z-index: 1;
+}
+
+header img {
+  width: 200px;
+  height: auto;
+  border-radius: 20px;
+}
+
+nav.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(500px, 90%);
+  margin-bottom: 40px;
+  z-index: 1;
 }
 
 .btn {
-display: flex;
-align-items: center;
-gap: 20px;
-text-decoration: none;
-color: #fff;
-background: var(--chip);
-padding: 22px 28px;
-border-radius: 18px;
-font-size: 40px;
-letter-spacing: 3px;
-transition: transform .08s ease, background .15s ease;
-position: relative;
-z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-decoration: none;
+  color: #fff;
+  background: var(--chip);
+  padding: 18px 24px;
+  border-radius: 16px;
+  font-size: 26px;
+  letter-spacing: 2px;
+  transition: transform .1s ease, background .2s ease;
 }
 .btn:hover {
-background: var(--chip-hover);
-transform: translateY(-1px);
+  background: var(--chip-hover);
+  transform: translateY(-2px);
 }
 
 .quad {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 8px;
-width: 64px;
-height: 64px;
-padding: 8px;
-background: #222428;
-border-radius: 14px;
-box-shadow: 0 0 0 4px var(--icon-border) inset;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  width: 36px;
+  height: 36px;
+  padding: 4px;
+  background: #222428;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--icon-border) inset;
 }
 
-.sq { border-radius: 8px }
-.sq.blue { background: var(--blue) }
-.sq.green { background: var(--green) }
-.sq.yellow { background: var(--yellow) }
-.sq.red { background: var(--red) }
+.sq { border-radius: 4px; }
+.sq.blue { background: var(--blue); }
+.sq.green { background: var(--green); }
+.sq.yellow { background: var(--yellow); }
+.sq.red { background: var(--red); }
 
-.logo {
-flex: 1;
-display: flex;
-align-items: center;
-justify-content: center;
-min-width: 420px;
+.announcements {
+  background: var(--chip);
+  padding: 20px 24px;
+  border-radius: 16px;
+  width: min(700px, 92%);
+  max-height: 250px;
+  overflow-y: auto;
+  line-height: 1.5;
+  z-index: 1;
 }
-.logo svg {
-width: 100%;
-height: auto;
-display: block;
+.announcements h2 {
+  margin-top: 0;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+.announcements ul {
+  margin: 0;
+  padding-left: 22px;
+}
+.announcements li {
+  margin-bottom: 12px;
 }
 
-@media(max-width:960px){
-.wrap { flex-direction: column; gap: 40px }
-.menu { min-width: unset; width: 100% }
-.btn { font-size: 34px }
-.logo { min-width: unset }
+@media(max-width: 600px) {
+  .btn {
+    font-size: 20px;
+    padding: 14px 18px;
+  }
+  header img {
+    width: 150px;
+  }
 }
-
 </style>
 </head>
 <body>
-  
+
 <canvas id="bg-canvas"></canvas>
 <div class="bubble-container" id="bubble-container"></div>
 
-<div class="wrap">
+<header>
+  <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo">
+</header>
 
 <nav class="menu">
-<a class="btn" href="pages\games\index.html">
-<span class="quad">
-<span class="sq blue"></span><span class="sq green"></span>
-<span class="sq yellow"></span><span class="sq red"></span>
-</span>
-<span>GAMES</span>
-</a>
-<a class="btn" href="pages\movies\index.html">
-<span class="quad">
-<span class="sq blue"></span><span class="sq green"></span>
-<span class="sq yellow"></span><span class="sq red"></span>
-</span>
-<span>MOVIES</span>
-</a>
-<a class="btn" href="pages\chat\index.html">
-<span class="quad">
-<span class="sq blue"></span><span class="sq green"></span>
-<span class="sq yellow"></span><span class="sq red"></span>
-</span>
-<span>CHAT (BETA)</span>
-</a>
+  <a class="btn" href="pages/games/index.html">
+    <span class="quad">
+      <span class="sq blue"></span><span class="sq green"></span>
+      <span class="sq yellow"></span><span class="sq red"></span>
+    </span>
+    <span>GAMES</span>
+  </a>
+  <a class="btn" href="pages/movies/index.html">
+    <span class="quad">
+      <span class="sq blue"></span><span class="sq green"></span>
+      <span class="sq yellow"></span><span class="sq red"></span>
+    </span>
+    <span>MOVIES</span>
+  </a>
+  <a class="btn" href="pages/chat/index.html">
+    <span class="quad">
+      <span class="sq blue"></span><span class="sq green"></span>
+      <span class="sq yellow"></span><span class="sq red"></span>
+    </span>
+    <span>CHAT (BETA)</span>
+  </a>
+  <a class="btn" href="pages/ai/index.html">
+    <span class="quad">
+      <span class="sq blue"></span><span class="sq green"></span>
+      <span class="sq yellow"></span><span class="sq red"></span>
+    </span>
+    <span>GP-CLANKER (AI)</span>
+  </a>
 </nav>
 
-<div class="logo" aria-label="GP logo">
-  <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo" width="771" height="771" style="width:100%;height:auto;display:block;">
-</div>
-</div>
-</div>
+<section class="announcements">
+  <h2>Announcements</h2>
+  <ul>
+    <li>Example update: We’ve added GP-Clanker (AI) to the site. Try it out now!</li>
+    <li>Site performance improvements are ongoing, expect smoother loading.</li>
+    <li>Upcoming: New movie and game categories arriving next month.</li>
+  </ul>
+</section>
 
 <script src="scripts/starry-background.js"></script>
 <script>
-    setupStarryBackground();
+  setupStarryBackground();
 </script>
 
 </body>
