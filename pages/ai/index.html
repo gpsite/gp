@@ -362,7 +362,7 @@ async function sendMessage() {
     } catch (err) {
         console.error(err);
         messagesDiv.removeChild(thinkingDiv);
-        addMessage("ai", "[Error fetching reply]");
+        addMessage("ai", "[Currently under extreme load, please try again later]");
     }
 }
 
