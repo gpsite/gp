@@ -52,12 +52,25 @@ header img {
   border-radius: 20px;
 }
 
+/* New flex row container */
+.main-row {
+  width: 100%;
+  max-width: 1250px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 40px;
+  z-index: 1;
+}
+
+/* MENU (right column on wide screens) */
 nav.menu {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: min(500px, 90%);
-  margin-bottom: 40px;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto 40px; /* auto centered in single-column mode */
   z-index: 1;
 }
 
@@ -101,7 +114,8 @@ nav.menu {
   background: var(--chip);
   padding: 20px 24px;
   border-radius: 16px;
-  width: min(700px, 92%);
+  width: 100%;
+  max-width: 680px;
   max-height: 250px;
   overflow-y: auto;
   line-height: 1.5;
@@ -120,6 +134,24 @@ nav.menu {
   margin-bottom: 12px;
 }
 
+/* Two-column layout for wider screens */
+@media (min-width: 900px) {
+  .main-row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .announcements {
+    flex: 1 1 55%;
+    max-height: 400px; /* give a bit more room on desktop */
+  }
+  nav.menu {
+    flex: 0 0 420px;
+    margin: 0; /* remove auto centering in row mode */
+  }
+}
+
+/* Mobile adjustments */
 @media(max-width: 600px) {
   .btn {
     font-size: 20px;
@@ -127,6 +159,9 @@ nav.menu {
   }
   header img {
     width: 150px;
+  }
+  .announcements {
+    max-height: 300px;
   }
 }
 </style>
@@ -140,45 +175,47 @@ nav.menu {
   <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo">
 </header>
 
-<nav class="menu">
-  <a class="btn" href="pages/games/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>GAMES</span>
-  </a>
-  <a class="btn" href="pages/movies/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>MOVIES</span>
-  </a>
-  <a class="btn" href="pages/chat/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>CHAT (BETA)</span>
-  </a>
-  <a class="btn" href="pages/ai/index.html">
-    <span class="quad">
-      <span class="sq blue"></span><span class="sq green"></span>
-      <span class="sq yellow"></span><span class="sq red"></span>
-    </span>
-    <span>GP-CLANKER (AI)</span>
-  </a>
-</nav>
+<div class="main-row">
+  <section class="announcements">
+    <h2>Announcements</h2>
+    <ul>
+      <li>Update: We’ve added GP-Clanker (AI) to the site. Try it out now!</li>
+      <li>Site performance improvements are ongoing, expect smoother loading.</li>
+      <li>Upcoming: Movies will be getting a backend fix to fix glitches.</li>
+    </ul>
+  </section>
 
-<section class="announcements">
-  <h2>Announcements</h2>
-  <ul>
-    <li>Update: We’ve added GP-Clanker (AI) to the site. Try it out now!</li>
-    <li>Site performance improvements are ongoing, expect smoother loading.</li>
-    <li>Upcoming: Movies will be getting a backend fix to fix glitches.</li>
-  </ul>
-</section>
+  <nav class="menu">
+    <a class="btn" href="pages/games/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>GAMES</span>
+    </a>
+    <a class="btn" href="pages/movies/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>MOVIES</span>
+    </a>
+    <a class="btn" href="pages/chat/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>CHAT (BETA)</span>
+    </a>
+    <a class="btn" href="pages/ai/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>GP-CLANKER (AI)</span>
+    </a>
+  </nav>
+</div>
 
 <script src="scripts/starry-background.js"></script>
 <script>
