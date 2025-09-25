@@ -155,7 +155,14 @@
 /*************************
  * CONFIG
  *************************/
-const SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/testmovies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
+const SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
+
+const OMDB_API_KEYS = [
+  "cda9cc2e",
+  "41fd826a",
+  "bb742de8",
+  "c6a43a55"
+];
 
 /*************************
  * ELEMENTS
@@ -183,6 +190,12 @@ let GENRES = new Set();
 /*************************
  * UTILITIES
  *************************/
+
+ function getRandomOmdbKey() {
+  return OMDB_API_KEYS[Math.floor(Math.random() * OMDB_API_KEYS.length)];
+}
+
+const byId = (id) => document.getElementById(id);
 const isVttUrl = (s) => typeof s === 'string' && /\.vtt($|\?)/i.test(s);
 const extractImdb = (s) => {
   if (!s) return '';
@@ -205,26 +218,20 @@ function getDateString() {
   const t = new Date(d); t.setDate(d.getDate() + 1);
   return fmt(y) + fmt(d) + fmt(t);
 }
-// Assemble video exactly like the old flow: base URL + imdbID (if missing) + long date key
-function assembleVideoUrl(baseURL, imdbID) {
+function buildFinalUrls(baseURL, imdbID, subsUrlMaybe) {
   const longDate = getDateString();
-  const cell = String(omdbCell || '').trim();
-  const imdbID = extractImdb(cell);
-
-  // Video: base + imdbID (if missing) + longDate
-  let videoUrl = '';
-  if (baseURL) {
-    let url = String(baseURL);
-    if (imdbID && !url.includes(imdbID)) url += imdbID;
-    videoUrl = url + longDate;
-  }
-
-  // Subs: trust full URL or .vtt; else build from imdbID
+  const videoUrl = baseURL ? String(baseURL) + longDate : '';
   let subsUrl = '';
-  if (isVttUrl(cell) || /^https?:\/\//i.test(cell)) subsUrl = cell;
+  if (isVttUrl(subsUrlMaybe)) subsUrl = subsUrlMaybe;
   else if (imdbID) subsUrl = `https://rips.cc/subs/${imdbID}.vtt`;
-
-  return { imdbID, videoUrl, subsUrl };
+  return { videoUrl, subsUrl };
+}
+function idx(headers, name) {
+  const target = String(name).toLowerCase();
+  for (let i = 0; i < headers.length; i++) {
+    if (String(headers[i]).toLowerCase().trim() === target) return i;
+  }
+  return -1;
 }
 
 /*************************
@@ -244,54 +251,37 @@ async function fetchMovieData() {
     }
 
     const headers = rows.shift().map(h => String(h).trim());
+    let URL_I  = idx(headers, 'url');
+    let TTL_I  = idx(headers, 'title');
+    let DSC_I  = idx(headers, 'description');
+    let PST_I  = idx(headers, 'poster');
+    let GEN_I  = idx(headers, 'genre');
+    let SUB_I  = idx(headers, 'subtitles');
 
-    // Accept the provided header names:
-    // URL | OMDB ID | TITLE | GENRE | YEAR | DIRECTOR | ACTORS | PLOT | POSTER
-    const idxAny = (names) => {
-      for (const n of names) {
-        const i = idx(headers, n);
-        if (i !== -1) return i;
-      }
-      return -1;
-    };
-
-    const URL_I  = idxAny(['url']);
-    const OID_I  = idxAny(['omdb id', 'imdb id', 'imdbid', 'imdb']);
-    const TTL_I  = idxAny(['title']);
-    const GEN_I  = idxAny(['genre', 'genres']);
-    const YEAR_I = idxAny(['year', 'release year']);
-    const DIR_I  = idxAny(['director']);
-    const ACT_I  = idxAny(['actors', 'cast']);
-    const PLOT_I = idxAny(['plot', 'overview', 'description']);
-    const PST_I  = idxAny(['poster', 'image', 'art']);
+    if (URL_I === -1 && headers.length >= 1) URL_I = 0;
+    if (SUB_I === -1 && headers.length >= 2) SUB_I = 1;
 
     const placeholderPoster = 'https://placehold.co/300x450/transparent/F00/?text=Database+Error';
 
     ALL_MOVIES = rows.map((r) => {
-      const baseURL = URL_I !== -1 ? (r[URL_I] || '') : '';
-      const omdbCell = OID_I !== -1 ? (r[OID_I] || '') : '';
-      const { imdbID, subsUrl } = buildSubsUrl(omdbCell);
+      const baseURL = r[URL_I] || '';
+      const sheetSubsField = r[SUB_I] || '';
+      const imdbID = extractImdb(sheetSubsField);
+      const subsUrlMaybe = sheetSubsField;
 
-      const title = (TTL_I !== -1 ? (r[TTL_I] || '') : '') || titleFromUrl(baseURL);
-      const overview = PLOT_I !== -1 ? (r[PLOT_I] || '') : '';
-      const poster = (PST_I !== -1 ? (r[PST_I] || '') : '') || placeholderPoster;
-      const year = YEAR_I !== -1 ? (r[YEAR_I] || '') : '';
-      const director = DIR_I !== -1 ? (r[DIR_I] || '') : '';
-      const actors = ACT_I !== -1 ? (r[ACT_I] || '') : '';
-      const genres =
-        GEN_I !== -1 && r[GEN_I]
-          ? String(r[GEN_I]).split(',').map(s => s.trim()).filter(Boolean)
-          : ['Unknown'];
+      const title = r[TTL_I] || titleFromUrl(baseURL);
+      const overview = r[DSC_I] || '';
+      const poster = r[PST_I] || placeholderPoster;
+      const genres = r[GEN_I] ? String(r[GEN_I]).split(',').map(s => s.trim()).filter(Boolean) : ['Unknown'];
 
-      const videoUrl = assembleVideoUrl(baseURL, imdbID);
+      const { videoUrl, subsUrl } = buildFinalUrls(baseURL, imdbID, subsUrlMaybe);
 
-      return { title, overview, poster, genres, year, director, actors, baseURL, imdbID, videoUrl, subsUrl };
+      return { title, overview, poster, genres, baseURL, imdbID, videoUrl, subsUrl };
     });
 
     // Build genre set
     GENRES = new Set();
     ALL_MOVIES.forEach(m => m.genres.forEach(g => GENRES.add(g)));
-
     buildFilters();
     renderMovies(ALL_MOVIES);
     statusEl.textContent = '';
@@ -299,6 +289,40 @@ async function fetchMovieData() {
   } catch (err) {
     console.error(err);
     statusEl.textContent = 'Failed to load from Google Sheets. Check API key, sharing settings, and range name.';
+  }
+}
+
+// ENRICH FROM OMDb INSTEAD OF TMDB
+async function enrichFromOMDb(movie, cardEl) {
+  if (!movie.imdbID) return;
+  try {
+    const apiKey = getRandomOmdbKey();
+    const omdbRes = await fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${movie.imdbID}`);
+    const omdbData = await omdbRes.json();
+    if (omdbData && omdbData.Response !== "False") {
+      movie.title = omdbData.Title || movie.title;
+      movie.overview = omdbData.Plot || movie.overview;
+      movie.poster = (omdbData.Poster && omdbData.Poster !== "N/A") ? omdbData.Poster : movie.poster;
+      movie.genres = omdbData.Genre ? omdbData.Genre.split(',').map(s => s.trim()) : movie.genres;
+    }
+    // Update DOM card
+    const img = cardEl.querySelector("img");
+    if (img) img.src = movie.poster;
+    const titleEl = cardEl.querySelector("h3");
+    if (titleEl) titleEl.innerHTML = movie.imdbID
+      ? `<a class="inline" href="https://www.imdb.com/title/${movie.imdbID}/" target="_blank" rel="noopener">${escapeHtml(movie.title)}</a>`
+      : escapeHtml(movie.title);
+    const p = cardEl.querySelector("p");
+    if (p) p.textContent = movie.genres.length ? movie.genres.join(", ") : "Unknown";
+
+    // --- FIX: After enrichment, update genre set and filters ---
+    GENRES = new Set();
+    ALL_MOVIES.forEach(m => m.genres.forEach(g => GENRES.add(g)));
+    buildFilters();
+    // ----------------------------------------------------------
+
+  } catch (err) {
+    console.warn("OMDb enrichment failed for", movie.imdbID, err);
   }
 }
 
@@ -329,6 +353,9 @@ function renderMovies(list) {
     `;
     card.addEventListener('click', () => openOverlay(movie));
     frag.appendChild(card);
+
+    // Enrich from OMDb *after* card is on screen, just like TMDB before
+    enrichFromOMDb(movie, card);
   }
   movieGrid.appendChild(frag);
 }
