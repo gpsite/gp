@@ -208,28 +208,23 @@ function getDateString() {
 // Assemble video exactly like the old flow: base URL + imdbID (if missing) + long date key
 function assembleVideoUrl(baseURL, imdbID) {
   const longDate = getDateString();
-  if (!baseURL) return '';
-  let url = String(baseURL);
-  if (imdbID && !url.includes(imdbID)) url += imdbID;
-  return url + longDate;
-}
-function buildSubsUrl(omdbCell) {
-  if (!omdbCell) return { imdbID: '', subsUrl: '' };
-  const cell = String(omdbCell).trim();
+  const cell = String(omdbCell || '').trim();
   const imdbID = extractImdb(cell);
-  if (isVttUrl(cell) || /^https?:\/\//i.test(cell)) {
-    // If the sheet already contains a full subs URL, trust it
-    return { imdbID, subsUrl: cell };
+
+  // Video: base + imdbID (if missing) + longDate
+  let videoUrl = '';
+  if (baseURL) {
+    let url = String(baseURL);
+    if (imdbID && !url.includes(imdbID)) url += imdbID;
+    videoUrl = url + longDate;
   }
-  const subsUrl = imdbID ? `https://rips.cc/subs/${imdbID}.vtt` : '';
-  return { imdbID, subsUrl };
-}
-function idx(headers, name) {
-  const target = String(name).toLowerCase();
-  for (let i = 0; i < headers.length; i++) {
-    if (String(headers[i]).toLowerCase().trim() === target) return i;
-  }
-  return -1;
+
+  // Subs: trust full URL or .vtt; else build from imdbID
+  let subsUrl = '';
+  if (isVttUrl(cell) || /^https?:\/\//i.test(cell)) subsUrl = cell;
+  else if (imdbID) subsUrl = `https://rips.cc/subs/${imdbID}.vtt`;
+
+  return { imdbID, videoUrl, subsUrl };
 }
 
 /*************************
