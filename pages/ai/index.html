@@ -194,7 +194,91 @@ body {
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
 const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA"; 
 const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite-preview-09-2025" });
+
+// Primary (preview) and fallback (regular stable) models
+const PRIMARY_MODEL = "gemini-2.5-flash-lite"; // stable regular model
+const FALLBACK_MODEL = "gemini-2.5-flash-lite-preview-09-2025";
+
+// Fallback state persisted per ET day
+let fallbackActive = JSON.parse(localStorage.getItem("fallbackActive") || "false");
+let fallbackDateET = localStorage.getItem("fallbackDateET") || ""; // YYYY-MM-DD (ET)
+
+// Helpers for ET date handling
+function getETDateString(d = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d).reduce((acc, p) => (acc[p.type] = p.value, acc), {});
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+function resetFallbackIfPastMidnightET() {
+  const todayET = getETDateString();
+  if (fallbackActive && fallbackDateET && todayET !== fallbackDateET) {
+    fallbackActive = false;
+    fallbackDateET = "";
+    localStorage.setItem("fallbackActive", "false");
+    localStorage.removeItem("fallbackDateET");
+  }
+}
+function setFallbackForToday() {
+  fallbackActive = true;
+  fallbackDateET = getETDateString();
+  localStorage.setItem("fallbackActive", "true");
+  localStorage.setItem("fallbackDateET", fallbackDateET);
+}
+function getCurrentModelId() {
+  resetFallbackIfPastMidnightET();
+  return fallbackActive ? FALLBACK_MODEL : PRIMARY_MODEL;
+}
+function isCapacityError(err) {
+  const msg = (err && (err.message || String(err)))?.toLowerCase() || "";
+  const status = err?.status || err?.response?.status;
+  return status === 429 || status === 503 ||
+         msg.includes("quota") || msg.includes("rate limit") ||
+         msg.includes("exceeded") || msg.includes("exhausted") ||
+         msg.includes("unavailable") || msg.includes("overloaded") ||
+         msg.includes("try again") || msg.includes("load") ||
+         msg.includes("capacity");
+}
+
+// Call Gemini with preview-first, then fallback model on capacity errors.
+// If both hit capacity, bubble a special error to show the extreme-load message.
+async function callModelWithFallback(promptText) {
+  resetFallbackIfPastMidnightET();
+
+  // 1st attempt: current preference (preview unless we've fallen back for today)
+  const firstModelId = getCurrentModelId();
+  try {
+    const m = genAI.getGenerativeModel({ model: firstModelId });
+    const res = await m.generateContent(promptText);
+    return { reply: res.response.text(), modelUsed: firstModelId };
+  } catch (err1) {
+    if (isCapacityError(err1)) {
+      // If first attempt was preview, activate fallback for the rest of the ET day
+      if (firstModelId === PRIMARY_MODEL) setFallbackForToday();
+
+      // 2nd attempt: the other model
+      const secondModelId = firstModelId === PRIMARY_MODEL ? FALLBACK_MODEL : PRIMARY_MODEL;
+      try {
+        const m2 = genAI.getGenerativeModel({ model: secondModelId });
+        const res2 = await m2.generateContent(promptText);
+        return { reply: res2.response.text(), modelUsed: secondModelId };
+      } catch (err2) {
+        if (isCapacityError(err2)) {
+          const bothFailed = new Error("Hey! We're currently under extreme load, please try again later...");
+          bothFailed.name = "BothModelsAtCapacity";
+          bothFailed.firstError = err1;
+          bothFailed.secondError = err2;
+          throw bothFailed;
+        }
+        throw err2;
+      }
+    }
+    throw err1;
+  }
+}
 
 let chats = JSON.parse(localStorage.getItem("chats") || "[]");
 let currentChat = null;
@@ -293,7 +377,6 @@ function addMessage(role, text, save = true) {
     if (save && currentChat !== null && chats[currentChat]) {
         chats[currentChat].messages.push({ role, text });
 
-
         if (role === "user" && chats[currentChat].messages.length === 1) {
             let title = text.trim();
             if (title.length > 25) title = title.slice(0, 16) + "...";
@@ -328,11 +411,10 @@ async function sendMessage() {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
     try {
-
         const chat = chats[currentChat];
         const recentMessages = chat.messages.slice(-10);
-        let promptMessages = [];
 
+        let promptMessages = [];
         if (chat.memorySummary) {
             promptMessages.push({ role: "system", content: "Memory: " + chat.memorySummary });
         }
@@ -341,28 +423,42 @@ async function sendMessage() {
             content: m.text
         })));
 
+        const promptText = promptMessages.map(m => m.content).join("\n");
 
-        const result = await model.generateContent(promptMessages.map(m => m.content).join("\n"));
-        const reply = result.response.text();
+        const { reply } = await callModelWithFallback(promptText);
 
         messagesDiv.removeChild(thinkingDiv);
         addMessage("ai", reply);
-
 
         if (chat.messages.length % 20 === 0) {
             const summaryPrompt = `
                 Summarize this chat in 3–4 sentences, keeping key info:
                 ${chat.messages.map(m => `${m.role}: ${m.text}`).join("\n")}
             `;
-            const summaryResult = await model.generateContent(summaryPrompt);
-            chat.memorySummary = summaryResult.response.text();
-            saveChats();
-        }//yu
+            try {
+                const { reply: summary } = await callModelWithFallback(summaryPrompt);
+                chat.memorySummary = summary;
+                saveChats();
+            } catch (summaryErr) {
+                // Only display the extreme load message if both models hit limits
+                if (summaryErr?.name === "BothModelsAtCapacity") {
+                    addMessage("ai", "[Currently under extreme load, please try again later]");
+                } else {
+                    // Silent fail for summary to avoid extra noise
+                    console.error("Summary error:", summaryErr);
+                }
+            }
+        }
 
     } catch (err) {
         console.error(err);
         messagesDiv.removeChild(thinkingDiv);
-        addMessage("ai", "[Currently under extreme load, please try again later]");
+        // Only show the extreme-load message if both models hit capacity/limits
+        if (err?.name === "BothModelsAtCapacity") {
+            addMessage("ai", "[Currently under extreme load, please try again later]");
+        } else {
+            addMessage("ai", "Sorry, something went wrong. Please try again.");
+        }
     }
 }
 
@@ -381,4 +477,3 @@ else newChat();
 </script>
 </body>
 </html>
-
