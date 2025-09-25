@@ -1,1 +1,383 @@
-PENIS PENIS PENIS
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GP-Clanker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"
+    data-delimiters='[{"left":"$","right":"$","display":false},{"left":"$$","right":"$$","display":true}]'>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    display: flex;
+    width: 80vw;
+    height: 80vh;
+    background: #0e0f13;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+.sidebar {
+    background: rgb(14, 15, 19, 1);
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+    backdrop-filter: blur(0px);
+}
+.sidebar button {
+    background: #222428;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+}
+.chat-list {
+    flex: 1;
+    overflow-y: auto;
+}
+.chat-item {
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 4px;
+}
+.chat-item.active, .chat-item:hover {
+    background: #13141a;
+}
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: rgb(19, 20, 26, 0.01);
+    backdrop-filter: blur(16px);
+}
+.messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.msg {
+    display: inline-block;
+    max-width: 70%;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    word-break: break-word;
+    line-height: 1.4;
+}
+.msg.user {
+    background: #0e0f13;
+    align-self: flex-end;
+    text-align: right;
+    color: #fff;
+}
+.msg.ai {
+    background: #1e1f29;
+    align-self: flex-start;
+    text-align: left;
+    color: #ffffff;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+.msg.ai svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    fill: #ffffff;
+}
+
+.input-row {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #222428;
+}
+.input-row input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: #0e0f13;
+    color: #fff;
+}
+.input-row input:focus { outline: none; }
+.input-row button {
+    margin-left: 8px;
+    background: #222428;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    cursor: pointer;
+}
+
+.thinking {
+  display: inline-block;
+  width: 50px;
+  text-align: left;
+}
+.thinking span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 2px;
+  background: #2b2e33;
+  border-radius: 50%;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.thinking span:nth-child(1) { animation-delay: 0s; }
+.thinking span:nth-child(2) { animation-delay: 0.2s; }
+.thinking span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #2b2e33; border-radius: 3px; }
+
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<div class="container">
+    <div class="sidebar">
+        <button id="newChatBtn">+ New Chat</button>
+        <div class="chat-list" id="chats"></div>
+    </div>
+    <div class="main">
+        <div class="messages" id="messages"></div>
+        <div class="input-row">
+            <input id="userInput" type="text" placeholder="Type your message..." autocomplete="off" />
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
+const API_KEY = "AIzaSyBYEoGjZ7cW0EKoJVQ6GjPGNsIQhTkamFA"; 
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+
+let chats = JSON.parse(localStorage.getItem("chats") || "[]");
+let currentChat = null;
+
+const chatsDiv = document.getElementById("chats");
+const messagesDiv = document.getElementById("messages");
+
+
+function renderChats() {
+    chatsDiv.innerHTML = "";
+    chats.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "chat-item" + (i === currentChat ? " active" : "");
+
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = c.title || "Chat " + (i + 1);
+        titleSpan.style.flex = "1";
+        titleSpan.onclick = () => loadChat(i);
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "✕";
+        delBtn.className = "del-btn";
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteChat(i);
+        };
+
+        div.style.display = "flex";
+        div.style.justifyContent = "space-between";
+        div.style.alignItems = "center";
+
+        div.appendChild(titleSpan);
+        div.appendChild(delBtn);
+        chatsDiv.appendChild(div);
+    });
+}
+
+function deleteChat(index) {
+    chats.splice(index, 1);
+    if (currentChat === index) {
+        if (chats.length > 0) {
+            currentChat = 0;
+            loadChat(0);
+        } else {
+            newChat();
+        }
+    } else if (currentChat > index) {
+        currentChat--; 
+    }
+    saveChats();
+    renderChats();
+}
+
+function loadChat(index) {
+    currentChat = index;
+    renderChats();
+    messagesDiv.innerHTML = "";
+    chats[index].messages.forEach(m => addMessage(m.role, m.text, false));
+    renderMathInElement(messagesDiv);
+}
+
+function newChat() {
+    const chat = { title: "New Chat", messages: [], memorySummary: "" };
+    chats.unshift(chat);
+    currentChat = 0;
+    saveChats();
+    renderChats();
+    loadChat(0);
+}
+
+function saveChats() { 
+    localStorage.setItem("chats", JSON.stringify(chats)); 
+}
+
+
+function addMessage(role, text, save = true) {
+    const safeHtml = marked.parse(text);
+    const div = document.createElement("div");
+    div.className = "msg " + role;
+
+    if (role === "ai") {
+        div.innerHTML = `
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" 
+                 fill="none" stroke="currentColor" stroke-linecap="round" 
+                 stroke-linejoin="round" stroke-width="1.5" width="18" height="18">
+              <rect height="7.5" width="12.5" y="5.75" x="1.75"/>
+              <path d="m10.75 8.75v1.5m-5.5-1.5v1.5m-.5-7.5 3.25 3 3.25-3"/>
+            </svg>
+          <div><strong>GP-Clanker:</strong><br>${safeHtml}</div>`;
+    } else {
+        div.innerHTML = `<strong>You:</strong><br>${safeHtml}`;
+    }
+
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    if (save && currentChat !== null && chats[currentChat]) {
+        chats[currentChat].messages.push({ role, text });
+
+
+        if (role === "user" && chats[currentChat].messages.length === 1) {
+            let title = text.trim();
+            if (title.length > 25) title = title.slice(0, 16) + "...";
+            chats[currentChat].title = title;
+        }
+
+        saveChats();
+        renderChats();
+    }
+
+    renderMathInElement(div, {
+        delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+        ]
+    });
+}
+
+
+async function sendMessage() {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage("user", text);
+    input.value = "";
+
+    const thinkingDiv = document.createElement("div");
+    thinkingDiv.className = "msg ai";
+    thinkingDiv.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
+    messagesDiv.appendChild(thinkingDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+
+        const chat = chats[currentChat];
+        const recentMessages = chat.messages.slice(-10);
+        let promptMessages = [];
+
+        if (chat.memorySummary) {
+            promptMessages.push({ role: "system", content: "Memory: " + chat.memorySummary });
+        }
+        promptMessages.push(...recentMessages.map(m => ({
+            role: m.role === "user" ? "user" : "assistant",
+            content: m.text
+        })));
+
+
+        const result = await model.generateContent(promptMessages.map(m => m.content).join("\n"));
+        const reply = result.response.text();
+
+        messagesDiv.removeChild(thinkingDiv);
+        addMessage("ai", reply);
+
+
+        if (chat.messages.length % 20 === 0) {
+            const summaryPrompt = `
+                Summarize this chat in 3–4 sentences, keeping key info:
+                ${chat.messages.map(m => `${m.role}: ${m.text}`).join("\n")}
+            `;
+            const summaryResult = await model.generateContent(summaryPrompt);
+            chat.memorySummary = summaryResult.response.text();
+            saveChats();
+        }
+
+    } catch (err) {
+        console.error(err);
+        messagesDiv.removeChild(thinkingDiv);
+        addMessage("ai", "[Currently under extreme load, please try again later]");
+    }
+}
+
+document.getElementById("sendBtn").onclick = sendMessage;
+document.getElementById("userInput").addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+document.getElementById("newChatBtn").onclick = newChat;
+
+renderChats();
+if(chats.length>0) loadChat(0);
+else newChat();
+</script>
+
+<script src="/gp/scripts/starry-background.js"></script>
+<script>
+    setupStarryBackground();
+</script>
+</body>
+</html>
