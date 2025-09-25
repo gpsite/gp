@@ -357,7 +357,7 @@ async function sendMessage() {
             const summaryResult = await model.generateContent(summaryPrompt);
             chat.memorySummary = summaryResult.response.text();
             saveChats();
-        }
+        }//yu
 
     } catch (err) {
         console.error(err);
