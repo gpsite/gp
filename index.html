@@ -1,2 +1,355 @@
-<script>window.location.href="https://gp-site.github.io/gp/";</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>George Pickens</title>
+<link rel="icon" type="image/gif" href="https://gp-site.github.io/gp/img/logo.png">
+<style>
+:root {
+  --bg:#000;
+  --chip:#222428;
+  --chip-hover:#2b2e33;
+  --icon-border:#000;
+  --blue:#74aef6;
+  --green:#7ed321;
+  --yellow:#f8e71c;
+  --red:#ff3b2f;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  padding-bottom: 90px; /* extra space at bottom */
+}
+
+#bg-canvas, .bubble-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+header {
+  margin-top: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+  z-index: 1;
+}
+
+header img {
+  width: 200px;
+  height: auto;
+  border-radius: 20px;
+}
+
+/* Row container */
+.main-row {
+  width: 100%;
+  max-width: 1250px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 40px;
+  z-index: 1;
+}
+
+/* MENU */
+nav.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto 40px;
+  z-index: 1;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  text-decoration: none;
+  color: #fff;
+  background: var(--chip);
+  padding: 18px 24px;
+  border-radius: 16px;
+  font-size: 26px;
+  letter-spacing: 2px;
+  transition: transform .1s ease, background .2s ease;
+}
+.btn:hover {
+  background: var(--chip-hover);
+  transform: translateY(-2px);
+}
+
+.quad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  width: 36px;
+  height: 36px;
+  padding: 4px;
+  background: #222428;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px var(--icon-border) inset;
+}
+
+.sq { border-radius: 4px; }
+.sq.blue { background: var(--blue); }
+.sq.green { background: var(--green); }
+.sq.yellow { background: var(--yellow); }
+.sq.red { background: var(--red); }
+
+.announcements {
+  background: var(--chip);
+  padding: 20px 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 680px;
+  /* height will stretch in wide (row) layout via flex item stretching */
+  overflow: hidden; /* hide any minor overflow after scaling */
+  line-height: 1.5;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.announcements h2 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+}
+
+.announcements-content {
+  /* This wrapper is what we dynamically resize */
+  font-size: 16px; /* base size (will be adjusted via JS) */
+  line-height: 1.5;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding-right: 4px; /* small space for scrollbar clearance */
+  scrollbar-width: thin;
+}
+
+.announcements-content ul {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.announcements-content li {
+  margin-bottom: 12px;
+}
+
+/* Two-column layout for wider screens */
+@media (min-width: 900px) {
+  .main-row {
+    flex-direction: row;
+    align-items: stretch; /* ensures equal height columns */
+    justify-content: center;
+  }
+  .announcements {
+    flex: 1 1 55%;
+  }
+  nav.menu {
+    flex: 0 0 420px;
+    margin: 0;
+  }
+  /* Ensure announcements content scroll only if really needed */
+  .announcements-content {
+    overflow-y: auto;
+  }
+}
+
+/* Mobile adjustments */
+@media(max-width: 600px) {
+  .btn {
+    font-size: 20px;
+    padding: 14px 18px;
+  }
+  header img {
+    width: 150px;
+  }
+}
+
+/* Optional nicer thin scrollbar (webkit) */
+.announcements-content::-webkit-scrollbar {
+  width: 8px;
+}
+.announcements-content::-webkit-scrollbar-track {
+  background: #1a1c1f;
+  border-radius: 8px;
+}
+.announcements-content::-webkit-scrollbar-thumb {
+  background: #3a3d42;
+  border-radius: 8px;
+}
+.announcements-content::-webkit-scrollbar-thumb:hover {
+  background: #4a4d52;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="bubble-container" id="bubble-container"></div>
+
+<header>
+  <img src="https://gp-site.github.io/gp/img/logo.png" alt="GP Logo">
+</header>
+
+<div class="main-row">
+  <section class="announcements" id="announcementsBox">
+    <h2>Announcements</h2>
+    <div class="announcements-content" id="announcementsContent">
+      <ul>
+        <li>Update: Added 30+ Games - See bottom of catelog - Some have weird controls, you can view/remap them once the game is selected - Also some take awhile to load.</li>
+        <li>Update: Added new game category 'Combat'.</li>
+        <li>Update: Movies have been fixed! Completely rebuilt, so they now work to their fullest.</li>
+        <li>Update: Added a 'Bordered Fullscreen' option to movies and games.</li>
+        <li>Update: Styled movies and games page to include stars.</li>
+        <li>Fix: Granny and 1v1.lol now fixed.</li>
+        <li>Coming Soon: Bringing back the game/movie requests, along with bug reporting.</li>
+      </ul>
+    </div>
+  </section>
+
+  <nav class="menu" id="buttonsColumn">
+    <a class="btn" href="pages/games/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>GAMES</span>
+    </a>
+    <a class="btn" href="pages/movies/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>MOVIES (FIXED)</span>
+    </a>
+    <a class="btn" href="pages/chat/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>CHAT (BETA)</span>
+    </a>
+    <a class="btn" href="pages/ai/index.html">
+      <span class="quad">
+        <span class="sq blue"></span><span class="sq green"></span>
+        <span class="sq yellow"></span><span class="sq red"></span>
+      </span>
+      <span>GP-CLANKER (AI)</span>
+    </a>
+  </nav>
+</div>
+
+<script src="scripts/starry-background.js"></script>
+<script>
+  // Provided background setup
+  if (typeof setupStarryBackground === 'function') {
+    setupStarryBackground();
+  }
+
+  // Dynamic announcement text fitting
+  (function() {
+    const BOX_MIN_WIDTH_FOR_SCALING = 900;      // Only scale in 2-column layout
+    const MIN_FONT = 14;                        // px
+    const MAX_FONT = 22;                        // px upper bound
+    const STEP = 1;                             // px increment
+    const FILL_RATIO_TARGET = 0.90;             // Aim to fill 90% height
+    const FILL_RATIO_MIN = 0.80;                // Don't shrink if already >= 80%
+    const RESIZE_DEBOUNCE = 120;                // ms
+
+    const box = document.getElementById('announcementsBox');
+    const content = document.getElementById('announcementsContent');
+    if (!box || !content) return;
+
+    let resizing = false;
+    let lastRun = 0;
+
+    function fitAnnouncements(force = false) {
+      if (window.innerWidth < BOX_MIN_WIDTH_FOR_SCALING) {
+        // Reset on mobile / narrow
+        content.style.fontSize = '';
+        return;
+      }
+
+      const now = performance.now();
+      if (!force && now - lastRun < 50) return; // lightweight throttle
+      lastRun = now;
+
+      // Prevent recursive layout thrash
+      if (resizing) return;
+      resizing = true;
+
+      // Start from current or min
+      let fontSize = parseFloat(getComputedStyle(content).fontSize) || MIN_FONT;
+      fontSize = Math.min(MAX_FONT, Math.max(MIN_FONT, fontSize));
+      content.style.fontSize = fontSize + 'px';
+
+      const available = box.clientHeight - (content.offsetTop - box.offsetTop) - 10; // 10px small safety
+      if (available <= 0) {
+        resizing = false;
+        return;
+      }
+
+      // Adjust upward if there's extra space
+      let safety = 0;
+      while (fontSize < MAX_FONT && content.scrollHeight < available * FILL_RATIO_TARGET && safety < 50) {
+        fontSize += STEP;
+        content.style.fontSize = fontSize + 'px';
+        safety++;
+      }
+
+      // If overflow, adjust downward
+      safety = 0;
+      while ((content.scrollHeight > available || (content.scrollHeight < available * FILL_RATIO_MIN && fontSize > MIN_FONT)) && safety < 50) {
+        fontSize -= STEP;
+        if (fontSize < MIN_FONT) {
+          fontSize = MIN_FONT;
+          break;
+        }
+        content.style.fontSize = fontSize + 'px';
+        safety++;
+      }
+
+      resizing = false;
+    }
+
+    // Debounce resize
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => fitAnnouncements(true), RESIZE_DEBOUNCE);
+    });
+
+    // Observe content changes (e.g., future dynamic updates)
+    const observer = new MutationObserver(() => fitAnnouncements(true));
+    observer.observe(content, { childList: true, subtree: true, characterData: true });
+
+    // Initial run after layout & images
+    window.addEventListener('load', () => {
+      // Allow a tick for fonts/rendering
+      requestAnimationFrame(() => fitAnnouncements(true));
+      // Second pass after potential scrollbar presence
+      setTimeout(() => fitAnnouncements(true), 150);
+    });
+  })();
+</script>
+
+</body>
+
+</html>
+
 

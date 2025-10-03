@@ -1,6 +1,5 @@
-// /firebase-messaging-sw.js
-importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging.js');
+importScripts('https://www.gstatic.com/firebasejs/12.2.1//firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.2.1//firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: "AIzaSyDhPv49xQEXZCmhfXZwDgq3GsMezpAsRbc",
@@ -12,7 +11,6 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Background messages (tab closed)
 messaging.onBackgroundMessage(payload => {
   const { title, body, icon } = payload.notification || {};
   self.registration.showNotification(title || 'New notification', {
@@ -24,7 +22,6 @@ messaging.onBackgroundMessage(payload => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  // Focus existing window or open your app
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
       for (const c of list) {
