@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Email Form</title>
+</head>
+<body>
+    <p><B>To receive future links, fill out the form and then send the email that appears.</B></p>
+  <h2>Send Us an Email</h2>
+  <form id="emailForm" onsubmit="sendEmail(event)">
+    <label for="name">Your Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+    <button type="submit">Send Email</button>
+  </form>
+
+  <script>
+    function sendEmail(event) {
+      event.preventDefault();
+      const name = encodeURIComponent(document.getElementById('name').value);
+
+      const message = encodeURIComponent(
+        " is requesting future GP URLs. DO NOT ALTER THIS EMAIL AT ALL"
+      );
+
+      const subject = encodeURIComponent("GP URL REQUEST");
+      const body = `${name}${message}`;
+      const mailtoUrl = `mailto:901906@lcps.org?subject=${subject}&body=${body}`;
+
+      window.open(mailtoUrl);
+    }
+  </script>
+</body>
+</html>
