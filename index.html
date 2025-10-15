@@ -227,7 +227,7 @@ nav.menu {
         <span class="sq blue"></span><span class="sq green"></span>
         <span class="sq yellow"></span><span class="sq red"></span>
       </span>
-      <span>MOVIES (FIXED)</span>
+      <span>MOVIES</span>
     </a>
     <a class="btn" href="pages/chat/index.html">
       <span class="quad">
@@ -241,7 +241,7 @@ nav.menu {
         <span class="sq blue"></span><span class="sq green"></span>
         <span class="sq yellow"></span><span class="sq red"></span>
       </span>
-      <span>GP-CLANKER (AI)</span>
+      <span>GP-CLANKER</span>
     </a>
   </nav>
 </div>
@@ -253,6 +253,10 @@ nav.menu {
   (function() {
     // Your provided endpoint (home sheet/range). Consider restricting this API key to your domain in Google Cloud Console.
     const SHEETS_ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/home?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
+
+      if (typeof setupStarryBackground === 'function') {
+        setupStarryBackground();
+      }
 
     const contentEl = document.getElementById('announcementsContent');
     if (!contentEl) return;
