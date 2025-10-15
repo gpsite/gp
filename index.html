@@ -117,8 +117,7 @@ nav.menu {
   border-radius: 16px;
   width: 100%;
   max-width: 680px;
-  /* height will stretch in wide (row) layout via flex item stretching */
-  overflow: hidden; /* hide any minor overflow after scaling */
+  overflow: hidden;
   line-height: 1.5;
   z-index: 1;
   display: flex;
@@ -131,7 +130,6 @@ nav.menu {
 }
 
 .announcements-content {
-  /* This wrapper is what we dynamically resize */
   font-size: 16px; /* base size (will be adjusted via JS) */
   line-height: 1.5;
   flex: 1 1 auto;
@@ -163,7 +161,6 @@ nav.menu {
     flex: 0 0 420px;
     margin: 0;
   }
-  /* Ensure announcements content scroll only if really needed */
   .announcements-content {
     overflow-y: auto;
   }
@@ -210,16 +207,9 @@ nav.menu {
   <section class="announcements" id="announcementsBox">
     <h2>Announcements</h2>
     <div class="announcements-content" id="announcementsContent">
+      <!-- Fallback content (will be replaced when Google Sheets loads) -->
       <ul>
-        <li><b>NEW SITE NOW UP. SHARE THIS NEW LINK WITH EVERYONE.</b></li>
-        <li><b>We've been blocked again. This site is our new one. Your data won't have been saved from the old version unfortunately. These blocking-related outages are becoming more frequent, and we understand that it's difficult to keep up with new sites. We are working on a method to keep everyone in the loop about the site's status. Thank you for sticking with us on this journey, we really appreciate all of you.</b></li>
-        <li>Update: Added 30+ Games - See bottom of catelog - Some have weird controls, you can view/remap them once the game is selected - Also some take awhile to load.</li>
-        <li>Update: Added new game category 'Combat'.</li>
-        <li>Update: Movies have been fixed! Completely rebuilt, so they now work to their fullest.</li>
-        <li>Update: Added a 'Bordered Fullscreen' option to movies and games.</li>
-        <li>Update: Styled movies and games page to include stars.</li>
-        <li>Fix: Granny and 1v1.lol now fixed.</li>
-        <li>Coming Soon: Bringing back the game/movie requests, along with bug reporting.</li>
+        <li><b>FAILED TO LOAD ANNOUNCEMENTS DATA</b></li>
       </ul>
     </div>
   </section>
@@ -257,6 +247,7 @@ nav.menu {
 </div>
 
 <script src="scripts/starry-background.js"></script>
+
 <script>
   // Provided background setup
   if (typeof setupStarryBackground === 'function') {
@@ -350,12 +341,77 @@ nav.menu {
   })();
 </script>
 
+<script>
+  // Load announcements from Google Sheets and inject into the list.
+  (function() {
+    // Your provided endpoint (home sheet/range). Consider restricting this API key to your domain in Google Cloud Console.
+    const SHEETS_ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/home?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
+
+    const contentEl = document.getElementById('announcementsContent');
+    if (!contentEl) return;
+
+    // Create a UL we will fully control
+    let ul = contentEl.querySelector('ul');
+    if (!ul) {
+      ul = document.createElement('ul');
+      contentEl.innerHTML = '';
+      contentEl.appendChild(ul);
+    }
+
+    function render(items) {
+      // Replace list content
+      ul.innerHTML = '';
+      for (const raw of items) {
+        const text = String(raw || '').trim();
+        if (!text) continue;
+        const li = document.createElement('li');
+
+        // Simple optional bold support: **text** => bold
+        const m = text.match(/^\*\*(.+)\*\*$/);
+        if (m) {
+          const b = document.createElement('b');
+          b.textContent = m[1].trim();
+          li.appendChild(b);
+        } else {
+          li.textContent = text; // safe (no HTML injection)
+        }
+
+        ul.appendChild(li);
+      }
+    }
+
+    async function fetchAnnouncements() {
+      try {
+        const res = await fetch(SHEETS_ENDPOINT + '&t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        // data.values is an array of rows. We use the first column of each row.
+        const rows = Array.isArray(data.values) ? data.values : [];
+        // Flatten first column, skip blank rows and a header that looks like "Announcements"
+        const items = rows
+          .map(r => (r && r.length ? r[0] : ''))
+          .map(v => (v == null ? '' : String(v)))
+          .map(v => v.trim())
+          .filter(v => v.length > 0 && !/^announcements?$/i.test(v));
+
+        if (items.length) {
+          render(items);
+        } else {
+          console.warn('No announcement items found in sheet.');
+        }
+      } catch (err) {
+        console.error('Failed to load announcements from Google Sheets:', err);
+        // Keep existing content as fallback
+      }
+    }
+
+    // Initial load and periodic refresh
+    fetchAnnouncements();
+    // Refresh every 5 minutes (adjust as desired)
+    setInterval(fetchAnnouncements, 5 * 60 * 1000);
+  })();
+</script>
+
 </body>
-
 </html>
-
-
-
-
-
-
