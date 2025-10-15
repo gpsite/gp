@@ -249,100 +249,7 @@ nav.menu {
 <script src="scripts/starry-background.js"></script>
 
 <script>
-  // Provided background setup
-  if (typeof setupStarryBackground === 'function') {
-    setupStarryBackground();
-  }
-
-  // Dynamic announcement text fitting
-  (function() {
-    const BOX_MIN_WIDTH_FOR_SCALING = 900;      // Only scale in 2-column layout
-    const MIN_FONT = 14;                        // px
-    const MAX_FONT = 22;                        // px upper bound
-    const STEP = 1;                             // px increment
-    const FILL_RATIO_TARGET = 0.90;             // Aim to fill 90% height
-    const FILL_RATIO_MIN = 0.80;                // Don't shrink if already >= 80%
-    const RESIZE_DEBOUNCE = 120;                // ms
-
-    const box = document.getElementById('announcementsBox');
-    const content = document.getElementById('announcementsContent');
-    if (!box || !content) return;
-
-    let resizing = false;
-    let lastRun = 0;
-
-    function fitAnnouncements(force = false) {
-      if (window.innerWidth < BOX_MIN_WIDTH_FOR_SCALING) {
-        // Reset on mobile / narrow
-        content.style.fontSize = '';
-        return;
-      }
-
-      const now = performance.now();
-      if (!force && now - lastRun < 50) return; // lightweight throttle
-      lastRun = now;
-
-      // Prevent recursive layout thrash
-      if (resizing) return;
-      resizing = true;
-
-      // Start from current or min
-      let fontSize = parseFloat(getComputedStyle(content).fontSize) || MIN_FONT;
-      fontSize = Math.min(MAX_FONT, Math.max(MIN_FONT, fontSize));
-      content.style.fontSize = fontSize + 'px';
-
-      const available = box.clientHeight - (content.offsetTop - box.offsetTop) - 10; // 10px small safety
-      if (available <= 0) {
-        resizing = false;
-        return;
-      }
-
-      // Adjust upward if there's extra space
-      let safety = 0;
-      while (fontSize < MAX_FONT && content.scrollHeight < available * FILL_RATIO_TARGET && safety < 50) {
-        fontSize += STEP;
-        content.style.fontSize = fontSize + 'px';
-        safety++;
-      }
-
-      // If overflow, adjust downward
-      safety = 0;
-      while ((content.scrollHeight > available || (content.scrollHeight < available * FILL_RATIO_MIN && fontSize > MIN_FONT)) && safety < 50) {
-        fontSize -= STEP;
-        if (fontSize < MIN_FONT) {
-          fontSize = MIN_FONT;
-          break;
-        }
-        content.style.fontSize = fontSize + 'px';
-        safety++;
-      }
-
-      resizing = false;
-    }
-
-    // Debounce resize
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => fitAnnouncements(true), RESIZE_DEBOUNCE);
-    });
-
-    // Observe content changes (e.g., future dynamic updates)
-    const observer = new MutationObserver(() => fitAnnouncements(true));
-    observer.observe(content, { childList: true, subtree: true, characterData: true });
-
-    // Initial run after layout & images
-    window.addEventListener('load', () => {
-      // Allow a tick for fonts/rendering
-      requestAnimationFrame(() => fitAnnouncements(true));
-      // Second pass after potential scrollbar presence
-      setTimeout(() => fitAnnouncements(true), 150);
-    });
-  })();
-</script>
-
-<script>
-  // Load announcements from Google Sheets and inject into the list.
+  // Load announcements from Google Sheets and inject into the list, with simple bold + color markup.
   (function() {
     // Your provided endpoint (home sheet/range). Consider restricting this API key to your domain in Google Cloud Console.
     const SHEETS_ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/home?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
@@ -358,24 +265,121 @@ nav.menu {
       contentEl.appendChild(ul);
     }
 
+    // Allowed CSS named colors (case-insensitive)
+    const ALLOWED_NAMED_COLORS = new Set([
+      'black','white','gray','grey','silver','lightgray','darkgray',
+      'red','crimson','maroon','orange','coral','tomato',
+      'yellow','gold','khaki',
+      'green','lime','olive','seagreen','teal',
+      'blue','navy','royalblue','dodgerblue','deepskyblue','skyblue',
+      'indigo','violet','purple','magenta','fuchsia','pink','hotpink',
+      'cyan','aqua','turquoise'
+    ]);
+
+    function normalizeColor(input) {
+      if (!input) return null;
+      const c = String(input).trim().toLowerCase();
+      // Accept #rgb or #rrggbb hex
+      if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c)) return c;
+      // Accept a whitelist of named colors
+      if (ALLOWED_NAMED_COLORS.has(c)) return c;
+      return null; // reject everything else
+    }
+
+    // Turn limited markup into DOM nodes safely (no innerHTML from user data).
+    // Supported:
+    // - **bold** or [b]bold[/b]
+    // - [color=red]text[/color] or [color=#ff8800]text[/color]
+    // Can be combined/nested.
+    function nodesFromMarkup(text) {
+      const frag = document.createDocumentFragment();
+      let i = 0;
+      let bold = false;
+      let color = null;
+      const colorStack = [];
+      let buf = '';
+
+      function flush() {
+        if (!buf) return;
+        let node;
+        if (color && bold) {
+          node = document.createElement('b');
+          node.style.color = color;
+          node.textContent = buf;
+        } else if (color) {
+          node = document.createElement('span');
+          node.style.color = color;
+          node.textContent = buf;
+        } else if (bold) {
+          node = document.createElement('b');
+          node.textContent = buf;
+        } else {
+          node = document.createTextNode(buf);
+        }
+        frag.appendChild(node);
+        buf = '';
+      }
+
+      while (i < text.length) {
+        // ** toggle bold
+        if (text.startsWith('**', i)) {
+          flush();
+          bold = !bold;
+          i += 2;
+          continue;
+        }
+        // [b] on
+        if (text.startsWith('[b]', i)) {
+          flush();
+          bold = true;
+          i += 3;
+          continue;
+        }
+        // [/b] off
+        if (text.startsWith('[/b]', i)) {
+          flush();
+          bold = false;
+          i += 4;
+          continue;
+        }
+        // [color=...] start
+        if (text.startsWith('[color=', i)) {
+          const endBracket = text.indexOf(']', i + 7);
+          if (endBracket !== -1) {
+            const raw = text.slice(i + 7, endBracket);
+            const ok = normalizeColor(raw);
+            flush();
+            // push current color and set new one if valid (ignore invalid)
+            colorStack.push(color);
+            color = ok !== null ? ok : color;
+            i = endBracket + 1;
+            continue;
+          }
+        }
+        // [/color] end
+        if (text.startsWith('[/color]', i)) {
+          flush();
+          color = colorStack.length ? colorStack.pop() : null;
+          i += 8;
+          continue;
+        }
+
+        // default: add one character
+        buf += text[i];
+        i++;
+      }
+
+      flush();
+      return frag;
+    }
+
     function render(items) {
-      // Replace list content
       ul.innerHTML = '';
       for (const raw of items) {
         const text = String(raw || '').trim();
         if (!text) continue;
         const li = document.createElement('li');
-
-        // Simple optional bold support: **text** => bold
-        const m = text.match(/^\*\*(.+)\*\*$/);
-        if (m) {
-          const b = document.createElement('b');
-          b.textContent = m[1].trim();
-          li.appendChild(b);
-        } else {
-          li.textContent = text; // safe (no HTML injection)
-        }
-
+        li.appendChild(nodesFromMarkup(text));
         ul.appendChild(li);
       }
     }
