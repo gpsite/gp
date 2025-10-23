@@ -44,6 +44,54 @@ body {
   z-index: 0;
 }
 
+/* ===== Parallax Hero (1.png over 2.png) ===== */
+.hero {
+  position: relative;
+  height: 100vh;           /* full-page banner */
+  width: 100vw;            /* full bleed */
+  margin-left: calc(50% - 50vw);  /* escape body padding for full-bleed */
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
+  z-index: 1;              /* above the starry bg */
+  background: #000;
+}
+
+.hero-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  will-change: transform;
+  transform: translateZ(0);
+  pointer-events: none;
+}
+
+/* Background = 2.png, Foreground = 1.png */
+.hero .bg { background-image: url('https://gpsite.github.io/gp/img/home/2.png'); }
+.hero .fg { background-image: url('https://gpsite.github.io/gp/img/home/1.png'); }
+
+/* Optional subtle dark overlay for readability if needed */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+  pointer-events: none;
+}
+
+/* Fade/slide in content after hero */
+.after-hero {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+body.content-visible .after-hero {
+  opacity: 1;
+  transform: none;
+}
+
+/* Header and main layout */
 header {
   margin-top: 20px;
   margin-bottom: 30px;
@@ -196,6 +244,12 @@ nav.menu {
 .announcements-content::-webkit-scrollbar-thumb:hover {
   background: #4a4d52;
 }
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .hero-layer { transform: none !important; }
+  .after-hero { opacity: 1 !important; transform: none !important; }
+}
 </style>
 </head>
 <body>
@@ -203,17 +257,23 @@ nav.menu {
 <canvas id="bg-canvas"></canvas>
 <div class="bubble-container" id="bubble-container"></div>
 
-<header>
+<!-- Parallax hero: place 1.png (foreground) and 2.png (background) alongside index.html -->
+<section class="hero" id="hero" aria-hidden="true">
+  <div class="hero-layer bg" id="hero-bg"></div>
+  <div class="hero-layer fg" id="hero-fg"></div>
+</section>
+
+<header class="after-hero">
   <img src="https://gpsite.github.io/gp/img/logo.png" alt="GP Logo">
 </header>
 
-<div class="main-row">
+<div class="main-row after-hero">
    <section class="announcements">
     <h2>QUICK SURVEY</h2>
     <div class="announcements-content">
       <!-- Fallback content (will be replaced when Google Sheets loads) -->
       <ul>
-        <li><b><a color="white" href="https://docs.google.com/forms/d/e/1FAIpQLSeRFwPmt8m8cPhrMoMa5M5-UMK7qEujuFKkFVrvzKg8lWRCCg/viewform?usp=header">Complete this quick anonymous survey for our class!</a></b></li>
+        <li><b><a color="white" href="https://docs.google.com/forms/d/e/1FAIpQLSeRFwPmt8m8cPhrMoMa5M5-UMK7qEujuFKkFVrvzKg8lWRCCg/viewform?usp=header">Complete this quick anonymous survey for our class[...]
       </ul>
     </div>
   </section>
@@ -260,6 +320,54 @@ nav.menu {
 </div>
 
 <script src="scripts/starry-background.js"></script>
+
+<script>
+  // Simple parallax and "reveal content after hero" logic
+  (function() {
+    const hero = document.getElementById('hero');
+    const bg = document.getElementById('hero-bg');
+    const fg = document.getElementById('hero-fg');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let heroHeight = 0;
+    let ticking = false;
+
+    function measure() {
+      heroHeight = hero ? hero.offsetHeight : window.innerHeight;
+      update();
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+
+    function update() {
+      ticking = false;
+      const y = window.scrollY || window.pageYOffset || 0;
+
+      // Toggle content visibility once user has scrolled beyond most of the hero
+      const threshold = heroHeight * 0.6;
+      if (y > threshold) {
+        document.body.classList.add('content-visible');
+      } else {
+        document.body.classList.remove('content-visible');
+      }
+
+      if (reduceMotion) return;
+      // Parallax: background slower, foreground a bit faster
+      const offset = Math.min(y, heroHeight);
+      if (bg) bg.style.transform = 'translateY(' + (offset * 0.2) + 'px)';
+      if (fg) fg.style.transform = 'translateY(' + (offset * 0.4) + 'px)';
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measure);
+    measure();
+    update();
+  })();
+</script>
 
 <script>
   // Load announcements from Google Sheets and inject into the list, with simple bold + color markup.
@@ -437,6 +545,3 @@ nav.menu {
 </body>
 
 </html>
-
-
-
