@@ -45,15 +45,18 @@ body {
 }
 
 /* ===== Parallax Hero (1.png over 2.png) ===== */
+/* Kept width:100% (not 100vw) to avoid horizontal overflow with body padding */
 .hero {
   position: relative;
-  height: 100vh;           /* full-page banner */
-  width: 100vw;            /* full bleed */
-  margin-left: calc(50% - 50vw);  /* escape body padding for full-bleed */
-  margin-right: calc(50% - 50vw);
+  height: 100vh;    /* full-page banner */
+  width: 100%;      /* honor body padding to avoid layout issues */
   overflow: hidden;
-  z-index: 1;              /* above the starry bg */
+  z-index: 1;       /* above the starry bg */
   background: #000;
+}
+
+@supports (height: 100svh) {
+  .hero { height: 100svh; } /* better mobile viewport sizing when supported */
 }
 
 .hero-layer {
@@ -67,7 +70,7 @@ body {
   pointer-events: none;
 }
 
-/* Background = 2.png, Foreground = 1.png */
+/* Background = 2.png, Foreground = 1.png (your URLs) */
 .hero .bg { background-image: url('https://gpsite.github.io/gp/img/home/2.png'); }
 .hero .fg { background-image: url('https://gpsite.github.io/gp/img/home/1.png'); }
 
@@ -78,17 +81,6 @@ body {
   inset: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
   pointer-events: none;
-}
-
-/* Fade/slide in content after hero */
-.after-hero {
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity .6s ease, transform .6s ease;
-}
-body.content-visible .after-hero {
-  opacity: 1;
-  transform: none;
 }
 
 /* Header and main layout */
@@ -248,7 +240,6 @@ nav.menu {
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .hero-layer { transform: none !important; }
-  .after-hero { opacity: 1 !important; transform: none !important; }
 }
 </style>
 </head>
@@ -257,23 +248,23 @@ nav.menu {
 <canvas id="bg-canvas"></canvas>
 <div class="bubble-container" id="bubble-container"></div>
 
-<!-- Parallax hero: place 1.png (foreground) and 2.png (background) alongside index.html -->
+<!-- Parallax hero -->
 <section class="hero" id="hero" aria-hidden="true">
   <div class="hero-layer bg" id="hero-bg"></div>
   <div class="hero-layer fg" id="hero-fg"></div>
 </section>
 
-<header class="after-hero">
+<header>
   <img src="https://gpsite.github.io/gp/img/logo.png" alt="GP Logo">
 </header>
 
-<div class="main-row after-hero">
+<div class="main-row">
    <section class="announcements">
     <h2>QUICK SURVEY</h2>
     <div class="announcements-content">
       <!-- Fallback content (will be replaced when Google Sheets loads) -->
       <ul>
-        <li><b><a color="white" href="https://docs.google.com/forms/d/e/1FAIpQLSeRFwPmt8m8cPhrMoMa5M5-UMK7qEujuFKkFVrvzKg8lWRCCg/viewform?usp=header">Complete this quick anonymous survey for our class[...]
+        <li><b><a color="white" href="https://docs.google.com/forms/d/e/1FAIpQLSeRFwPmt8m8cPhrMoMa5M5-UMK7qEujuFKkFVrvzKg8lWRCCg/viewform?usp=header">Complete this quick anonymous survey for our class[...]</a></b></li>
       </ul>
     </div>
   </section>
@@ -322,18 +313,24 @@ nav.menu {
 <script src="scripts/starry-background.js"></script>
 
 <script>
-  // Simple parallax and "reveal content after hero" logic
+  // Lightweight parallax (no layout mutations)
   (function() {
     const hero = document.getElementById('hero');
     const bg = document.getElementById('hero-bg');
     const fg = document.getElementById('hero-fg');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    if (!hero || !bg || !fg) return;
+
+    let heroTop = 0;
     let heroHeight = 0;
     let ticking = false;
 
     function measure() {
-      heroHeight = hero ? hero.offsetHeight : window.innerHeight;
+      const rect = hero.getBoundingClientRect();
+      // Compute hero's page offset using current scroll
+      heroTop = (window.scrollY || window.pageYOffset || 0) + rect.top;
+      heroHeight = rect.height || window.innerHeight;
       update();
     }
 
@@ -347,23 +344,29 @@ nav.menu {
       ticking = false;
       const y = window.scrollY || window.pageYOffset || 0;
 
-      // Toggle content visibility once user has scrolled beyond most of the hero
-      const threshold = heroHeight * 0.6;
-      if (y > threshold) {
-        document.body.classList.add('content-visible');
-      } else {
-        document.body.classList.remove('content-visible');
+      if (reduceMotion) {
+        bg.style.transform = '';
+        fg.style.transform = '';
+        return;
       }
 
-      if (reduceMotion) return;
-      // Parallax: background slower, foreground a bit faster
-      const offset = Math.min(y, heroHeight);
-      if (bg) bg.style.transform = 'translateY(' + (offset * 0.2) + 'px)';
-      if (fg) fg.style.transform = 'translateY(' + (offset * 0.4) + 'px)';
+      // progress: 0 at top of hero, 1 at bottom of hero
+      const progress = Math.min(Math.max((y - heroTop) / heroHeight, 0), 1);
+
+      // Move layers at different speeds
+      // bg slower, fg faster for depth
+      const bgOffset = (y - heroTop) * 0.2;
+      const fgOffset = (y - heroTop) * 0.4;
+
+      bg.style.transform = 'translateY(' + bgOffset + 'px)';
+      fg.style.transform = 'translateY(' + fgOffset + 'px)';
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', measure);
+    window.addEventListener('orientationchange', measure);
+
+    // Initial
     measure();
     update();
   })();
@@ -372,17 +375,15 @@ nav.menu {
 <script>
   // Load announcements from Google Sheets and inject into the list, with simple bold + color markup.
   (function() {
-    // Your provided endpoint (home sheet/range). Consider restricting this API key to your domain in Google Cloud Console.
     const SHEETS_ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/home?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
 
-      if (typeof setupStarryBackground === 'function') {
-        setupStarryBackground();
-      }
+    if (typeof setupStarryBackground === 'function') {
+      setupStarryBackground();
+    }
 
     const contentEl = document.getElementById('announcementsContent');
     if (!contentEl) return;
 
-    // Create a UL we will fully control
     let ul = contentEl.querySelector('ul');
     if (!ul) {
       ul = document.createElement('ul');
@@ -390,7 +391,6 @@ nav.menu {
       contentEl.appendChild(ul);
     }
 
-    // Allowed CSS named colors (case-insensitive)
     const ALLOWED_NAMED_COLORS = new Set([
       'black','white','gray','grey','silver','lightgray','darkgray',
       'red','crimson','maroon','orange','coral','tomato',
@@ -404,18 +404,11 @@ nav.menu {
     function normalizeColor(input) {
       if (!input) return null;
       const c = String(input).trim().toLowerCase();
-      // Accept #rgb or #rrggbb hex
       if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c)) return c;
-      // Accept a whitelist of named colors
       if (ALLOWED_NAMED_COLORS.has(c)) return c;
-      return null; // reject everything else
+      return null;
     }
 
-    // Turn limited markup into DOM nodes safely (no innerHTML from user data).
-    // Supported:
-    // - **bold** or [b]bold[/b]
-    // - [color=red]text[/color] or [color=#ff8800]text[/color]
-    // Can be combined/nested.
     function nodesFromMarkup(text) {
       const frag = document.createDocumentFragment();
       let i = 0;
@@ -446,52 +439,23 @@ nav.menu {
       }
 
       while (i < text.length) {
-        // ** toggle bold
-        if (text.startsWith('**', i)) {
-          flush();
-          bold = !bold;
-          i += 2;
-          continue;
-        }
-        // [b] on
-        if (text.startsWith('[b]', i)) {
-          flush();
-          bold = true;
-          i += 3;
-          continue;
-        }
-        // [/b] off
-        if (text.startsWith('[/b]', i)) {
-          flush();
-          bold = false;
-          i += 4;
-          continue;
-        }
-        // [color=...] start
+        if (text.startsWith('**', i)) { flush(); bold = !bold; i += 2; continue; }
+        if (text.startsWith('[b]', i)) { flush(); bold = true; i += 3; continue; }
+        if (text.startsWith('[/b]', i)) { flush(); bold = false; i += 4; continue; }
         if (text.startsWith('[color=', i)) {
           const endBracket = text.indexOf(']', i + 7);
           if (endBracket !== -1) {
             const raw = text.slice(i + 7, endBracket);
             const ok = normalizeColor(raw);
             flush();
-            // push current color and set new one if valid (ignore invalid)
             colorStack.push(color);
             color = ok !== null ? ok : color;
             i = endBracket + 1;
             continue;
           }
         }
-        // [/color] end
-        if (text.startsWith('[/color]', i)) {
-          flush();
-          color = colorStack.length ? colorStack.pop() : null;
-          i += 8;
-          continue;
-        }
-
-        // default: add one character
-        buf += text[i];
-        i++;
+        if (text.startsWith('[/color]', i)) { flush(); color = colorStack.length ? colorStack.pop() : null; i += 8; continue; }
+        buf += text[i++];
       }
 
       flush();
@@ -515,9 +479,7 @@ nav.menu {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
 
-        // data.values is an array of rows. We use the first column of each row.
         const rows = Array.isArray(data.values) ? data.values : [];
-        // Flatten first column, skip blank rows and a header that looks like "Announcements"
         const items = rows
           .map(r => (r && r.length ? r[0] : ''))
           .map(v => (v == null ? '' : String(v)))
@@ -531,17 +493,13 @@ nav.menu {
         }
       } catch (err) {
         console.error('Failed to load announcements from Google Sheets:', err);
-        // Keep existing content as fallback
       }
     }
 
-    // Initial load and periodic refresh
     fetchAnnouncements();
-    // Refresh every 5 minutes (adjust as desired)
     setInterval(fetchAnnouncements, 5 * 60 * 1000);
   })();
 </script>
 
 </body>
-
 </html>
