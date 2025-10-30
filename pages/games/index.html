@@ -135,21 +135,32 @@
         const categoryIndex = headers.indexOf('Category');
         const urlIndex = headers.indexOf('URL');
         const thumbnailIndex = headers.indexOf('Thumbnail');
-
+      
         allGames = rows.map(row => ({
           title: row[titleIndex],
           categories: row[categoryIndex] ? row[categoryIndex].split(',').map(c => c.trim()) : [],
           url: row[urlIndex],
           thumbnail: row[thumbnailIndex]
         }));
-
+      
+        // Build categories and filters
         categories = new Set();
         allGames.forEach(g => g.categories.forEach(c => categories.add(c)));
-        identifySeries();
-        buildSeriesFilters();
         buildFilters();
+      
+        // ALWAYS render first so the grid shows even if series logic fails
         renderGames(allGames);
-      } catch (e) { console.error("Error fetching game data", e); }
+      
+        // Then try series (won't block initial render if it fails)
+        try {
+          identifySeries();       // your function (any version)
+          buildSeriesFilters();   // guarded below
+        } catch (e) {
+          console.warn('Series disabled due to error:', e);
+        }
+      } catch (e) {
+        console.error("Error fetching game data", e);
+      }
     }
 
     // Render game cards
