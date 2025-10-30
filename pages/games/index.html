@@ -185,15 +185,13 @@
 
     // Identify game series
     function identifySeries() {
-        const potentialSeriesNames = new Set();
         const seriesCandidates = new Map();
-
         // Regex for titles ending with a number or Roman numeral (e.g., "Game 2", "Game IV")
         const numberSeriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
         // Regex for titles with a colon (e.g., "Series: Episode")
         const colonSeriesRegex = /^([^:]+):/i;
 
-        // --- Pass 1: Identify potential series base names from numbered or colon-based titles ---
+        // --- Pass 1: Group games by potential series names ---
         allGames.forEach(game => {
             let seriesName = null;
             const colonMatch = game.title.match(colonSeriesRegex);
@@ -202,34 +200,36 @@
             } else {
                 const numberMatch = game.title.match(numberSeriesRegex);
                 if (numberMatch) {
-                    // Avoid matching years like "Game 2024" as a series
-                    const potentialNumber = numberMatch[2];
-                    if (potentialNumber.length < 4 || isNaN(potentialNumber) || parseInt(potentialNumber, 10) < 1900) {
-                        seriesName = numberMatch[1].trim();
-                    }
+                    seriesName = numberMatch[1].trim();
                 }
             }
-            if (seriesName) {
-                potentialSeriesNames.add(seriesName);
-            }
-        });
-
-        // --- Pass 2: Group all games based on the identified series names ---
-        // Sort names by length descending to match longer names first (e.g., "Papa's Pizzeria" before "Papa's")
-        const sortedSeriesNames = Array.from(potentialSeriesNames).sort((a, b) => b.length - a.length);
-
-        allGames.forEach(game => {
-            // Find the first (and longest) series name that the game title starts with.
-            const matchedSeriesName = sortedSeriesNames.find(name => game.title.startsWith(name));
             
-            if (matchedSeriesName) {
-                if (!seriesCandidates.has(matchedSeriesName)) {
-                    seriesCandidates.set(matchedSeriesName, []);
+            if (seriesName) {
+                if (!seriesCandidates.has(seriesName)) {
+                    seriesCandidates.set(seriesName, []);
                 }
-                seriesCandidates.get(matchedSeriesName).push(game);
+                seriesCandidates.get(seriesName).push(game);
             }
         });
+
+        // --- Pass 2: Add named one-offs (like "Moto X3M Winter") to existing series ---
+        // Create a copy of the keys to iterate over, as we might modify the map
+        const baseSeriesNames = [...seriesCandidates.keys()];
         
+        allGames.forEach(game => {
+            // Check if this game is already in a series
+            const alreadyInSeries = [...seriesCandidates.values()].some(games => games.includes(game));
+            if (alreadyInSeries) {
+                return; // Skip if already part of a series
+            }
+
+            // Find if the title starts with a known series name (e.g., "Moto X3M")
+            const matchedSeries = baseSeriesNames.find(name => game.title.startsWith(name + ' '));
+            if (matchedSeries) {
+                seriesCandidates.get(matchedSeries).push(game);
+            }
+        });
+
         series.clear();
         // Final check: only keep groups that have more than one game.
         for (const [name, games] of seriesCandidates.entries()) {
