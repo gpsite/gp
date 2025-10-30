@@ -185,86 +185,88 @@
 
     function identifySeries() {
       try {
-          const seriesCandidates = new Map(); // Key: potential series name, Value: array of game objects
-
-          // Regex for series ending in a number or Roman numeral (e.g., "Game 2", "Game IV")
-          const numberSeriesRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
-          // Regex for series using a colon (e.g., "Series: Episode")
-          const colonSeriesRegex = /^([^:]+):/i;
-
-          // --- Step 1: Find all potential series names for each game ---
-          allGames.forEach(game => {
-              const title = (game.title || "").trim(); // Safely handle undefined or empty titles
-              if (!title) return;
-
-              let potentialSeriesNames = new Set();
-
-              // Add colon-based series name (e.g., "Henry Stickman")
-              const colonMatch = title.match(colonSeriesRegex);
-              if (colonMatch) {
-                  potentialSeriesNames.add(colonMatch[1].trim());
-              }
-
-              // Add number-based series name (e.g., "Papa's Pizzeria")
-              const numberMatch = title.match(numberSeriesRegex);
-              if (numberMatch) {
-                  potentialSeriesNames.add(numberMatch[1].trim());
-              }
-
-              // Add word-prefix-based series name (e.g., "Moto X3M")
-              const words = title.split(' ');
-              if (words.length > 1) {
-                  // Check 2-word and 3-word prefixes
-                  potentialSeriesNames.add(words.slice(0, 2).join(' '));
-                  if (words.length > 2) {
-                      potentialSeriesNames.add(words.slice(0, 3).join(' '));
-                  }
-              }
-
-              // --- Step 2: Add the game to each of its potential series groups ---
-              potentialSeriesNames.forEach(name => {
-                  if (!seriesCandidates.has(name)) {
-                      seriesCandidates.set(name, []);
-                  }
-                  seriesCandidates.get(name).push(game);
-              });
-          });
-
-          // --- Step 3: Filter down to valid series ---
-          series.clear();
-          const finalSeries = new Map();
-
-          // Create a sorted list of valid series (longest names first)
-          const sortedKeys = [...seriesCandidates.keys()]
-              .filter(key => seriesCandidates.get(key).length > 1) // Must have more than 1 game
-              .sort((a, b) => b.length - a.length); // Sort by length, descending
-
-          // Process keys from longest to shortest to avoid including sub-series
-          // (e.g., we prefer "Moto X3M" over "Moto")
-          sortedKeys.forEach(key => {
-              // Check if this series is already fully contained within a longer, already-added series
-              let isSubSeries = false;
-              for (const finalKey of finalSeries.keys()) {
-                  if (key.startsWith(finalKey)) {
-                      isSubSeries = true;
-                      break;
-                  }
-              }
-
-              if (!isSubSeries) {
-                  finalSeries.set(key, seriesCandidates.get(key));
-              }
-          });
-
-          // Final assignment to the global 'series' map
-          finalSeries.forEach((games, name) => {
-              series.set(name, games);
-          });
-
-      } catch (error) {
-          console.error("Error identifying game series:", error);
-          // Ensure 'series' is in a clean state and does not cause further errors
-          series.clear();
+        // Ensure 'series' is a Map
+        if (!(series instanceof Map)) series = new Map();
+        else series.clear();
+      
+        // Count candidate base names and keep a nice display label for each
+        const counts = Object.create(null);     // key -> count
+        const labels = Object.create(null);     // key -> display label
+        const candidatesByIndex = [];           // index -> [keys]
+      
+        const numberSeriesRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
+        const norm = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
+      
+        function addCandidate(list, raw) {
+          if (!raw) return;
+          const key = norm(raw);
+          if (key.length < 3) return;
+          if (!list.includes(key)) list.push(key);
+          counts[key] = (counts[key] || 0) + 1;
+          if (!labels[key]) labels[key] = raw.trim();
+        }
+      
+        // Build candidates for each game
+        for (let i = 0; i < allGames.length; i++) {
+          const title = (allGames[i]?.title || "").trim();
+          const list = [];
+          if (!title) { candidatesByIndex[i] = list; continue; }
+        
+          // 1) Colon-based prefix: "Series: Episode"
+          const colonIdx = title.indexOf(':');
+          if (colonIdx > 0) addCandidate(list, title.slice(0, colonIdx));
+        
+          // 2) Trailing number/Roman: "Game 2" or "Game IV"
+          const mNum = title.match(numberSeriesRegex);
+          if (mNum) addCandidate(list, mNum[1]);
+        
+          // 3) Shared leading words (first 3 words, then first 2 words)
+          const words = title.split(/\s+/);
+          if (words.length >= 3) addCandidate(list, words.slice(0, 3).join(' '));
+          if (words.length >= 2) addCandidate(list, words.slice(0, 2).join(' '));
+        
+          candidatesByIndex[i] = list;
+        }
+      
+        // Pick the best key per title with priority: colon > number > first3 > first2
+        const buckets = Object.create(null);
+        for (let i = 0; i < allGames.length; i++) {
+          const title = (allGames[i]?.title || "").trim();
+          const list = candidatesByIndex[i] || [];
+          if (!title || list.length === 0) continue;
+        
+          const colonIdx = title.indexOf(':');
+          const colonKey = colonIdx > 0 ? norm(title.slice(0, colonIdx)) : null;
+        
+          const mNum = title.match(numberSeriesRegex);
+          const numKey = mNum ? norm(mNum[1]) : null;
+        
+          const words = title.split(/\s+/);
+          const first3 = words.length >= 3 ? norm(words.slice(0, 3).join(' ')) : null;
+          const first2 = words.length >= 2 ? norm(words.slice(0, 2).join(' ')) : null;
+        
+          const ordered = [colonKey, numKey, first3, first2].filter(Boolean);
+        
+          let chosen = null;
+          for (const k of ordered) {
+            if (list.includes(k) && (counts[k] || 0) >= 2) { chosen = k; break; }
+          }
+          if (!chosen) continue;
+        
+          (buckets[chosen] ||= []).push(allGames[i]);
+        }
+      
+        // Finalize series map with groups of size > 1
+        for (const key in buckets) {
+          const group = buckets[key];
+          if (group.length > 1) {
+            const label = labels[key] || key;
+            series.set(label, group);
+          }
+        }
+      } catch (err) {
+        console.error("identifySeries failed:", err);
+        if (series && typeof series.clear === "function") series.clear();
       }
     }
 
