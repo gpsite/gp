@@ -185,89 +185,96 @@
 
     function identifySeries() {
       try {
-        // Ensure 'series' is a Map
-        if (!(series instanceof Map)) series = new Map();
-        else series.clear();
-      
-        // Count candidate base names and keep a nice display label for each
-        const counts = Object.create(null);     // key -> count
-        const labels = Object.create(null);     // key -> display label
-        const candidatesByIndex = [];           // index -> [keys]
+        // Work on a sorted copy so adjacent entries with the same base are next to each other
+        const sorted = [...allGames]
+          .filter(g => g && g.title)
+          .sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
       
         const numberSeriesRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
+      
+        // Determine a base label for grouping:
+        // priority: before colon > trailing number/Roman numeral (ignores years) > first 3 words > first 2 words
+        function baseLabel(title) {
+          const t = title.trim();
+          const colonIdx = t.indexOf(':');
+          if (colonIdx > 0) return t.slice(0, colonIdx).trim();
+        
+          const m = t.match(numberSeriesRegex);
+          if (m) {
+            const suffix = m[2];
+            const asNum = parseInt(suffix, 10);
+            // Treat common years as NOT a series indicator
+            if (!(suffix && !isNaN(asNum) && asNum >= 1900 && asNum <= 2099)) {
+              return m[1].trim();
+            }
+          }
+        
+          const words = t.split(/\s+/);
+          if (words.length >= 3) return words.slice(0, 3).join(' ').trim();
+          if (words.length >= 2) return words.slice(0, 2).join(' ').trim();
+          return t;
+        }
+      
         const norm = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
       
-        function addCandidate(list, raw) {
-          if (!raw) return;
-          const key = norm(raw);
-          if (key.length < 3) return;
-          if (!list.includes(key)) list.push(key);
-          counts[key] = (counts[key] || 0) + 1;
-          if (!labels[key]) labels[key] = raw.trim();
-        }
-      
-        // Build candidates for each game
-        for (let i = 0; i < allGames.length; i++) {
-          const title = (allGames[i]?.title || "").trim();
-          const list = [];
-          if (!title) { candidatesByIndex[i] = list; continue; }
+        // Scan adjacent sorted titles and group runs that share the same base
+        const bucketsByKey = new Map(); // normalized base -> { label, games[] }
+        let i = 0;
+        while (i < sorted.length) {
+          const base = baseLabel(sorted[i].title);
+          const key = norm(base);
+          let j = i + 1;
+          const run = [sorted[i]];
         
-          // 1) Colon-based prefix: "Series: Episode"
-          const colonIdx = title.indexOf(':');
-          if (colonIdx > 0) addCandidate(list, title.slice(0, colonIdx));
-        
-          // 2) Trailing number/Roman: "Game 2" or "Game IV"
-          const mNum = title.match(numberSeriesRegex);
-          if (mNum) addCandidate(list, mNum[1]);
-        
-          // 3) Shared leading words (first 3 words, then first 2 words)
-          const words = title.split(/\s+/);
-          if (words.length >= 3) addCandidate(list, words.slice(0, 3).join(' '));
-          if (words.length >= 2) addCandidate(list, words.slice(0, 2).join(' '));
-        
-          candidatesByIndex[i] = list;
-        }
-      
-        // Pick the best key per title with priority: colon > number > first3 > first2
-        const buckets = Object.create(null);
-        for (let i = 0; i < allGames.length; i++) {
-          const title = (allGames[i]?.title || "").trim();
-          const list = candidatesByIndex[i] || [];
-          if (!title || list.length === 0) continue;
-        
-          const colonIdx = title.indexOf(':');
-          const colonKey = colonIdx > 0 ? norm(title.slice(0, colonIdx)) : null;
-        
-          const mNum = title.match(numberSeriesRegex);
-          const numKey = mNum ? norm(mNum[1]) : null;
-        
-          const words = title.split(/\s+/);
-          const first3 = words.length >= 3 ? norm(words.slice(0, 3).join(' ')) : null;
-          const first2 = words.length >= 2 ? norm(words.slice(0, 2).join(' ')) : null;
-        
-          const ordered = [colonKey, numKey, first3, first2].filter(Boolean);
-        
-          let chosen = null;
-          for (const k of ordered) {
-            if (list.includes(k) && (counts[k] || 0) >= 2) { chosen = k; break; }
+          while (j < sorted.length) {
+            const nb = baseLabel(sorted[j].title);
+            if (norm(nb) === key) {
+              run.push(sorted[j]);
+              j++;
+            } else {
+              break;
+            }
           }
-          if (!chosen) continue;
         
-          (buckets[chosen] ||= []).push(allGames[i]);
+          if (run.length > 1) {
+            if (!bucketsByKey.has(key)) {
+              bucketsByKey.set(key, { label: base, games: [] });
+            }
+            const bucket = bucketsByKey.get(key);
+            // Merge without duplicates
+            const seen = new Set(bucket.games.map(g => g.title));
+            run.forEach(g => { if (!seen.has(g.title)) bucket.games.push(g); });
+          }
+        
+          i = j;
         }
       
-        // Finalize series map with groups of size > 1
-        for (const key in buckets) {
-          const group = buckets[key];
-          if (group.length > 1) {
-            const label = labels[key] || key;
-            series.set(label, group);
-          }
+        // Finalize global series map
+        series.clear();
+        for (const { label, games } of bucketsByKey.values()) {
+          if (games.length > 1) series.set(label, games);
         }
-      } catch (err) {
-        console.error("identifySeries failed:", err);
-        if (series && typeof series.clear === "function") series.clear();
+      } catch (e) {
+        console.error('identifySeries error:', e);
+        series.clear();
       }
+    }
+
+    // Open game overlay
+    function openOverlay(game) {
+      gameContainer.innerHTML = "";
+      if (game.url.endsWith(".swf")) {
+        gameContainer.innerHTML = `
+          <object id="gameObject" type="application/x-shockwave-flash" data="${game.url}" width="650" height="450">
+            <param name="movie" value="${game.url}">
+            <param name="quality" value="high">
+            <param name="wmode" value="transparent">
+          </object>
+        `;
+      } else {
+        gameContainer.innerHTML = `<iframe id="gameIframe" src="${game.url}" class="embed"></iframe>`;
+      }
+      overlay.style.display = "flex";
     }
 
     function closeOverlay() {
