@@ -183,28 +183,15 @@
       });
     }
 
-    // Identify game series
     function identifySeries() {
         const seriesCandidates = new Map();
-        // Regex for titles ending with a number or Roman numeral (e.g., "Game 2", "Game IV")
-        const numberSeriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
-        // Regex for titles with a colon (e.g., "Series: Episode")
-        const colonSeriesRegex = /^([^:]+):/i;
+        // This regex looks for a title ending with a space and then numbers or Roman numerals. (PUSH STUPDI GITHUB)
+        const seriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
 
-        // --- Pass 1: Group games by potential series names ---
         allGames.forEach(game => {
-            let seriesName = null;
-            const colonMatch = game.title.match(colonSeriesRegex);
-            if (colonMatch) {
-                seriesName = colonMatch[1].trim();
-            } else {
-                const numberMatch = game.title.match(numberSeriesRegex);
-                if (numberMatch) {
-                    seriesName = numberMatch[1].trim();
-                }
-            }
-            
-            if (seriesName) {
+            const match = game.title.match(seriesRegex);
+            if (match) {
+                const seriesName = match[1].trim();
                 if (!seriesCandidates.has(seriesName)) {
                     seriesCandidates.set(seriesName, []);
                 }
@@ -212,35 +199,8 @@
             }
         });
 
-        // --- Pass 2: Add named one-offs (like "Moto X3M Winter") to existing series ---
-        // Create a copy of the keys to iterate over, as we might modify the map
-        const baseSeriesNames = [...seriesCandidates.keys()];
-        
-        allGames.forEach(game => {
-            // Check if this game is already in a series
-            const alreadyInSeries = [...seriesCandidates.values()].some(games => games.includes(game));
-            if (alreadyInSeries) {
-                return; // Skip if already part of a series
-            }
-
-            // Find if the title starts with a known series name (e.g., "Moto X3M")
-            const matchedSeries = baseSeriesNames.find(name => game.title.startsWith(name + ' '));
-            if (matchedSeries) {
-                seriesCandidates.get(matchedSeries).push(game);
-            }
-        });
-
         series.clear();
-        // Final check: only keep groups that have more than one game.
-        for (const [name, games] of seriesCandidates.entries()) {
-            if (games.length > 1) {
-                series.set(name, games);
-            }
-        }
-    }
-
-        series.clear();
-        // Only consider a group of games a "series" if there's more than one game in it.
+        // Only consider a group of games a "series" if there's more than one.
         for (const [name, games] of seriesCandidates.entries()) {
             if (games.length > 1) {
                 series.set(name, games);
