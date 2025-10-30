@@ -183,84 +183,53 @@
       });
     }
 
-    // Identify and group games into series based on common naming patterns.
     function identifySeries() {
         const seriesCandidates = new Map();
-        const processedTitles = new Set();
-
-        // --- Pass 1: Group by explicit patterns (colon or number) ---
-        const colonRegex = /^([^:]+):/i;
-        const numberRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
+        // This regex looks for a title ending with a space and then numbers or Roman numerals. (PUSH STUPDI GITHUB)
+        const seriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
 
         allGames.forEach(game => {
-            const title = game.title.trim();
-            let seriesName = null;
-
-            const colonMatch = title.match(colonRegex);
-            if (colonMatch) {
-                seriesName = colonMatch[1].trim();
-            } else {
-                const numberMatch = title.match(numberRegex);
-                if (numberMatch) {
-                    seriesName = numberMatch[1].trim();
-                }
-            }
-
-            if (seriesName) {
+            const match = game.title.match(seriesRegex);
+            if (match) {
+                const seriesName = match[1].trim();
                 if (!seriesCandidates.has(seriesName)) {
                     seriesCandidates.set(seriesName, []);
                 }
                 seriesCandidates.get(seriesName).push(game);
-                processedTitles.add(game.title);
             }
         });
 
-        // --- Pass 2: Group remaining games by common multi-word prefixes ---
-        const potentialSeries = new Map();
-        const unprocessedGames = allGames.filter(game => !processedTitles.has(game.title));
-
-        unprocessedGames.forEach(game => {
-            const words = game.title.trim().split(' ');
-            if (words.length > 1) {
-                // Create potential series names from the first few words
-                for (let i = 2; i <= words.length; i++) {
-                    const prefix = words.slice(0, i).join(' ');
-                    if (!potentialSeries.has(prefix)) {
-                        potentialSeries.set(prefix, []);
-                    }
-                    potentialSeries.get(prefix).push(game);
-                }
-            }
-        });
-
-        potentialSeries.forEach((games, prefix) => {
-            if (games.length > 1) {
-                if (!seriesCandidates.has(prefix)) {
-                    seriesCandidates.set(prefix, games);
-                }
-            }
-        });
-
-        // --- Final Cleanup: Remove subgroups and ensure minimum size ---
         series.clear();
-        const sortedNames = Array.from(seriesCandidates.keys()).sort((a, b) => b.length - a.length);
-
-        sortedNames.forEach(name => {
-            // Check if this series is already part of a larger, more specific series
-            let isSubgroup = false;
-            for (const existingName of series.keys()) {
-                if (existingName.startsWith(name)) {
-                    isSubgroup = true;
-                    break;
-                }
+        // Only consider a group of games a "series" if there's more than one.
+        for (const [name, games] of seriesCandidates.entries()) {
+            if (games.length > 1) {
+                series.set(name, games);
             }
+        }
+    }
 
-            if (!isSubgroup) {
-                const games = seriesCandidates.get(name);
-                if (games.length > 1) {
-                    series.set(name, games);
-                }
-            }
+    // Build series filter buttons
+    function buildSeriesFilters() {
+        seriesMenu.innerHTML = "";
+        if (series.size === 0) {
+            seriesBtn.style.display = 'none'; // Hide button if no series are found
+            return;
+        }
+        seriesBtn.style.display = 'flex';
+        
+        const sortedSeries = new Map([...series.entries()].sort());
+
+        // Add a button to show all games again
+        const allSeriesBtn = document.createElement("button");
+        allSeriesBtn.textContent = "All";
+        allSeriesBtn.onclick = () => renderGames(allGames);
+        seriesMenu.appendChild(allSeriesBtn);
+
+        sortedSeries.forEach((games, seriesName) => {
+            const btn = document.createElement("button");
+            btn.textContent = seriesName;
+            btn.onclick = () => renderGames(games);
+            seriesMenu.appendChild(btn);
         });
     }
 
