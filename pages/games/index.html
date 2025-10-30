@@ -186,23 +186,21 @@
     // Identify and group games into series based on common naming patterns.
     function identifySeries() {
         const seriesCandidates = new Map();
-        
-        // Regex for titles with a colon (e.g., "Series: Episode")
-        const colonSeriesRegex = /^([^:]+):/i;
-        // Regex for titles ending with a number or Roman numeral (e.g., "Game 2", "Game IV")
-        const numberSeriesRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
+        const processedTitles = new Set();
 
-        // --- Step 1: Initial Pass with Regex ---
-        // First, group games using simple, reliable patterns.
+        // --- Pass 1: Group by explicit patterns (colon or number) ---
+        const colonRegex = /^([^:]+):/i;
+        const numberRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
+
         allGames.forEach(game => {
-            let seriesName = null;
             const title = game.title.trim();
+            let seriesName = null;
 
-            const colonMatch = title.match(colonSeriesRegex);
+            const colonMatch = title.match(colonRegex);
             if (colonMatch) {
                 seriesName = colonMatch[1].trim();
             } else {
-                const numberMatch = title.match(numberSeriesRegex);
+                const numberMatch = title.match(numberRegex);
                 if (numberMatch) {
                     seriesName = numberMatch[1].trim();
                 }
@@ -213,75 +211,53 @@
                     seriesCandidates.set(seriesName, []);
                 }
                 seriesCandidates.get(seriesName).push(game);
+                processedTitles.add(game.title);
             }
         });
 
-        // --- Step 2: Advanced Prefix-Based Grouping ---
-        // Find games that share a common prefix, like "Moto X3M".
-        const prefixes = new Map();
-        const sortedTitles = allGames.map(g => g.title.trim()).sort();
+        // --- Pass 2: Group remaining games by common multi-word prefixes ---
+        const potentialSeries = new Map();
+        const unprocessedGames = allGames.filter(game => !processedTitles.has(game.title));
 
-        for (let i = 0; i < sortedTitles.length - 1; i++) {
-            const title1 = sortedTitles[i];
-            const title2 = sortedTitles[i+1];
-            
-            // Find the common prefix between adjacent sorted titles.
-            let j = 0;
-            while (j < title1.length && j < title2.length && title1[j] === title2[j]) {
-                j++;
-            }
-            let commonPrefix = title1.substring(0, j);
-
-            // The prefix should end at a word boundary (space).
-            const lastSpace = commonPrefix.lastIndexOf(' ');
-            if (lastSpace > 0) {
-                commonPrefix = commonPrefix.substring(0, lastSpace).trim();
-            } else {
-                continue; // Not a meaningful prefix
-            }
-
-            if (commonPrefix.length > 3) { // Require a reasonably long prefix.
-                if (!prefixes.has(commonPrefix)) {
-                    prefixes.set(commonPrefix, 1);
-                }
-                prefixes.set(commonPrefix, prefixes.get(commonPrefix) + 1);
-            }
-        }
-        
-        // --- Step 3: Merge Prefix Groups into Series Candidates ---
-        prefixes.forEach((count, prefix) => {
-            if (count > 1) { // If the prefix is shared by more than one game.
-                const gamesInSeries = allGames.filter(g => g.title.trim().startsWith(prefix));
-                if (gamesInSeries.length > 1) {
-                    if (!seriesCandidates.has(prefix)) {
-                        seriesCandidates.set(prefix, []);
+        unprocessedGames.forEach(game => {
+            const words = game.title.trim().split(' ');
+            if (words.length > 1) {
+                // Create potential series names from the first few words
+                for (let i = 2; i <= words.length; i++) {
+                    const prefix = words.slice(0, i).join(' ');
+                    if (!potentialSeries.has(prefix)) {
+                        potentialSeries.set(prefix, []);
                     }
-                    // Add games to the series, avoiding duplicates.
-                    gamesInSeries.forEach(game => {
-                        const existingSeries = seriesCandidates.get(prefix);
-                        if (!existingSeries.some(g => g.title === game.title)) {
-                            existingSeries.push(game);
-                        }
-                    });
+                    potentialSeries.get(prefix).push(game);
                 }
             }
         });
 
-        // --- Step 4: Final Cleanup ---
-        // Filter out any groups that don't have at least 2 games.
-        series.clear();
-        seriesCandidates.forEach((games, name) => {
+        potentialSeries.forEach((games, prefix) => {
             if (games.length > 1) {
-                // Remove any subgroups. For example, if we have "Papa's" and "Papa's Pizzeria",
-                // we only want to keep the more specific "Papa's Pizzeria" group.
-                let isSubgroup = false;
-                seriesCandidates.forEach((otherGames, otherName) => {
-                    if (name !== otherName && name.startsWith(otherName)) {
-                        isSubgroup = true;
-                    }
-                });
+                if (!seriesCandidates.has(prefix)) {
+                    seriesCandidates.set(prefix, games);
+                }
+            }
+        });
 
-                if (!isSubgroup) {
+        // --- Final Cleanup: Remove subgroups and ensure minimum size ---
+        series.clear();
+        const sortedNames = Array.from(seriesCandidates.keys()).sort((a, b) => b.length - a.length);
+
+        sortedNames.forEach(name => {
+            // Check if this series is already part of a larger, more specific series
+            let isSubgroup = false;
+            for (const existingName of series.keys()) {
+                if (existingName.startsWith(name)) {
+                    isSubgroup = true;
+                    break;
+                }
+            }
+
+            if (!isSubgroup) {
+                const games = seriesCandidates.get(name);
+                if (games.length > 1) {
                     series.set(name, games);
                 }
             }
