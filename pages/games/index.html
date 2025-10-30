@@ -83,6 +83,7 @@
   <div class="sidebar">
     <div class="circle-btn" id="searchBtn"><i class="fa fa-search"></i><input type="text" id="searchInput" placeholder="Search..."></div>
     <div class="circle-btn" id="filterBtn"><i class="fa fa-filter"></i><div class="filter-menu" id="filterMenu"></div></div>
+    <div class="circle-btn" id="seriesBtn"><i class="fa fa-list-ol"></i><div class="filter-menu" id="seriesMenu"></div></div>
     <div class="scrollbar"><div class="track"></div><div class="thumb"><div></div><div></div><div></div></div></div>
     <a class="circle-btn" id="homeBtn" href="../../index.html"><i class="fa fa-home"></i></a>
   </div>
@@ -114,11 +115,14 @@
     const searchInput = document.getElementById("searchInput");
     const filterBtn = document.getElementById("filterBtn");
     const filterMenu = document.getElementById("filterMenu");
+    const seriesBtn = document.getElementById("seriesBtn");
+    const seriesMenu = document.getElementById("seriesMenu");
     const overlay = document.getElementById("gameOverlay");
     const gameContainer = document.getElementById("gameContainer");
 
     let allGames = [];
     let categories = new Set();
+    let series = new Map();
 
     // Fetch game data from Google Sheets
     async function fetchGameData() {
@@ -141,6 +145,8 @@
 
         categories = new Set();
         allGames.forEach(g => g.categories.forEach(c => categories.add(c)));
+        identifySeries();
+        buildSeriesFilters();
         buildFilters();
         renderGames(allGames);
       } catch (e) { console.error("Error fetching game data", e); }
@@ -175,6 +181,56 @@
         btn.onclick = () => renderGames(allGames.filter(g => g.categories.includes(cat)));
         filterMenu.appendChild(btn);
       });
+    }
+
+    function identifySeries() {
+        const seriesCandidates = new Map();
+        // This regex looks for a title ending with a space and then numbers or Roman numerals.
+        const seriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
+
+        allGames.forEach(game => {
+            const match = game.title.match(seriesRegex);
+            if (match) {
+                const seriesName = match[1].trim();
+                if (!seriesCandidates.has(seriesName)) {
+                    seriesCandidates.set(seriesName, []);
+                }
+                seriesCandidates.get(seriesName).push(game);
+            }
+        });
+
+        series.clear();
+        // Only consider a group of games a "series" if there's more than one.
+        for (const [name, games] of seriesCandidates.entries()) {
+            if (games.length > 1) {
+                series.set(name, games);
+            }
+        }
+    }
+
+    // Build series filter buttons
+    function buildSeriesFilters() {
+        seriesMenu.innerHTML = "";
+        if (series.size === 0) {
+            seriesBtn.style.display = 'none'; // Hide button if no series are found
+            return;
+        }
+        seriesBtn.style.display = 'flex';
+        
+        const sortedSeries = new Map([...series.entries()].sort());
+
+        // Add a button to show all games again
+        const allSeriesBtn = document.createElement("button");
+        allSeriesBtn.textContent = "All";
+        allSeriesBtn.onclick = () => renderGames(allGames);
+        seriesMenu.appendChild(allSeriesBtn);
+
+        sortedSeries.forEach((games, seriesName) => {
+            const btn = document.createElement("button");
+            btn.textContent = seriesName;
+            btn.onclick = () => renderGames(games);
+            seriesMenu.appendChild(btn);
+        });
     }
 
     // Open game overlay
@@ -303,6 +359,11 @@
     // --- Filter functionality ---
     filterBtn.addEventListener("click", () => {
       filterBtn.classList.toggle("active");
+    });
+
+    // --- Series Filter functionality ---
+    seriesBtn.addEventListener("click", () => {
+      seriesBtn.classList.toggle("active");
     });
 
     // --- Overlay escape key close ---
