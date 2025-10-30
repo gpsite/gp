@@ -183,15 +183,34 @@
       });
     }
 
+        // Identify game series
     function identifySeries() {
         const seriesCandidates = new Map();
-        // This regex looks for a title ending with a space and then numbers or Roman numerals. (PUSH STUPDI GITHUB)
-        const seriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
+        // Regex for titles ending with a number or Roman numeral (e.g., "Game 2", "Game IV")
+        const numberSeriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
+        // Regex for titles with a colon (e.g., "Series: Episode")
+        const colonSeriesRegex = /^([^:]+):/i;
 
         allGames.forEach(game => {
-            const match = game.title.match(seriesRegex);
-            if (match) {
-                const seriesName = match[1].trim();
+            let seriesName = null;
+            
+            // First, check for colon-based series like "Henry Stickman: ..."
+            const colonMatch = game.title.match(colonSeriesRegex);
+            if (colonMatch) {
+                seriesName = colonMatch[1].trim();
+            } else {
+                // If no colon, check for number-based series like "Papa's Pizzeria 2"
+                const numberMatch = game.title.match(numberSeriesRegex);
+                if (numberMatch) {
+                    // Avoid matching years like "Game 2024" as a series name of "Game"
+                    const potentialNumber = numberMatch[2];
+                    if (potentialNumber.length < 4 || isNaN(potentialNumber) || parseInt(potentialNumber, 10) < 1900) {
+                         seriesName = numberMatch[1].trim();
+                    }
+                }
+            }
+
+            if (seriesName) {
                 if (!seriesCandidates.has(seriesName)) {
                     seriesCandidates.set(seriesName, []);
                 }
@@ -200,7 +219,7 @@
         });
 
         series.clear();
-        // Only consider a group of games a "series" if there's more than one.
+        // Only consider a group of games a "series" if there's more than one game in it.
         for (const [name, games] of seriesCandidates.entries()) {
             if (games.length > 1) {
                 series.set(name, games);
