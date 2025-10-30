@@ -183,40 +183,61 @@
       });
     }
 
-        // Identify game series
+    // Identify game series
     function identifySeries() {
+        const potentialSeriesNames = new Set();
         const seriesCandidates = new Map();
+
         // Regex for titles ending with a number or Roman numeral (e.g., "Game 2", "Game IV")
         const numberSeriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
         // Regex for titles with a colon (e.g., "Series: Episode")
         const colonSeriesRegex = /^([^:]+):/i;
 
+        // --- Pass 1: Identify potential series base names from numbered or colon-based titles ---
         allGames.forEach(game => {
             let seriesName = null;
-            
-            // First, check for colon-based series like "Henry Stickman: ..."
             const colonMatch = game.title.match(colonSeriesRegex);
             if (colonMatch) {
                 seriesName = colonMatch[1].trim();
             } else {
-                // If no colon, check for number-based series like "Papa's Pizzeria 2"
                 const numberMatch = game.title.match(numberSeriesRegex);
                 if (numberMatch) {
-                    // Avoid matching years like "Game 2024" as a series name of "Game"
+                    // Avoid matching years like "Game 2024" as a series
                     const potentialNumber = numberMatch[2];
                     if (potentialNumber.length < 4 || isNaN(potentialNumber) || parseInt(potentialNumber, 10) < 1900) {
-                         seriesName = numberMatch[1].trim();
+                        seriesName = numberMatch[1].trim();
                     }
                 }
             }
-
             if (seriesName) {
-                if (!seriesCandidates.has(seriesName)) {
-                    seriesCandidates.set(seriesName, []);
-                }
-                seriesCandidates.get(seriesName).push(game);
+                potentialSeriesNames.add(seriesName);
             }
         });
+
+        // --- Pass 2: Group all games based on the identified series names ---
+        // Sort names by length descending to match longer names first (e.g., "Papa's Pizzeria" before "Papa's")
+        const sortedSeriesNames = Array.from(potentialSeriesNames).sort((a, b) => b.length - a.length);
+
+        allGames.forEach(game => {
+            // Find the first (and longest) series name that the game title starts with.
+            const matchedSeriesName = sortedSeriesNames.find(name => game.title.startsWith(name));
+            
+            if (matchedSeriesName) {
+                if (!seriesCandidates.has(matchedSeriesName)) {
+                    seriesCandidates.set(matchedSeriesName, []);
+                }
+                seriesCandidates.get(matchedSeriesName).push(game);
+            }
+        });
+        
+        series.clear();
+        // Final check: only keep groups that have more than one game.
+        for (const [name, games] of seriesCandidates.entries()) {
+            if (games.length > 1) {
+                series.set(name, games);
+            }
+        }
+    }
 
         series.clear();
         // Only consider a group of games a "series" if there's more than one game in it.
