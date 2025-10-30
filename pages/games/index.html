@@ -184,70 +184,88 @@
     }
 
     function identifySeries() {
-        const seriesCandidates = new Map();
-        // This regex looks for a title ending with a space and then numbers or Roman numerals. (PUSH STUPDI GITHUB)
-        const seriesRegex = /(.+?)\s*(?:\s([0-9]+|[IVXLCDM]+))$/i;
+      try {
+          const seriesCandidates = new Map(); // Key: potential series name, Value: array of game objects
 
-        allGames.forEach(game => {
-            const match = game.title.match(seriesRegex);
-            if (match) {
-                const seriesName = match[1].trim();
-                if (!seriesCandidates.has(seriesName)) {
-                    seriesCandidates.set(seriesName, []);
-                }
-                seriesCandidates.get(seriesName).push(game);
-            }
-        });
+          // Regex for series ending in a number or Roman numeral (e.g., "Game 2", "Game IV")
+          const numberSeriesRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
+          // Regex for series using a colon (e.g., "Series: Episode")
+          const colonSeriesRegex = /^([^:]+):/i;
 
-        series.clear();
-        // Only consider a group of games a "series" if there's more than one.
-        for (const [name, games] of seriesCandidates.entries()) {
-            if (games.length > 1) {
-                series.set(name, games);
-            }
-        }
-    }
+          // --- Step 1: Find all potential series names for each game ---
+          allGames.forEach(game => {
+              const title = (game.title || "").trim(); // Safely handle undefined or empty titles
+              if (!title) return;
 
-    // Build series filter buttons
-    function buildSeriesFilters() {
-        seriesMenu.innerHTML = "";
-        if (series.size === 0) {
-            seriesBtn.style.display = 'none'; // Hide button if no series are found
-            return;
-        }
-        seriesBtn.style.display = 'flex';
-        
-        const sortedSeries = new Map([...series.entries()].sort());
+              let potentialSeriesNames = new Set();
 
-        // Add a button to show all games again
-        const allSeriesBtn = document.createElement("button");
-        allSeriesBtn.textContent = "All";
-        allSeriesBtn.onclick = () => renderGames(allGames);
-        seriesMenu.appendChild(allSeriesBtn);
+              // Add colon-based series name (e.g., "Henry Stickman")
+              const colonMatch = title.match(colonSeriesRegex);
+              if (colonMatch) {
+                  potentialSeriesNames.add(colonMatch[1].trim());
+              }
 
-        sortedSeries.forEach((games, seriesName) => {
-            const btn = document.createElement("button");
-            btn.textContent = seriesName;
-            btn.onclick = () => renderGames(games);
-            seriesMenu.appendChild(btn);
-        });
-    }
+              // Add number-based series name (e.g., "Papa's Pizzeria")
+              const numberMatch = title.match(numberSeriesRegex);
+              if (numberMatch) {
+                  potentialSeriesNames.add(numberMatch[1].trim());
+              }
 
-    // Open game overlay
-    function openOverlay(game) {
-      gameContainer.innerHTML = "";
-      if (game.url.endsWith(".swf")) {
-        gameContainer.innerHTML = `
-          <object id="gameObject" type="application/x-shockwave-flash" data="${game.url}" width="650" height="450">
-            <param name="movie" value="${game.url}">
-            <param name="quality" value="high">
-            <param name="wmode" value="transparent">
-          </object>
-        `;
-      } else {
-        gameContainer.innerHTML = `<iframe id="gameIframe" src="${game.url}" class="embed"></iframe>`;
+              // Add word-prefix-based series name (e.g., "Moto X3M")
+              const words = title.split(' ');
+              if (words.length > 1) {
+                  // Check 2-word and 3-word prefixes
+                  potentialSeriesNames.add(words.slice(0, 2).join(' '));
+                  if (words.length > 2) {
+                      potentialSeriesNames.add(words.slice(0, 3).join(' '));
+                  }
+              }
+
+              // --- Step 2: Add the game to each of its potential series groups ---
+              potentialSeriesNames.forEach(name => {
+                  if (!seriesCandidates.has(name)) {
+                      seriesCandidates.set(name, []);
+                  }
+                  seriesCandidates.get(name).push(game);
+              });
+          });
+
+          // --- Step 3: Filter down to valid series ---
+          series.clear();
+          const finalSeries = new Map();
+
+          // Create a sorted list of valid series (longest names first)
+          const sortedKeys = [...seriesCandidates.keys()]
+              .filter(key => seriesCandidates.get(key).length > 1) // Must have more than 1 game
+              .sort((a, b) => b.length - a.length); // Sort by length, descending
+
+          // Process keys from longest to shortest to avoid including sub-series
+          // (e.g., we prefer "Moto X3M" over "Moto")
+          sortedKeys.forEach(key => {
+              // Check if this series is already fully contained within a longer, already-added series
+              let isSubSeries = false;
+              for (const finalKey of finalSeries.keys()) {
+                  if (key.startsWith(finalKey)) {
+                      isSubSeries = true;
+                      break;
+                  }
+              }
+
+              if (!isSubSeries) {
+                  finalSeries.set(key, seriesCandidates.get(key));
+              }
+          });
+
+          // Final assignment to the global 'series' map
+          finalSeries.forEach((games, name) => {
+              series.set(name, games);
+          });
+
+      } catch (error) {
+          console.error("Error identifying game series:", error);
+          // Ensure 'series' is in a clean state and does not cause further errors
+          series.clear();
       }
-      overlay.style.display = "flex";
     }
 
     function closeOverlay() {
