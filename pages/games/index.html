@@ -196,12 +196,12 @@
 
     function buildSeriesFilters() {
       seriesMenu.innerHTML = "";
-        
+
       const allBtn = document.createElement("button");
       allBtn.textContent = "All Series";
       allBtn.onclick = () => renderGames(allGames);
       seriesMenu.appendChild(allBtn);
-        
+
       series.forEach((games, label) => {
         const btn = document.createElement("button");
         btn.textContent = label;
@@ -212,77 +212,56 @@
 
     function identifySeries() {
       try {
-        // Work on a sorted copy so adjacent entries with the same base are next to each other
         const sorted = [...allGames]
           .filter(g => g && g.title)
           .sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
       
-        const numberSeriesRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
-      
-        // Determine a base label for grouping:
-        // priority: before colon > trailing number/Roman numeral (ignores years) > first 3 words > first 2 words
-        function baseLabel(title) {
-          const t = title.trim();
-          const colonIdx = t.indexOf(':');
-          if (colonIdx > 0) return t.slice(0, colonIdx).trim();
+        const normalize = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
         
-          const m = t.match(numberSeriesRegex);
-          if (m) {
-            const suffix = m[2];
-            const asNum = parseInt(suffix, 10);
-            // Treat common years as NOT a series indicator
-            if (!(suffix && !isNaN(asNum) && asNum >= 1900 && asNum <= 2099)) {
-              return m[1].trim();
-            }
+        function neighBase(title) {
+          const t = normalize(title);
+          const parts = t.split(" ");
+        
+          // If has a trailing number/Roman numeral and it's not a year, extract base
+          const numberMatch = t.match(/(.+?)\s+([0-9]+|[IVXLCDM]+)$/i);
+          if (numberMatch) {
+            const suffix = numberMatch[2];
+            const n = parseInt(suffix, 10);
+            if (!(n >= 1900 && n <= 2099)) return normalize(numberMatch[1]);
           }
         
-          const words = t.split(/\s+/);
-          if (words.length >= 3) return words.slice(0, 3).join(' ').trim();
-          if (words.length >= 2) return words.slice(0, 2).join(' ').trim();
-          return t;
+          // Otherwise: take first 2 words for adjacency grouping
+          return parts.slice(0, 2).join(" ");
         }
       
-        const norm = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
-      
-        // Scan adjacent sorted titles and group runs that share the same base
-        const bucketsByKey = new Map(); // normalized base -> { label, games[] }
+        const buckets = new Map();
         let i = 0;
+      
         while (i < sorted.length) {
-          const base = baseLabel(sorted[i].title);
-          const key = norm(base);
+          const base = neighBase(sorted[i].title);
+          let run = [sorted[i]];
           let j = i + 1;
-          const run = [sorted[i]];
         
-          while (j < sorted.length) {
-            const nb = baseLabel(sorted[j].title);
-            if (norm(nb) === key) {
-              run.push(sorted[j]);
-              j++;
-            } else {
-              break;
-            }
+          while (j < sorted.length && neighBase(sorted[j].title) === base) {
+            run.push(sorted[j]);
+            j++;
           }
         
           if (run.length > 1) {
-            if (!bucketsByKey.has(key)) {
-              bucketsByKey.set(key, { label: base, games: [] });
-            }
-            const bucket = bucketsByKey.get(key);
-            // Merge without duplicates
-            const seen = new Set(bucket.games.map(g => g.title));
-            run.forEach(g => { if (!seen.has(g.title)) bucket.games.push(g); });
+            const label = run[0].title.split(" ").slice(0, 2).join(" ");
+            buckets.set(label, run);
           }
         
           i = j;
         }
       
-        // Finalize global series map
         series.clear();
-        for (const { label, games } of bucketsByKey.values()) {
+        for (const [label, games] of buckets.entries()) {
           if (games.length > 1) series.set(label, games);
         }
+      
       } catch (e) {
-        console.error('identifySeries error:', e);
+        console.error("identifySeries dynamic error:", e);
         series.clear();
       }
     }
@@ -362,6 +341,15 @@
     `);
   }
 
+  function closeOtherMenus(opening) {
+    if (opening !== 'filter') filterBtn.classList.remove('active');
+    if (opening !== 'series') seriesBtn.classList.remove('active');
+    if (opening !== 'search') {
+      searchBtn.classList.remove('active');
+      searchInput.value = "";
+    }
+  }
+
 
     fetchGameData();
 
@@ -397,14 +385,16 @@
 
     // --- Search functionality ---
     searchBtn.addEventListener("click", () => {
-      searchBtn.classList.toggle("active");
-      if (searchBtn.classList.contains("active")) {
+      const active = searchBtn.classList.toggle("active");
+      if (active) {
+        closeOtherMenus('search');
         searchInput.focus();
       } else {
         searchInput.value = "";
         renderGames(allGames);
       }
     });
+
     searchInput.addEventListener("input", e => {
       const term = e.target.value.toLowerCase();
       renderGames(allGames.filter(g => g.title.toLowerCase().includes(term)));
@@ -412,12 +402,13 @@
 
     // --- Filter functionality ---
     filterBtn.addEventListener("click", () => {
-      filterBtn.classList.toggle("active");
+      const active = filterBtn.classList.toggle("active");
+      if (active) closeOtherMenus('filter');
     });
 
-    // --- Series Filter functionality ---
     seriesBtn.addEventListener("click", () => {
-      seriesBtn.classList.toggle("active");
+      const active = seriesBtn.classList.toggle("active");
+      if (active) closeOtherMenus('series');
     });
 
     // --- Overlay escape key close ---
