@@ -194,6 +194,22 @@
       });
     }
 
+    function buildSeriesFilters() {
+      seriesMenu.innerHTML = "";
+        
+      const allBtn = document.createElement("button");
+      allBtn.textContent = "All Series";
+      allBtn.onclick = () => renderGames(allGames);
+      seriesMenu.appendChild(allBtn);
+        
+      series.forEach((games, label) => {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.onclick = () => renderGames(games);
+        seriesMenu.appendChild(btn);
+      });
+    }
+
     function identifySeries() {
       try {
         // Work on a sorted copy so adjacent entries with the same base are next to each other
