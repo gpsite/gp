@@ -410,7 +410,9 @@
 
     searchInput.addEventListener("input", e => {
       const term = e.target.value.toLowerCase();
-      renderGames(allGames.filter(g => g.title.toLowerCase().includes(term)));
+      renderGames(
+        allGames.filter(g => (g.title || "").toLowerCase().includes(term))
+      );
     });
 
     // --- Filter functionality ---
@@ -439,4 +441,5 @@
   </script>
 
 </body>
+
 </html>
