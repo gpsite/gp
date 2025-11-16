@@ -1,111 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Game Catalog</title>
-  <link rel="icon" type="image/gif" href="https://gp-site.github.io/gp/img/logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Game Catalog — GP</title>
+  <link rel="icon" type="image/png" href="https://gpsite.github.io/gp/img/logo.png">
+
+  <!-- Poppins (same as GP) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
   <style>
-    body {
-      margin: 0;
-      background: #000;
-      color: #ccc;
-      font-family: sans-serif;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
+    :root{
+      --bg-image: url("https://gpsite.github.io/gp/img/home/fall-bg.jpg");
+      --glass-bg: rgba(255,255,255,0.12);
+      --glass-bg-hover: rgba(255,255,255,0.18);
+      --glass-border: rgba(255,255,255,0.35);
+      --glass-highlight: rgba(255,255,255,0.55);
+      --text: #ffffff;
+      --muted: #cfcfcf;
+      --accent: rgba(255,255,255,0.06);
     }
 
-    /* main comps */
-    .sidebar { width: 80px; background: #0e0f13; border-radius: 20px; margin: 20px; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 10px; }
-    .circle-btn { width: 45px; height: 45px; background: #222428; border-radius: 50%; margin: 10px 0; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 18px; cursor: pointer; position: relative; transition: all 0.3s ease; overflow: visible; }
-    .circle-btn input { position: absolute; left: 50px; width: 0; opacity: 0; border: none; outline: none; padding: 5px 10px; border-radius: 10px; background: #2b2e33; color: #fff; transition: all 0.3s ease; z-index: 99; }
-    .circle-btn.active input { height: 20px; width: 200px; opacity: 1; }
-    .filter-menu { position: absolute; top: 0; left: 55px; background: #222428; border-radius: 10px; padding: 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px; max-width: 200px; overflow-x: hidden; overflow-y: visible; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1; }
-    .circle-btn.active .filter-menu { max-height: 400px; opacity: 1; padding: 10px; pointer-events: auto; user-select: auto; }
-    .filter-menu button { background: #2b2e33; color: #fff; border: none; padding: 5px; border-radius: 6px; white-space: nowrap; cursor: pointer; text-align: left;}
-    .filter-menu button:hover { background: #13141a; }
-    .scrollbar { flex: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; position: relative; }
-    .track { position: absolute; top: 10px; bottom: 10px; width: 10px; border-radius: 5px; background: #222428; }
-    .thumb { width: 55px; height: 35px; background: #222428; border-radius: 10px; position: absolute; top: 0; cursor: grab; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    .thumb div { width: 40%; height: 3px; background: #fff; margin: 2px 0; border-radius: 2px; }
-    .catalog-frame { flex: 1; margin: 20px; border-radius: 20px; border-style: solid; border-width: 8px; border-color: #0e0f13; background: rgba(14,15,19,0.1); backdrop-filter: blur(16px); padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; }
-    .catalog-inner { flex: 1; border-radius: 15px; padding: 15px; overflow-y: scroll; scrollbar-width: none; }
-    .catalog-inner::-webkit-scrollbar { display: none; }
-    .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; }
-    .game-card { background: #222428; border-radius: 15px; padding: 8px; text-align: center; cursor: pointer; }
-    .game-card h3 { font-size: 13px; margin: 5px 0; color: #fff; }
-    .game-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; background: #444; }
-    .game-card p { font-size: 11px; color: #fff; margin: 5px 0 0; }
-    #homeBtn { margin-top: auto; }
+    html,body{height:100%; margin:0;}
+    body{
+      color:var(--text);
+      font-family:"Poppins","Segoe UI",system-ui,-apple-system,Arial,Helvetica,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      background: var(--bg-image) center / cover no-repeat fixed;
+      display:flex;
+      height:100vh;
+      overflow:hidden;
+    }
 
-    /* overlay for game iframe */
+    /* Layout */
+    .app {
+      display:flex;
+      width:100%;
+      max-width:var(--max-width);
+      margin: 28px auto;
+      gap:18px;
+      padding: 20px;
+      box-sizing:border-box;
+      align-items:stretch;
+      width: calc(100% - 56px);
+    }
+
+    /* Sidebar (glass) */
+    .sidebar {
+      width: 80px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px) saturate(120%);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 var(--glass-highlight);
+      border-radius: 20px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+      box-sizing:border-box;
+      padding-bottom: 10px;
+      z-index: 10;
+    }
+
+    .circle-btn { width: 46px; height: 46px; background: rgba(0,0,0,0.24); border-radius: 50%; margin: 6px 0; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 18px; cursor: pointer; position: relative; transition: transform .15s ease, box-shadow .15s ease; z-index: 9001;}
+    .circle-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.45); }
+    .circle-btn input { position: absolute; left: 56px; width: 0; opacity: 0; border: none; outline: none; padding: 6px 10px; border-radius: 10px; background: rgba(0,0,0,0.7); color: #fff; transition: all 0.2s ease; z-index: 9002; }
+    .circle-btn.active input { width: 220px; opacity: 1; height: 32px; top: 6px; z-index: 9003;}
+
+    .filter-menu { position: absolute; top: 8px; left: 62px; background: rgba(0,0,0,0.7); border-radius: 10px; padding: 8px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; max-width: 240px; opacity: 0; pointer-events: none; transition: all 0.18s ease; z-index: 1000; }
+    .circle-btn.active .filter-menu { opacity: 1; pointer-events: auto; }
+
+    .filter-menu button { background: rgba(255,255,255,0.04); color: #fff; border: none; padding: 6px 8px; border-radius: 6px; white-space: nowrap; cursor: pointer; font-size: 13px; }
+    .filter-menu button:hover { background: rgba(255,255,255,0.07); }
+
+    .scrollbar { flex: 1; width:100%; display:flex; align-items:center; justify-content:center; position:relative; margin-top:6px; }
+    .track { position:absolute; top:8px; bottom:8px; width: 10px; border-radius: 8px; background: rgba(0,0,0,0.24); }
+    .thumb { width: 54px; height: 34px; background: rgba(0,0,0,0.24); border-radius: 10px; position: absolute; top: 8px; cursor: grab; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+    .thumb div { width: 40%; height: 3px; background: #fff; margin: 2px 0; border-radius: 2px; opacity: .85; }
+
+    a.home-btn { margin-top: auto; width:46px; height:46px; display:flex; align-items:center; justify-content:center; text-decoration:none; color:#fff; background: rgba(0,0,0,0.24); border-radius:50%; }
+    a.home-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.45); }
+
+    /* Catalog (glass) */
+    .catalog-frame {
+      flex:1;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding: 14px;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px) saturate(120%);
+      display:flex;
+      flex-direction:column;
+      min-height: 68vh;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 var(--glass-highlight);
+    }
+
+    .catalog-inner {
+      flex:1;
+      border-radius: 10px;
+      padding: 12px;
+      overflow-y: scroll; 
+      scrollbar-width: none; 
+      
+    }
+
+    .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 18px; align-items:start; }
+    .game-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.16)); border-radius: 12px; box-shadow: 0 18px 40px rgba(0,0,0,0.45); padding: 8px; text-align:center; cursor:pointer; transition: transform .12s ease, box-shadow .12s ease; border: 1px solid rgba(255,255,255,0.03); }
+    .game-card:hover { transform: translateY(-6px); }
+    .game-card h3 { font-size: 13px; margin: 6px 0; color: #fff; font-weight:700; }
+    .game-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; background: #333; display:block; }
+    .game-card p { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
+
+    /* overlay for game iframe (above leaves) */
     .game-overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0,0,0,0.88);
       display: none;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      z-index: 9999;
+      z-index: 9999; /* above the leaves */
+      padding: 24px;
+      box-sizing: border-box;
     }
     .game-overlay iframe, .game-overlay object {
-      width: 80vw;
-      height: 80vh;
+      width: 86vw;
+      height: 82vh;
       border: none;
       border-radius: 12px;
       background: #000;
     }
-    .overlay-controls {
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
+    .overlay-controls { margin-top: 12px; display:flex; gap:10px; }
+    .overlay-controls button { background: rgba(255,255,255,0.04); color:#fff; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
+    .overlay-controls button:hover { background: rgba(255,255,255,0.07); }
+
+    /* Responsive */
+    @media (max-width: 920px){
+      .app { flex-direction: column; margin: 16px; width: calc(100% - 32px); }
+      .sidebar { width: 100%; flex-direction: row; padding: 8px; gap: 8px; border-radius: 12px; }
+      .circle-btn input { left: auto; right: 8px; }
+      .filter-menu { left: 8px; top: 56px; }
+      .catalog-frame { min-height: 60vh; }
+      .game-overlay iframe { width: 96vw; height: 72vh; }
     }
-    .overlay-controls button {
-      background: #222428;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
+
+    /* Falling leaves overlay (decorative) - lower z than overlay */
+    .leaf-layer{
+      position:fixed;
+      inset:0;
+      z-index:8000; /* under the game overlay but above background */
+      pointer-events:none;
+      overflow:hidden;
     }
-    .overlay-controls button:hover { background: #2b2e33; }
+    .leaf{
+      position:absolute;
+      top:-10vh;
+      left:0;
+      width:1em;
+      height:1em;
+      transform: translateY(-10vh);
+      animation: fall var(--fall-duration, 14s) linear var(--delay, 0s) infinite;
+      will-change: transform;
+      opacity: var(--opacity, .95);
+    }
+    .leaf .sway{
+      display:inline-block;
+      animation: sway var(--sway-duration, 4s) ease-in-out var(--delay, 0s) infinite alternate;
+      will-change: transform;
+    }
+    .leaf .spin{
+      display:inline-block;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
+      animation: spin var(--spin-duration, 10s) linear var(--delay, 0s) infinite;
+      will-change: transform;
+    }
+
+    @keyframes fall{
+      0%{ transform: translateY(-10vh); }
+      100%{ transform: translateY(110vh); }
+    }
+    @keyframes sway{
+      0%{ transform: translateX(calc(var(--sway-range, 32px) * -1)); }
+      100%{ transform: translateX(var(--sway-range, 32px)); }
+    }
+    @keyframes spin{
+      100%{ transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .leaf-layer{ display:none !important; }
+    }
   </style>
 </head>
 <body>
-  
-  <canvas id="bg-canvas"></canvas>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="circle-btn" id="searchBtn"><i class="fa fa-search"></i><input type="text" id="searchInput" placeholder="Search..."></div>
-    <div class="circle-btn" id="filterBtn"><i class="fa fa-filter"></i><div class="filter-menu" id="filterMenu"></div></div>
-    <div class="circle-btn" id="seriesBtn"><i class="fa fa-list-ol"></i><div class="filter-menu" id="seriesMenu"></div></div>
-    <div class="scrollbar"><div class="track"></div><div class="thumb"><div></div><div></div><div></div></div></div>
-    <a class="circle-btn" id="homeBtn" href="../../index.html"><i class="fa fa-home"></i></a>
-  </div>
+  <!-- Falling leaves layer (decorative) -->
+  <div class="leaf-layer" id="leaf-layer" aria-hidden="true"></div>
 
-  <!-- Catalog -->
-  <div class="catalog-frame">
-    <div class="catalog-inner" id="catalog">
-      <div class="game-grid" id="gameGrid"></div>
+  <div class="app" role="main" aria-label="Game catalog application">
+    <!-- Sidebar -->
+    <div class="sidebar" aria-hidden="false">
+      <div class="circle-btn" id="searchBtn" title="Search">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search...">
+      </div>
+
+      <div class="circle-btn" id="filterBtn" title="Filters">
+        <i class="fa fa-filter"></i>
+        <div class="filter-menu" id="filterMenu" aria-hidden="true"></div>
+      </div>
+
+      <div class="circle-btn" id="seriesBtn" title="Series">
+        <i class="fa fa-list-ol"></i>
+        <div class="filter-menu" id="seriesMenu" aria-hidden="true"></div>
+      </div>
+
+      <div class="scrollbar" aria-hidden="true">
+        <div class="track"></div>
+        <div class="thumb" id="thumb"><div></div><div></div><div></div></div>
+      </div>
+
+      <a class="home-btn" id="homeBtn" href="../../index.html" title="Home"><i class="fa fa-home"></i></a>
+    </div>
+
+    <!-- Catalog -->
+    <div class="catalog-frame" role="region" aria-label="Game catalog">
+      <div class="catalog-inner" id="catalog">
+        <div class="game-grid" id="gameGrid" aria-live="polite" aria-atomic="false"></div>
+      </div>
     </div>
   </div>
 
   <!-- Overlay -->
-  <div class="game-overlay" id="gameOverlay">
-    <div id="gameContainer"></div>
+  <div class="game-overlay" id="gameOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div id="gameContainer" aria-label="Game container"></div>
     <div class="overlay-controls">
-      <button onclick="toggleFullscreen()">Fullscreen</button>
-      <button onclick="toggleBorderdFullscreen()">Borderd Fullscreen (progress wont save)</button>
+      <button id="fsBtn" onclick="toggleFullscreen()">Fullscreen</button>
+      <button onclick="toggleBorderdFullscreen()">Bordered Fullscreen</button>
       <button onclick="closeOverlay()">Close</button>
     </div>
   </div>
 
-  <script>
+  <!-- Game data + UI logic -->
+<script>
     const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
     const catalog = document.getElementById("catalog");
     const thumb = document.querySelector(".thumb");
@@ -367,14 +512,34 @@
     fetchGameData();
 
     // Sync scrollbar thumb position
-    function syncThumb() {
-      const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
-      const trackHeight = track.clientHeight - thumb.clientHeight;
-      thumb.style.top = (track.offsetTop + ratio * trackHeight) + "px";
-    }
-    catalog.addEventListener("scroll", syncThumb);
+    function updateTrackHole() {
+  const trackRect = track.getBoundingClientRect();
+  const thumbRect = thumb.getBoundingClientRect();
+  const topRel = Math.max(0, thumbRect.top - trackRect.top);
+  const bottomRel = Math.min(trackRect.height, topRel + thumbRect.height);
 
-    let dragging = false;
+  const h = Math.max(1, Math.round(trackRect.height));
+  const t = Math.round(topRel);
+  const b = Math.round(bottomRel);
+
+  const mask = `linear-gradient(to bottom, black 0px, black ${t}px, transparent ${t}px, transparent ${b}px, black ${b}px, black ${h}px)`;
+  track.style.webkitMaskImage = mask;
+  track.style.maskImage = mask;
+}
+
+// --- SYNC THUMB POSITION ---
+function syncThumb() {
+  const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
+  const trackHeight = track.clientHeight - thumb.clientHeight;
+  const newTop = track.offsetTop + ratio * trackHeight;
+  thumb.style.top = newTop + "px";
+  updateTrackHole();
+}
+catalog.addEventListener("scroll", syncThumb);
+window.addEventListener("resize", syncThumb);
+
+// --- DRAG HANDLER ---
+let dragging = false;
     let startY, startTop;
     thumb.addEventListener("mousedown", e => {
       dragging = true;
@@ -435,11 +600,117 @@
 
   </script>
 
-  <script src="/gp/scripts/starry-background.js"></script>
+  <!-- Falling leaves generator (copied from GP home) -->
   <script>
-    setupStarryBackground();
+    (function(){
+      const layer = document.getElementById('leaf-layer');
+      if (!layer) return;
+
+      // Respect reduced motion
+      try{
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          return;
+        }
+      }catch(e){}
+
+      const LEAFS = ['🍁','🍂','🍃'];
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+
+      // Scale number of leaves by viewport width (with sensible bounds)
+      const COUNT = Math.max(12, Math.min(40, Math.round(vw / 40)));
+
+      function rand(min, max){ return Math.random() * (max - min) + min; }
+
+      for (let i = 0; i < COUNT; i++){
+        const leaf = document.createElement('span');
+        leaf.className = 'leaf';
+
+        const sway = document.createElement('span');
+        sway.className = 'sway';
+
+        const spin = document.createElement('span');
+        spin.className = 'spin';
+        spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
+
+        // Random properties
+        const startLeftVw = rand(0, 100);
+        const sizePx = rand(16, 36);
+        const fallDuration = rand(10, 22); // seconds
+        const swayDuration = rand(2.2, 5.2); // seconds
+        const swayRange = rand(18, 60); // px
+        const spinDuration = rand(6, 13); // seconds
+        const delay = -rand(0, 22); // negative delay staggers leaves
+        const opacity = rand(0.5, 1);
+
+        leaf.style.left = startLeftVw.toFixed(2) + 'vw';
+        leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
+        leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
+        leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
+        leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
+        leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
+        leaf.style.setProperty('--opacity', opacity.toFixed(2));
+
+        // Randomize spin direction
+        spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
+        spin.style.fontSize = sizePx.toFixed(0) + 'px';
+
+        sway.appendChild(spin);
+        leaf.appendChild(sway);
+        layer.appendChild(leaf);
+      }
+
+      // Optional: update density on resize (basic)
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const current = layer.children.length;
+          const vwNow = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+          const target = Math.max(12, Math.min(40, Math.round(vwNow / 40)));
+          const toAdd = Math.max(0, target - current);
+          for (let i = 0; i < toAdd; i++){
+            const evt = new Event('addLeaf');
+            layer.dispatchEvent(evt);
+          }
+        }, 250);
+      });
+
+      // Support adding extra leaves later if needed
+      layer.addEventListener('addLeaf', () => {
+        const leaf = document.createElement('span');
+        leaf.className = 'leaf';
+        const sway = document.createElement('span');
+        sway.className = 'sway';
+        const spin = document.createElement('span');
+        spin.className = 'spin';
+        spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
+
+        const startLeftVw = rand(0, 100);
+        const sizePx = rand(16, 36);
+        const fallDuration = rand(10, 22);
+        const swayDuration = rand(2.2, 5.2);
+        const swayRange = rand(18, 60);
+        const spinDuration = rand(6, 13);
+        const delay = -rand(0, 22);
+        const opacity = rand(0.5, 1);
+
+        leaf.style.left = startLeftVw.toFixed(2) + 'vw';
+        leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
+        leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
+        leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
+        leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
+        leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
+        leaf.style.setProperty('--opacity', opacity.toFixed(2));
+
+        spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
+        spin.style.fontSize = sizePx.toFixed(0) + 'px';
+
+        sway.appendChild(spin);
+        leaf.appendChild(sway);
+        layer.appendChild(leaf);
+      });
+    })();
   </script>
 
 </body>
-
 </html>
