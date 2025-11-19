@@ -520,10 +520,6 @@
   const h = Math.max(1, Math.round(trackRect.height));
   const t = Math.round(topRel);
   const b = Math.round(bottomRel);
-
-  const mask = `linear-gradient(to bottom, black 0px, black ${t}px, transparent ${t}px, transparent ${b}px, black ${b}px, black ${h}px)`;
-  track.style.webkitMaskImage = mask;
-  track.style.maskImage = mask;
 }
 
 // --- SYNC THUMB POSITION ---
@@ -713,3 +709,4 @@ let dragging = false;
 
 </body>
 </html>
+
