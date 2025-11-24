@@ -110,7 +110,7 @@ a.btn{
   padding:18px 24px;
   transition:background .2s ease, transform .1s ease, box-shadow .25s ease;
 }
-a.btn:hover{
+a.btn:not(.disabled):hover{
   background: var(--glass-bg-hover);
   transform:translateY(-2px);
   box-shadow:0 14px 40px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.55);
@@ -120,6 +120,19 @@ a.btn .meta{
   opacity:.9;
   font-size:.8em;
   margin-left:6px;
+}
+
+/* Disabled / down state for buttons */
+a.btn.disabled{
+  opacity:0.55;
+  filter:grayscale(60%);
+  pointer-events:none; /* disable mouse interactions */
+  cursor:default;
+  color: rgba(255,255,255,0.75);
+  box-shadow:none;
+  transform:none;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 /* Announcements panel */
@@ -247,7 +260,8 @@ a.btn .meta{
         <a class="btn glass simple-btn" href="pages/games/index.html" aria-label="Games">GAMES</a>
         <a class="btn glass simple-btn" href="pages/movies/index.html" aria-label="Movies">MOVIES</a>
         <a class="btn glass simple-btn" href="pages/chat/index.html" aria-label="Chat">CHAT <span class="meta">(BETA)</span></a>
-        <a class="btn glass simple-btn" href="pages/ai/index.html" aria-label="GP-CLANKER">GP-CLANKER</a>
+        <!-- GP-CLANKER is DOWN: visually disabled and non-interactive -->
+        <a class="btn glass simple-btn disabled" aria-label="GP-CLANKER (down)" aria-disabled="true" tabindex="-1">GP-CLANKER <span class="meta">(DOWN)</span></a>
       </nav>
 
       <!-- Announcements -->
@@ -493,5 +507,3 @@ a.btn .meta{
   </script>
 </body>
 </html>
-
-
