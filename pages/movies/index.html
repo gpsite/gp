@@ -268,37 +268,24 @@
     let series = new Map();
 
     function generateKeyThreeDates() {
-    // Use UTC time to match the server clock
-    const now = new Date();
-    const utc = new Date(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds()
-    );
-      
-    const yesterday = new Date(utc.getTime() - 24 * 60 * 60 * 1000);
-    const tomorrow = new Date(utc.getTime() + 24 * 60 * 60 * 1000);
-      
-    function pad(n) {
-      return n.toString().padStart(2, '0');
+      const pad = (n) => String(n).padStart(2, '0');
+        
+      // Use UTC to avoid local timezone issues
+      const now = new Date();
+      const utcYear = now.getUTCFullYear();
+      const utcMonth = now.getUTCMonth();
+      const utcDate = now.getUTCDate();
+        
+      const yesterday = new Date(Date.UTC(utcYear, utcMonth, utcDate - 1));
+      const today = new Date(Date.UTC(utcYear, utcMonth, utcDate));
+      const tomorrow = new Date(Date.UTC(utcYear, utcMonth, utcDate + 1));
+        
+      function makeYMD(date) {
+        return date.getUTCFullYear() + pad(date.getUTCMonth() + 1) + pad(date.getUTCDate());
+      }
+    
+      return makeYMD(yesterday) + makeYMD(today) + makeYMD(tomorrow);
     }
-  
-    function makeYMD(date) {
-      return (
-        date.getFullYear() +
-        pad(date.getMonth() + 1) +
-        pad(date.getDate()) +
-        pad(date.getHours()) +
-        pad(date.getMinutes()) +
-        pad(date.getSeconds())
-      );
-    }
-  
-    return makeYMD(yesterday) + makeYMD(utc) + makeYMD(tomorrow);
-  }
 
     function buildMovieUrl(raw) {
       if (!raw) return '';
