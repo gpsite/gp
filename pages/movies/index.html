@@ -313,7 +313,7 @@
 
         allMovies = rows.map(row => ({
           rawUrl: row[urlIndex] || '',
-          url: buildMovieUrl(row[urlIndex] || ''),
+          url: buildMovieUrl(row[urlIndex] || ''),  // ok
           imdb: row[imdbIndex] || '',
           title: row[titleIndex] || '',
           categories: row[catIndex] ? row[catIndex].split(',').map(c => c.trim()) : [],
@@ -423,8 +423,8 @@
 
     function openOverlay(movie) {
       currentMovie = movie;
-      const finalUrl = buildMovieUrl(movie.rawUrl || movie.url);
-      
+      const finalUrl = movie.url;
+
       const subtitleBtn = document.getElementById('subtitleBtn');
       if (movie.subtitleUrl && movie.subtitleUrl.trim() !== '') {
         subtitleBtn.style.display = 'inline-block';
