@@ -268,17 +268,37 @@
     let series = new Map();
 
     function generateKeyThreeDates() {
-      const pad = (n) => String(n).padStart(2, '0');
-      const makeYMD = (d) =>
-        d.getFullYear().toString() +
-        pad(d.getMonth() + 1) +
-        pad(d.getDate());
-      const now = new Date();
-      const day0 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-      const day1 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const day2 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-      return makeYMD(day0) + makeYMD(day1) + makeYMD(day2);
+    // Use UTC time to match the server clock
+    const now = new Date();
+    const utc = new Date(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours(),
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    );
+      
+    const yesterday = new Date(utc.getTime() - 24 * 60 * 60 * 1000);
+    const tomorrow = new Date(utc.getTime() + 24 * 60 * 60 * 1000);
+      
+    function pad(n) {
+      return n.toString().padStart(2, '0');
     }
+  
+    function makeYMD(date) {
+      return (
+        date.getFullYear() +
+        pad(date.getMonth() + 1) +
+        pad(date.getDate()) +
+        pad(date.getHours()) +
+        pad(date.getMinutes()) +
+        pad(date.getSeconds())
+      );
+    }
+  
+    return makeYMD(yesterday) + makeYMD(utc) + makeYMD(tomorrow);
+  }
 
     function buildMovieUrl(raw) {
       if (!raw) return '';
