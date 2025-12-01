@@ -355,45 +355,41 @@ async function callModelWithFallback(promptText) {
 }
 
 // Image generation with fallback
-async function generateImageWithFallback(prompt, size = "1024x1024") {
-  const modelsToTry = [IMAGE_MODEL_PRIMARY, IMAGE_MODEL_FALLBACK];
+async function generateImageWithFallback(prompt) {
+    const models = [IMAGE_MODEL_PRIMARY, IMAGE_MODEL_FALLBACK];
 
-  for (let i = 0; i < modelsToTry.length; i++) {
-    try {
-      const model = genAI.getGenerativeModel({ model: modelsToTry[i] });
-      const res = await model.generateImage({
-        prompt,
-        size
-      });
+    for (let m of models) {
+        try {
+            const model = genAI.getGenerativeModel({ model: m });
 
-      // SDK response shape may vary; this attempts to extract base64/mime
-      const candidate = res?.response?.candidates?.[0];
-      // Two common shapes: candidate.content.parts[0].inlineData OR candidate.image (base64)
-      let img;
-      if (candidate?.content?.parts?.[0]?.inlineData) {
-        img = candidate.content.parts[0].inlineData;
-      } else if (candidate?.image?.b64) {
-        img = { data: candidate.image.b64, mimeType: "image/png" };
-      } else if (candidate?.image) {
-        // fallback if SDK returns direct data
-        img = { data: candidate.image, mimeType: "image/png" };
-      }
+            const result = await model.generateContent({
+                contents: [
+                    {
+                        role: "user",
+                        parts: [
+                            { text: prompt },
+                            { fileData: { mimeType: "image/png", fileUri: "" } }
+                        ]
+                    }
+                ],
+                generationConfig: {
+                    responseMimeType: "image/png"
+                }
+            });
 
-      if (!img || !img.data) throw new Error("No image returned");
+            const inline = result.response.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+            if (!inline) throw new Error("No inlineData received");
 
-      return {
-        base64: img.data,
-        mime: img.mimeType || "image/png",
-        modelUsed: modelsToTry[i]
-      };
-    } catch (err) {
-      // If it's a capacity-like error, try the next model, otherwise bubble up
-      if (!isCapacityError(err) || i === modelsToTry.length - 1) {
-        throw err;
-      }
-      // otherwise continue to next model
+            return {
+                mime: inline.mimeType,
+                base64: inline.data
+            };
+        } catch (err) {
+            if (!isCapacityError(err)) throw err;
+        }
     }
-  }
+
+    throw new Error("Both image models failed");
 }
 
 // ------- Chat state & UI logic -------
@@ -633,40 +629,27 @@ async function sendMessage() {
 
 // ------- Image panel handlers -------
 document.getElementById("genImgBtn").onclick = async () => {
-    const promptInput = document.getElementById("imgPrompt");
-    const sizeSelect = document.getElementById("imgSize");
+    const prompt = document.getElementById("imgPrompt").value.trim();
     const output = document.getElementById("imageResults");
-    const prompt = promptInput.value.trim();
-    const size = sizeSelect.value || "1024x1024";
 
     if (!prompt) return;
-    output.innerHTML = `<div class="image-card"><div class="thinking"><span></span><span></span><span></span></div><div>Generating image…</div></div>`;
+
+    output.innerHTML = `<p>Generating…</p>`;
+
     try {
-        const { base64, mime, modelUsed } = await generateImageWithFallback(prompt, size);
-        const dataUrl = `data:${mime};base64,${base64}`;
-        const card = document.createElement("div");
-        card.className = "image-card";
-        card.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="font-size:13px;color:#ddd;">Model: ${modelUsed}</div>
-                <button class="save-btn" style="background:#222428;color:#fff;border:none;border-radius:6px;padding:6px;cursor:pointer;">Save to chat</button>
-            </div>
-            <img src="${dataUrl}" style="max-width:760px;border-radius:8px;">
-            <div style="font-size:12px;color:#bdbdbd;">Prompt: ${marked.parseInline(prompt)}</div>
+        const { mime, base64 } = await generateImageWithFallback(prompt);
+        const url = `data:${mime};base64,${base64}`;
+
+        output.innerHTML = `
+            <img src="${url}" 
+                 style="max-width:80%; border-radius:8px;">
         `;
-        output.prepend(card);
-        // attach save handler
-        card.querySelector(".save-btn").onclick = () => {
-            // Save image into current chat as ai-image message and show in chat
-            addMessage("ai-image", dataUrl, true);
-            // switch to chat panel so user sees saved image
-            showChatPanel();
-        };
     } catch (err) {
+        output.innerHTML = `<p style="color:red;">Image generation failed.</p>`;
         console.error("Image generation error:", err);
-        output.innerHTML = `<div class="image-card" style="color:#f66;">Image generation failed. Try again later.</div>`;
     }
 };
+
 
 // ------- Panel switching -------
 function showImagePanel() {
