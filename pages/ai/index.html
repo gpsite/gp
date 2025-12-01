@@ -210,6 +210,11 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 const PRIMARY_MODEL = "gemini-2.5-flash-lite"; // stable regular model
 const FALLBACK_MODEL = "gemini-2.5-flash-lite-preview-09-2025";
 
+// Image models
+const IMAGE_MODEL_PRIMARY = "gemini-2.0-flash-preview";
+const IMAGE_MODEL_FALLBACK = "gemini-1.5-flash";
+
+
 // Fallback state persisted per ET day
 let fallbackActive = JSON.parse(localStorage.getItem("fallbackActive") || "false");
 let fallbackDateET = localStorage.getItem("fallbackDateET") || ""; // YYYY-MM-DD (ET)
@@ -291,6 +296,34 @@ async function callModelWithFallback(promptText) {
   }
 }
 
+async function generateImageWithFallback(prompt) {
+  const modelsToTry = [IMAGE_MODEL_PRIMARY, IMAGE_MODEL_FALLBACK];
+
+  for (let i = 0; i < modelsToTry.length; i++) {
+    try {
+      const m = genAI.getGenerativeModel({ model: modelsToTry[i] });
+      const res = await m.generateImage({
+        prompt,
+        size: "1024x1024"
+      });
+
+      const img = res.response.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+      if (!img) throw new Error("No image returned");
+
+      return {
+        base64: img.data,
+        mime: img.mimeType,
+        modelUsed: modelsToTry[i]
+      };
+    } catch (err) {
+      if (!isCapacityError(err) || i === modelsToTry.length - 1) {
+        throw err;
+      }
+    }
+  }
+}
+
+
 let chats = JSON.parse(localStorage.getItem("chats") || "[]");
 let currentChat = null;
 
@@ -369,6 +402,25 @@ function addMessage(role, text, save = true) {
     const div = document.createElement("div");
     div.className = "msg " + role;
 
+    if (role === "ai-image") {
+    const div = document.createElement("div");
+    div.className = "msg ai";
+    div.innerHTML = `
+        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"
+            fill="none" stroke="currentColor" stroke-linecap="round"
+            stroke-linejoin="round" stroke-width="1.5" width="18" height="18">
+            <rect height="7.5" width="12.5" y="5.75" x="1.75"/>
+            <path d="m10.75 8.75v1.5m-5.5-1.5v1.5m-.5-7.5 3.25 3 3.25-3"/>
+        </svg>
+        <div><strong>GP-Clanker:</strong><br>
+            <img src="${text}" style="max-width:300px;border-radius:8px;margin-top:6px;">
+        </div>
+    `;
+    messagesDiv.appendChild(div);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return;
+    }
+
     if (role === "ai") {
         div.innerHTML = `
             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" 
@@ -410,6 +462,35 @@ function addMessage(role, text, save = true) {
 async function sendMessage() {
     const input = document.getElementById("userInput");
     const text = input.value.trim();
+
+    // Image generation trigger
+    if (text.toLowerCase().startsWith("generate image:")) {
+        const prompt = text.substring("generate image:".length).trim();
+    
+        const thinkingDiv = document.createElement("div");
+        thinkingDiv.className = "msg ai";
+        thinkingDiv.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
+        messagesDiv.appendChild(thinkingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+        try {
+            const imgRes = await generateImageWithFallback(prompt);
+            messagesDiv.removeChild(thinkingDiv);
+        
+            const base64Url = `data:${imgRes.mime};base64,${imgRes.base64}`;
+            addMessage("ai-image", base64Url);
+        
+        } catch (err) {
+            messagesDiv.removeChild(thinkingDiv);
+            addMessage("ai", "Image generation failed. Try again later.");
+        }
+    
+        input.value = "";
+        return; // Skip text model
+    }
+
+
+
     if (!text) return;
 
     addMessage("user", text);
