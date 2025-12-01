@@ -17,16 +17,11 @@ html, body {
     height: 100%;
     width: 100%;
     overflow: hidden;
-}
-
-body {
-    font-family: Arial, sans-serif;
     background: #000;
     color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-family: Arial, sans-serif;
 }
+
 .container {
     display: flex;
     width: 80vw;
@@ -37,7 +32,7 @@ body {
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 .sidebar {
-    background: rgb(14, 15, 19, 1);
+    background: rgba(14,15,19,1);
     width: 220px;
     display: flex;
     flex-direction: column;
@@ -52,6 +47,10 @@ body {
     border-radius: 6px;
     padding: 10px;
     cursor: pointer;
+    text-align: left;
+}
+.sidebar button.active {
+    background: #13141a;
 }
 .chat-list {
     flex: 1;
@@ -62,6 +61,9 @@ body {
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 .chat-item.active, .chat-item:hover {
     background: #13141a;
@@ -70,8 +72,15 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: rgb(19, 20, 26, 0.01);
+    background: rgba(19,20,26,0.01);
     backdrop-filter: blur(16px);
+    position: relative;
+}
+.panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
 }
 .messages {
     flex: 1;
@@ -79,6 +88,7 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 .msg {
     display: inline-block;
@@ -136,6 +146,41 @@ body {
     cursor: pointer;
 }
 
+/* Image panel */
+#imagePanel {
+    display: none;
+    flex-direction: column;
+    min-height: 0;
+}
+#imagePanel .controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+#imagePanel input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: #0e0f13;
+    color: #fff;
+}
+#imageResults {
+    margin-top: 16px;
+    overflow-y: auto;
+    max-height: calc(80vh - 220px);
+}
+.image-card {
+    margin-bottom: 12px;
+    border-radius: 8px;
+    padding: 8px;
+    background: rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* thinking animation */
 .thinking {
   display: inline-block;
   width: 50px;
@@ -170,7 +215,6 @@ body {
   height: 100%;
   z-index: -1;
 }
-
 </style>
 </head>
 
@@ -180,7 +224,6 @@ body {
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-ZTK0MCM715');
 </script>
     
@@ -189,31 +232,51 @@ body {
 
 <div class="container">
     <div class="sidebar">
-        <button id="newChatBtn">+ New Chat</button>
+        <button id="newChatBtn" class="active">+ New Chat</button>
+        <button id="imageGenBtn">🖼 Image Generator</button>
         <div class="chat-list" id="chats"></div>
     </div>
+
     <div class="main">
-        <div class="messages" id="messages"></div>
-        <div class="input-row">
-            <input id="userInput" type="text" placeholder="Type your message..." autocomplete="off" />
-            <button id="sendBtn">Send</button>
+        <!-- CHAT PANEL -->
+        <div id="chatPanel" class="panel">
+            <div class="messages" id="messages"></div>
+            <div class="input-row">
+                <input id="userInput" type="text" placeholder="Type your message..." autocomplete="off" />
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
+
+        <!-- IMAGE GENERATOR PANEL -->
+        <div id="imagePanel" class="panel" aria-hidden="true">
+            <h2 style="margin:0 0 8px 0;">Image Generator</h2>
+            <div style="font-size:12px; color:#bdbdbd;">Using Gemini 2.0 Flash Preview (with fallback)</div>
+            <div class="controls">
+                <input id="imgPrompt" type="text" placeholder="Describe your image (e.g. 'a glass robot in fog, cinematic')" />
+                <select id="imgSize" style="background:#0e0f13;color:#fff;border:none;border-radius:6px;padding:10px;">
+                    <option value="512x512">512</option>
+                    <option value="768x768">768</option>
+                    <option value="1024x1024" selected>1024</option>
+                </select>
+                <button id="genImgBtn">Generate</button>
+            </div>
+            <div id="imageResults"></div>
         </div>
     </div>
 </div>
 
 <script type="module">
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai";
-const API_KEY = "AIzaSyBKOdh6dmf2vJ9sQlZwoW7jv9KV4pKCOcI"; 
+const API_KEY = "AIzaSyBKOdh6dmf2vJ9sQlZwoW7jv9KV4pKCOcI";
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-// Primary (preview) and fallback (regular stable) models
-const PRIMARY_MODEL = "gemini-2.5-flash-lite"; // stable regular model
+// Primary (preview) and fallback (regular stable) models for text
+const PRIMARY_MODEL = "gemini-2.5-flash-lite";
 const FALLBACK_MODEL = "gemini-2.5-flash-lite-preview-09-2025";
 
 // Image models
 const IMAGE_MODEL_PRIMARY = "gemini-2.0-flash-preview";
 const IMAGE_MODEL_FALLBACK = "gemini-1.5-flash";
-
 
 // Fallback state persisted per ET day
 let fallbackActive = JSON.parse(localStorage.getItem("fallbackActive") || "false");
@@ -259,12 +322,10 @@ function isCapacityError(err) {
          msg.includes("capacity");
 }
 
-// Call Gemini with preview-first, then fallback model on capacity errors.
-// If both hit capacity, bubble a special error to show the extreme-load message.
+// Text model call with fallback behavior
 async function callModelWithFallback(promptText) {
   resetFallbackIfPastMidnightET();
 
-  // 1st attempt: current preference (preview unless we've fallen back for today)
   const firstModelId = getCurrentModelId();
   try {
     const m = genAI.getGenerativeModel({ model: firstModelId });
@@ -272,10 +333,7 @@ async function callModelWithFallback(promptText) {
     return { reply: res.response.text(), modelUsed: firstModelId };
   } catch (err1) {
     if (isCapacityError(err1)) {
-      // If first attempt was preview, activate fallback for the rest of the ET day
       if (firstModelId === PRIMARY_MODEL) setFallbackForToday();
-
-      // 2nd attempt: the other model
       const secondModelId = firstModelId === PRIMARY_MODEL ? FALLBACK_MODEL : PRIMARY_MODEL;
       try {
         const m2 = genAI.getGenerativeModel({ model: secondModelId });
@@ -296,51 +354,70 @@ async function callModelWithFallback(promptText) {
   }
 }
 
-async function generateImageWithFallback(prompt) {
+// Image generation with fallback
+async function generateImageWithFallback(prompt, size = "1024x1024") {
   const modelsToTry = [IMAGE_MODEL_PRIMARY, IMAGE_MODEL_FALLBACK];
 
   for (let i = 0; i < modelsToTry.length; i++) {
     try {
-      const m = genAI.getGenerativeModel({ model: modelsToTry[i] });
-      const res = await m.generateImage({
+      const model = genAI.getGenerativeModel({ model: modelsToTry[i] });
+      const res = await model.generateImage({
         prompt,
-        size: "1024x1024"
+        size
       });
 
-      const img = res.response.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-      if (!img) throw new Error("No image returned");
+      // SDK response shape may vary; this attempts to extract base64/mime
+      const candidate = res?.response?.candidates?.[0];
+      // Two common shapes: candidate.content.parts[0].inlineData OR candidate.image (base64)
+      let img;
+      if (candidate?.content?.parts?.[0]?.inlineData) {
+        img = candidate.content.parts[0].inlineData;
+      } else if (candidate?.image?.b64) {
+        img = { data: candidate.image.b64, mimeType: "image/png" };
+      } else if (candidate?.image) {
+        // fallback if SDK returns direct data
+        img = { data: candidate.image, mimeType: "image/png" };
+      }
+
+      if (!img || !img.data) throw new Error("No image returned");
 
       return {
         base64: img.data,
-        mime: img.mimeType,
+        mime: img.mimeType || "image/png",
         modelUsed: modelsToTry[i]
       };
     } catch (err) {
+      // If it's a capacity-like error, try the next model, otherwise bubble up
       if (!isCapacityError(err) || i === modelsToTry.length - 1) {
         throw err;
       }
+      // otherwise continue to next model
     }
   }
 }
 
-
+// ------- Chat state & UI logic -------
 let chats = JSON.parse(localStorage.getItem("chats") || "[]");
 let currentChat = null;
 
 const chatsDiv = document.getElementById("chats");
 const messagesDiv = document.getElementById("messages");
-
+const chatPanel = document.getElementById("chatPanel");
+const imagePanel = document.getElementById("imagePanel");
+const newChatBtn = document.getElementById("newChatBtn");
+const imageGenBtn = document.getElementById("imageGenBtn");
 
 function renderChats() {
     chatsDiv.innerHTML = "";
     chats.forEach((c, i) => {
         const div = document.createElement("div");
         div.className = "chat-item" + (i === currentChat ? " active" : "");
+        div.onclick = () => loadChat(i);
 
         const titleSpan = document.createElement("span");
         titleSpan.textContent = c.title || "Chat " + (i + 1);
         titleSpan.style.flex = "1";
-        titleSpan.onclick = () => loadChat(i);
+
         const delBtn = document.createElement("button");
         delBtn.textContent = "✕";
         delBtn.className = "del-btn";
@@ -348,10 +425,6 @@ function renderChats() {
             e.stopPropagation();
             deleteChat(i);
         };
-
-        div.style.display = "flex";
-        div.style.justifyContent = "space-between";
-        div.style.alignItems = "center";
 
         div.appendChild(titleSpan);
         div.appendChild(delBtn);
@@ -369,7 +442,7 @@ function deleteChat(index) {
             newChat();
         }
     } else if (currentChat > index) {
-        currentChat--; 
+        currentChat--;
     }
     saveChats();
     renderChats();
@@ -379,7 +452,7 @@ function loadChat(index) {
     currentChat = index;
     renderChats();
     messagesDiv.innerHTML = "";
-    chats[index].messages.forEach(m => addMessage(m.role, m.text, false));
+    (chats[index].messages || []).forEach(m => addMessage(m.role, m.text, false));
     renderMathInElement(messagesDiv);
 }
 
@@ -392,34 +465,42 @@ function newChat() {
     loadChat(0);
 }
 
-function saveChats() { 
-    localStorage.setItem("chats", JSON.stringify(chats)); 
+function saveChats() {
+    localStorage.setItem("chats", JSON.stringify(chats));
 }
 
-
+// Add message to chat display & optionally save to chat
 function addMessage(role, text, save = true) {
+    // ai-image uses a data URL in `text`
+    if (role === "ai-image") {
+        const imgDiv = document.createElement("div");
+        imgDiv.className = "msg ai";
+        imgDiv.innerHTML = `
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" 
+                 fill="none" stroke="currentColor" stroke-linecap="round" 
+                 stroke-linejoin="round" stroke-width="1.5" width="18" height="18">
+              <rect height="7.5" width="12.5" y="5.75" x="1.75"/>
+              <path d="m10.75 8.75v1.5m-5.5-1.5v1.5m-.5-7.5 3.25 3 3.25-3"/>
+            </svg>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <strong>GP-Clanker:</strong>
+              <img src="${text}" style="max-width:380px;border-radius:8px;">
+            </div>
+        `;
+        messagesDiv.appendChild(imgDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        if (save && currentChat !== null && chats[currentChat]) {
+            chats[currentChat].messages.push({ role, text });
+            saveChats();
+            renderChats();
+        }
+        return;
+    }
+
     const safeHtml = marked.parse(text);
     const div = document.createElement("div");
     div.className = "msg " + role;
-
-    if (role === "ai-image") {
-    const div = document.createElement("div");
-    div.className = "msg ai";
-    div.innerHTML = `
-        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"
-            fill="none" stroke="currentColor" stroke-linecap="round"
-            stroke-linejoin="round" stroke-width="1.5" width="18" height="18">
-            <rect height="7.5" width="12.5" y="5.75" x="1.75"/>
-            <path d="m10.75 8.75v1.5m-5.5-1.5v1.5m-.5-7.5 3.25 3 3.25-3"/>
-        </svg>
-        <div><strong>GP-Clanker:</strong><br>
-            <img src="${text}" style="max-width:300px;border-radius:8px;margin-top:6px;">
-        </div>
-    `;
-    messagesDiv.appendChild(div);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    return;
-    }
 
     if (role === "ai") {
         div.innerHTML = `
@@ -458,38 +539,35 @@ function addMessage(role, text, save = true) {
     });
 }
 
-
+// ------- Message sending & image generation integration -------
 async function sendMessage() {
     const input = document.getElementById("userInput");
     const text = input.value.trim();
 
-    // Image generation trigger
+    // Image generation inline trigger remains supported, but we mostly use the Image tab
     if (text.toLowerCase().startsWith("generate image:")) {
         const prompt = text.substring("generate image:".length).trim();
-    
+
         const thinkingDiv = document.createElement("div");
         thinkingDiv.className = "msg ai";
         thinkingDiv.innerHTML = '<div class="thinking"><span></span><span></span><span></span></div>';
         messagesDiv.appendChild(thinkingDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    
+
         try {
-            const imgRes = await generateImageWithFallback(prompt);
+            const imgRes = await generateImageWithFallback(prompt, "1024x1024");
             messagesDiv.removeChild(thinkingDiv);
-        
+
             const base64Url = `data:${imgRes.mime};base64,${imgRes.base64}`;
             addMessage("ai-image", base64Url);
-        
         } catch (err) {
             messagesDiv.removeChild(thinkingDiv);
             addMessage("ai", "Image generation failed. Try again later.");
         }
-    
+
         input.value = "";
-        return; // Skip text model
+        return;
     }
-
-
 
     if (!text) return;
 
@@ -532,11 +610,9 @@ async function sendMessage() {
                 chat.memorySummary = summary;
                 saveChats();
             } catch (summaryErr) {
-                // Only display the extreme load message if both models hit limits
                 if (summaryErr?.name === "BothModelsAtCapacity") {
                     addMessage("ai", "[Currently under extreme load, please try again later]");
                 } else {
-                    // Silent fail for summary to avoid extra noise
                     console.error("Summary error:", summaryErr);
                 }
             }
@@ -544,8 +620,9 @@ async function sendMessage() {
 
     } catch (err) {
         console.error(err);
-        messagesDiv.removeChild(thinkingDiv);
-        // Only show the extreme-load message if both models hit capacity/limits
+        // remove thinking if still present
+        const td = document.querySelector(".msg.ai .thinking");
+        if (td && td.parentElement) td.parentElement.remove();
         if (err?.name === "BothModelsAtCapacity") {
             addMessage("ai", "[Currently under extreme load, please try again later]");
         } else {
@@ -554,20 +631,89 @@ async function sendMessage() {
     }
 }
 
+// ------- Image panel handlers -------
+document.getElementById("genImgBtn").onclick = async () => {
+    const promptInput = document.getElementById("imgPrompt");
+    const sizeSelect = document.getElementById("imgSize");
+    const output = document.getElementById("imageResults");
+    const prompt = promptInput.value.trim();
+    const size = sizeSelect.value || "1024x1024";
+
+    if (!prompt) return;
+    output.innerHTML = `<div class="image-card"><div class="thinking"><span></span><span></span><span></span></div><div>Generating image…</div></div>`;
+    try {
+        const { base64, mime, modelUsed } = await generateImageWithFallback(prompt, size);
+        const dataUrl = `data:${mime};base64,${base64}`;
+        const card = document.createElement("div");
+        card.className = "image-card";
+        card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:13px;color:#ddd;">Model: ${modelUsed}</div>
+                <button class="save-btn" style="background:#222428;color:#fff;border:none;border-radius:6px;padding:6px;cursor:pointer;">Save to chat</button>
+            </div>
+            <img src="${dataUrl}" style="max-width:760px;border-radius:8px;">
+            <div style="font-size:12px;color:#bdbdbd;">Prompt: ${marked.parseInline(prompt)}</div>
+        `;
+        output.prepend(card);
+        // attach save handler
+        card.querySelector(".save-btn").onclick = () => {
+            // Save image into current chat as ai-image message and show in chat
+            addMessage("ai-image", dataUrl, true);
+            // switch to chat panel so user sees saved image
+            showChatPanel();
+        };
+    } catch (err) {
+        console.error("Image generation error:", err);
+        output.innerHTML = `<div class="image-card" style="color:#f66;">Image generation failed. Try again later.</div>`;
+    }
+};
+
+// ------- Panel switching -------
+function showImagePanel() {
+    chatPanel.style.display = "none";
+    imagePanel.style.display = "flex";
+    imagePanel.setAttribute("aria-hidden", "false");
+    newChatBtn.classList.remove("active");
+    imageGenBtn.classList.add("active");
+    // hide chat list to reduce clutter
+    chatsDiv.style.display = "none";
+}
+function showChatPanel() {
+    imagePanel.style.display = "none";
+    chatPanel.style.display = "flex";
+    imagePanel.setAttribute("aria-hidden", "true");
+    imageGenBtn.classList.remove("active");
+    newChatBtn.classList.add("active");
+    chatsDiv.style.display = "block";
+}
+
+imageGenBtn.onclick = () => {
+    showImagePanel();
+};
+newChatBtn.onclick = () => {
+    showChatPanel();
+    newChat();
+};
+
+// ------- bindings -------
 document.getElementById("sendBtn").onclick = sendMessage;
 document.getElementById("userInput").addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
-document.getElementById("newChatBtn").onclick = newChat;
 
+// initial load
 renderChats();
-if(chats.length>0) loadChat(0);
+if (chats.length > 0) loadChat(0);
 else newChat();
+
+// expose for debugging if needed
+window._gp = { genAI, generateImageWithFallback, callModelWithFallback };
+
 </script>
 
 <script src="/gp/scripts/starry-background.js"></script>
 <script>
-    setupStarryBackground();
+    if (typeof setupStarryBackground === "function") {
+        setupStarryBackground();
+    }
 </script>
 </body>
-
-</html>>
-
+</html>
