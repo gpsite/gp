@@ -9,7 +9,7 @@
  *
  * Usage per page:
  *   window.initEffectsManager({
- *     backgroundFallback: '#050915',
+ *     backgroundFallback: '#222a3eff',
  *     glassSelectors: ['.sidebar', '.catalog-frame'], // optional, page-specific
  *     storageKey: 'gp-reduced-effects'               // optional, shared key
  *   });
@@ -19,7 +19,7 @@
 
   window.initEffectsManager = function(options){
     const opts = Object.assign({
-      backgroundFallback: '#050915',
+      backgroundFallback: '#222a3eff',
       glassSelectors: [],       // extra selectors that should lose blur/shadows
       storageKey: 'gp-reduced-effects',
       buttonLabel: 'Effects',
