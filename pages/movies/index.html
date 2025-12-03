@@ -13,6 +13,7 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+  <script src="https://gpsite.github.io/gp/js/effects-manager.js"></script>
 
   <style>
     :root{
@@ -639,115 +640,110 @@ let dragging = false;
 
   <!-- Falling leaves generator (copied from GP home) -->
   <script>
-    (function(){
-      const layer = document.getElementById('leaf-layer');
-      if (!layer) return;
+/**
+ * Shared leaf / snow generator
+ * Define window.initLeaves() so Effects Manager can turn snow off/on.
+ */
+window.initLeaves = function() {
+  const layer = document.getElementById('leaf-layer');
+  if (!layer) return;
 
-      // Respect reduced motion
-      try{
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          return;
-        }
-      }catch(e){}
+  // Clear any existing leaves before (re)generating
+  layer.innerHTML = '';
+  layer.style.display = '';
 
-      const LEAFS = ['❄️'];
-      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  // Respect reduced motion
+  try{
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+  }catch(e){}
 
-      // Scale number of leaves by viewport width (with sensible bounds)
-      const COUNT = Math.max(12, Math.min(40, Math.round(vw / 40)));
+  const LEAFS = ['❄️'];
+  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
 
-      function rand(min, max){ return Math.random() * (max - min) + min; }
+  // Scale number of leaves by viewport width (with sensible bounds)
+  const COUNT = Math.max(12, Math.min(40, Math.round(vw / 40)));
 
-      for (let i = 0; i < COUNT; i++){
-        const leaf = document.createElement('span');
-        leaf.className = 'leaf';
+  function rand(min, max){ return Math.random() * (max - min) + min; }
 
-        const sway = document.createElement('span');
-        sway.className = 'sway';
+  function createLeaf() {
+    const leaf = document.createElement('span');
+    leaf.className = 'leaf';
 
-        const spin = document.createElement('span');
-        spin.className = 'spin';
-        spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
+    const sway = document.createElement('span');
+    sway.className = 'sway';
 
-        // Random properties
-        const startLeftVw = rand(0, 100);
-        const sizePx = rand(16, 36);
-        const fallDuration = rand(10, 22); // seconds
-        const swayDuration = rand(2.2, 5.2); // seconds
-        const swayRange = rand(18, 60); // px
-        const spinDuration = rand(6, 13); // seconds
-        const delay = -rand(0, 22); // negative delay staggers leaves
-        const opacity = rand(0.5, 1);
+    const spin = document.createElement('span');
+    spin.className = 'spin';
+    spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
 
-        leaf.style.left = startLeftVw.toFixed(2) + 'vw';
-        leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
-        leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
-        leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
-        leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
-        leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
-        leaf.style.setProperty('--opacity', opacity.toFixed(2));
+    // Random properties
+    const startLeftVw = rand(0, 100);
+    const sizePx = rand(16, 36);
+    const fallDuration = rand(10, 22); // seconds
+    const swayDuration = rand(2.2, 5.2); // seconds
+    const swayRange = rand(18, 60); // px
+    const spinDuration = rand(6, 13); // seconds
+    const delay = -rand(0, 22); // negative delay staggers leaves
+    const opacity = rand(0.5, 1);
 
-        // Randomize spin direction
-        spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
-        spin.style.fontSize = sizePx.toFixed(0) + 'px';
+    leaf.style.left = startLeftVw.toFixed(2) + 'vw';
+    leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
+    leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
+    leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
+    leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
+    leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
+    leaf.style.setProperty('--opacity', opacity.toFixed(2));
 
-        sway.appendChild(spin);
-        leaf.appendChild(sway);
-        layer.appendChild(leaf);
+    // Randomize spin direction
+    spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
+    spin.style.fontSize = sizePx.toFixed(0) + 'px';
+
+    sway.appendChild(spin);
+    leaf.appendChild(sway);
+    layer.appendChild(leaf);
+  }
+
+  for (let i = 0; i < COUNT; i++){
+    createLeaf();
+  }
+
+  // Optional: update density on resize (basic)
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const current = layer.children.length;
+      const vwNow = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const target = Math.max(12, Math.min(40, Math.round(vwNow / 40)));
+      const toAdd = Math.max(0, target - current);
+      for (let i = 0; i < toAdd; i++){
+        createLeaf();
       }
+    }, 250);
+  });
+};
 
-      // Optional: update density on resize (basic)
-      let resizeTimer = null;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-          const current = layer.children.length;
-          const vwNow = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-          const target = Math.max(12, Math.min(40, Math.round(vwNow / 40)));
-          const toAdd = Math.max(0, target - current);
-          for (let i = 0; i < toAdd; i++){
-            const evt = new Event('addLeaf');
-            layer.dispatchEvent(evt);
-          }
-        }, 250);
+// Run once on load
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof window.initLeaves === 'function') {
+    window.initLeaves();
+  }
+});
+</script>
+
+  <script>
+    // Initialize effects manager for MOVIES
+    window.addEventListener('DOMContentLoaded', function(){
+      window.initEffectsManager({
+        backgroundFallback: '#050915',
+        glassSelectors: ['.sidebar', '.catalog-frame'],
+        storageKey: 'gp-reduced-effects'
       });
-
-      // Support adding extra leaves later if needed
-      layer.addEventListener('addLeaf', () => {
-        const leaf = document.createElement('span');
-        leaf.className = 'leaf';
-        const sway = document.createElement('span');
-        sway.className = 'sway';
-        const spin = document.createElement('span');
-        spin.className = 'spin';
-        spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
-
-        const startLeftVw = rand(0, 100);
-        const sizePx = rand(16, 36);
-        const fallDuration = rand(10, 22);
-        const swayDuration = rand(2.2, 5.2);
-        const swayRange = rand(18, 60);
-        const spinDuration = rand(6, 13);
-        const delay = -rand(0, 22);
-        const opacity = rand(0.5, 1);
-
-        leaf.style.left = startLeftVw.toFixed(2) + 'vw';
-        leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
-        leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
-        leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
-        leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
-        leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
-        leaf.style.setProperty('--opacity', opacity.toFixed(2));
-
-        spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
-        spin.style.fontSize = sizePx.toFixed(0) + 'px';
-
-        sway.appendChild(spin);
-        leaf.appendChild(sway);
-        layer.appendChild(leaf);
-      });
-    })();
+    });
   </script>
+
 
 </body>
 </html>
