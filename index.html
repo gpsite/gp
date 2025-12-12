@@ -257,7 +257,39 @@ a.btn.disabled{
           <div class="logo-box">
              <img src="https://gpsite.github.io/gpmedia/img/logo.png" alt="GP Logo">
           </div>
-          
+    <div class="countdown-card" style="flex:1 1 100px; min-width:220px; padding:14px; border-radius:18px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03);">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div>
+          <div style="font-weight:700; font-family:'Poppins',sans-serif; font-size:14px;">Winter Break</div>
+        </div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.6);">December 19 · 16:18</div>
+      </div>
+
+      <div class="countdown-values" style="display:flex; gap:10px; margin-top:12px; align-items:center;">
+        <div style="flex:1; text-align:center;">
+          <div class="cd-value cd-days-left" style="font-family:'Poppins',sans-serif; font-weight:800; font-size:26px; color:var(--text);">0</div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.65); margin-top:6px;">Days</div>
+        </div>
+        <div style="width:1px; background:rgba(255,255,255,0.04); height:48px; align-self:center;"></div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="text-align:center;">
+            <div class="cd-value cd-hours" style="font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:var(--text);">00</div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.65); margin-top:6px;">Hrs</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="cd-value cd-mins" style="font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:var(--text);">00</div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.65); margin-top:6px;">Min</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="cd-value cd-secs" style="font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:var(--text);">00</div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.65); margin-top:6px;">Sec</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="cd-status" style="margin-top:10px; font-size:12px; color:rgba(255,255,255,0.7);"></div>
+
         <a class="btn glass simple-btn" href="pages/games/index.html" aria-label="Games">GAMES</a>
         <a class="btn glass simple-btn" href="pages/movies/index.html" aria-label="Movies">MOVIES</a>
         <a class="btn glass simple-btn" href="https://forms.gle/cVCC9Mzd8VZ3jjsMA" target="_blank" aria-label="Form">REQUESTS<span class="meta">(NEW)</span></a>
@@ -266,6 +298,7 @@ a.btn.disabled{
 
       <!-- Announcements -->
       <section id="announcementsBox" class="announcements glass">
+        
         <h2>Announcements</h2>
         <div class="announcements-content" id="announcementsContent">
           <ul>
@@ -497,11 +530,60 @@ window.addEventListener('DOMContentLoaded', function(){
       storageKey: 'gp-reduced-effects'
     });
   });
+  (function(){
+  // Targets (local time)
+  // December 19, 2025 16:18 local time
+  const decTarget = new Date(2025, 11, 19, 16, 18, 0); // month: 11 = December
+  // January 1, 2026 00:00 local time
+  const nyTarget  = new Date(2026, 0, 1, 0, 0, 0);    // month: 0 = January
+
+  // elements
+  const decEls = {
+    days: document.querySelector('.cd-days-left'),
+    hours: document.querySelector('.cd-hours'),
+    mins: document.querySelector('.cd-mins'),
+    secs: document.querySelector('.cd-secs'),
+    status: document.querySelectorAll('.cd-status')[0]
+  };
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function updateCountdown(target, els){
+    const now = new Date();
+    let diff = Math.max(0, target.getTime() - now.getTime());
+    if (diff <= 0) {
+      els.days.textContent = '0';
+      els.hours.textContent = '00';
+      els.mins.textContent = '00';
+      els.secs.textContent = '00';
+      els.status.textContent = "Time's up";
+      return;
+    } else {
+      els.status.textContent = '';
+    }
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / (3600*24));
+    const hours = Math.floor(totalSeconds / 3600) % 24;
+    const minutes = Math.floor(totalSeconds / 60) % 60;
+    const seconds = totalSeconds % 60;
+
+    els.days.textContent = String(days);
+    els.hours.textContent = pad(hours);
+    els.mins.textContent = pad(minutes);
+    els.secs.textContent = pad(seconds);
+  }
+
+  // initial update + ticking
+  function tick(){
+    updateCountdown(decTarget, decEls);
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
 </script>
 
 </body>
 </html>
-
 
 
 
