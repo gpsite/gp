@@ -228,7 +228,7 @@
     </div>
 
     <!-- Catalog -->
-    <div class="catalog-frame" role="region" aria-label="Movie catalog">
+    <div class="catalog-frame" onload="setserver(1)" role="region" aria-label="Movie catalog">
       <div class="catalog-inner" id="catalog">
         <div class="movie-grid" id="movieGrid" aria-live="polite" aria-atomic="false"></div>
       </div>
@@ -263,12 +263,17 @@
     const movieContainer = document.getElementById("movieContainer");
     const movieInfo = document.getElementById("movieInfo");
 
+    fucntion setserver(number) {
+      return number
+    };
+  
     let allMovies = [];
     let categories = new Set();
     let currentMovie = null;
     let series = new Map();
+    let server = setserver();
 
-    function generateKeyThreeDates() {
+    function generateKeyThreeDates(server) {
       const pad = (n) => String(n).padStart(2, '0');
         
       // Use UTC to avoid local timezone issues
@@ -276,16 +281,21 @@
       const utcYear = now.getUTCFullYear();
       const utcMonth = now.getUTCMonth();
       const utcDate = now.getUTCDate();
-        
+
+
+      const daybeforeyesterday = new Date(Date.UTC(utcYear, utcMonth, utcDate - 2));
       const yesterday = new Date(Date.UTC(utcYear, utcMonth, utcDate - 1));
       const today = new Date(Date.UTC(utcYear, utcMonth, utcDate));
       const tomorrow = new Date(Date.UTC(utcYear, utcMonth, utcDate + 1));
-        
+      const dayaftertomorrow = new Date(Date.UTC(utcYear, utcMonth, utcDate + 2));
+      
       function makeYMD(date) {
         return date.getUTCFullYear() + pad(date.getUTCMonth() + 1) + pad(date.getUTCDate());
       }
     
-      return makeYMD(yesterday) + makeYMD(today) + makeYMD(tomorrow);
+      if (server = 1) {return makeYMD(yesterday) + makeYMD(today) + makeYMD(tomorrow)};
+      if (server = 2) {return makeYMD(daybeforeyesterday) + makeYMD(yesterday) + makeYMD(today)};
+      if (server = 3) {return makeYMD(today) + makeYMD(tomorrow) + makeYMD(dayaftertomorrow)};
     }
 
     function buildMovieUrl(raw) {
