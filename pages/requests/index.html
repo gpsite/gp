@@ -1,1 +1,555 @@
-placeholder
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Requests - GP</title>
+  <link rel="icon" type="image/png" href="https://gpsite.github.io/gp/img/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://gpsite.github.io/gp/js/effects-manager.js"></script>
+
+  <style>
+    :root{
+      --bg-image: url("https://gpsite.github.io/gpmedia/img/home/winter-bg.png");
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --muted-2: #94a3b8;
+      --panel-radius: 20px;
+      --button-radius: 18px;
+      --glass-bg: rgba(8,10,14,0.56);
+      --glass-border: rgba(255,255,255,0.08);
+      --glass-highlight: rgba(255,255,255,0.06);
+      --max-width: 1250px;
+
+      /* layout heights */
+      --panel-min-height: 820px; /* increased so iframe fits without scroll */
+      --iframe-height: 760px;
+    }
+
+    html,body{height:100%; margin:0;}
+    body{
+      color:var(--text);
+      font-family:"Poppins","Segoe UI",system-ui,-apple-system,Arial,Helvetica,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      background: var(--bg-image) center / cover no-repeat fixed;
+      display:flex;
+      justify-content:center;
+      padding:28px;
+      box-sizing:border-box;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:var(--max-width);
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:28px;
+      align-items:start;
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px) saturate(130%);
+      box-shadow:
+        0 12px 34px rgba(0,0,0,0.5),
+        inset 0 1px 0 var(--glass-highlight);
+      border-radius: var(--panel-radius);
+      padding:18px;
+      box-sizing:border-box;
+      color:var(--text);
+      min-height: var(--panel-min-height);
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* Left: form pane */
+    .left .h {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    h1 { margin:0; font-size:1.1rem; font-weight:700; color:var(--text); }
+    .small { color:var(--muted); font-size:0.95rem; margin:0; }
+
+    .form-frame {
+      width:100%;
+      height:var(--iframe-height);
+      border:0;
+      border-radius:12px;
+      background:transparent;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    /* Right: requests list */
+    .right .h {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+    }
+
+    /* Tabs (games/movies/glitches/other) */
+    .tabs {
+      display:flex;
+      gap:8px;
+      margin-top:6px;
+    }
+    .tab {
+      background:transparent;
+      border:1px solid transparent;
+      color:var(--muted);
+      padding:8px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:0.95rem;
+    }
+    .tab.active {
+      background: rgba(255,255,255,0.06);
+      color:var(--text);
+      border-color: rgba(255,255,255,0.06);
+    }
+
+    .controls-row { display:flex; gap:12px; align-items:center; }
+
+    .search {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background: rgba(255,255,255,0.02);
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .search input {
+      background:transparent;
+      border:0;
+      outline:none;
+      color:var(--text);
+      font-size:0.95rem;
+      min-width:220px;
+    }
+    .search .hint { color:var(--muted); font-size:0.9rem; }
+
+    /* make the right pane header occupy only necessary space and list fill the remainder */
+    .right .list {
+      margin-top:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      border-radius:12px;
+      padding:10px;
+      overflow:auto;
+      flex:1 1 auto; /* allow it to stretch and scroll */
+      box-sizing:border-box;
+    }
+
+    .row {
+      display:grid;
+      grid-template-columns: 160px 1fr 120px;
+      gap:12px;
+      align-items:center;
+      padding:12px;
+      border-radius:10px;
+      transition: background .12s;
+      border: 1px solid transparent;
+    }
+    .row:hover {
+      background: rgba(255,255,255,0.03);
+      border-color: rgba(255,255,255,0.03);
+    }
+
+    .date { color:var(--muted); font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .main { font-size:1rem; color:var(--text); word-break:break-word; }
+    .status { text-align:right; }
+
+    .pill {
+      display:inline-block;
+      padding:6px 12px;
+      border-radius:999px;
+      font-weight:700;
+      color:#0b1220;
+      font-size:0.9rem;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08);
+    }
+    .s-completed { background:#10b981; color:#021011; }    /* green */
+    .s-in-progress { background:yellow; color:#2b1600; }  /* amber */
+    .s-received { background:#fb923c; color:#2b0f00; }     /* orange */
+    .s-terminated { background:#ef4444; color:#2b0b0b; }   /* red */
+    .s-unknown { background:#94a3b8; color:#071018; }      /* gray/blue */
+
+    .muted { color:var(--muted); font-size:0.95rem; }
+
+    .highlight { background: rgba(255,255,0,0.12); padding:0 2px; border-radius:3px; }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .wrap { grid-template-columns: 1fr; }
+      .glass { min-height: auto; }
+      .form-frame { height: 420px; }
+      .row { grid-template-columns: 1fr; text-align:left; }
+      .status { text-align:left; }
+      .search input { min-width:140px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="glass left" aria-labelledby="form-title">
+      <div class="h">
+        <div>
+          <h1 id="form-title">Submit a Request</h1>
+          <p class="small">Use this form to send us requests. Opens embedded below.</p>
+        </div>
+        <div>
+          <button id="open-form" class="tab" style="border-radius:12px;">Open form</button>
+        </div>
+      </div>
+
+      <!-- Embedded form made taller so it fits without internal scrolling -->
+      <iframe id="requestForm" class="form-frame" src="https://forms.gle/cVCC9Mzd8VZ3jjsMA" title="Request form"></iframe>
+
+      <p class="small" style="margin-top:8px;">If the form does not embed, click "Open form".</p>
+    </section>
+
+    <section class="glass right" aria-labelledby="requests-title">
+      <div class="h" style="align-items:flex-start;">
+        <div>
+          <h1 id="requests-title">Submitted Requests</h1>
+          <p class="small" id="loaded-info">Loading…</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-end;">
+          <div class="tabs" role="tablist" id="tabs">
+            <button class="tab active" data-type="games" role="tab" aria-selected="true">Games</button>
+            <button class="tab" data-type="movies" role="tab">Movies</button>
+            <button class="tab" data-type="glitches" role="tab">Glitches</button>
+            <button class="tab" data-type="other" role="tab">Other</button>
+          </div>
+
+          <div class="controls-row" style="margin-top:8px;">
+            <div class="search" title="Search requests">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden style="opacity:0.8">
+                <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <input id="search" placeholder="Search requests (press Esc to clear)" aria-label="Search requests" />
+            </div>
+            <div class="muted" id="counts" style="margin-left:6px;">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- List is empty initially; sheet data will populate it. The list is scrollable and fills the right panel. -->
+      <div class="list" id="list" role="list" aria-live="polite">
+        <!-- items inserted here -->
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function(){
+      // Updated Google Sheets values endpoint (range "additions")
+      const sheetUrl = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/additions?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
+
+      // Runtime storage
+      let ITEMS = [];        // parsed items from sheet
+      let currentTab = 'games';
+      let headers = [];      // header names from sheet
+      let mapping = {};      // column mapping
+
+      // Normalize status to label + class
+      function normalizeStatus(s){
+        if(!s) return {label:'Unknown', cls:'s-unknown'};
+        const v = String(s).trim().toLowerCase();
+        if(v.includes('completed') || v === 'completed' || v === 'complete') return {label:'Completed', cls:'s-completed'};
+        if(v.includes('in progress') || v.includes('in-progress') || v === 'in progress' || v === 'inprogress') return {label:'In Progress', cls:'s-in-progress'};
+        if(v.includes('rec') || v.includes('receive') || v.includes('recieved') || v.includes('received')) return {label:'Received', cls:'s-received'};
+        if(v.includes('termin') || v.includes('cancel') || v.includes('terminated')) return {label:'Terminated', cls:'s-terminated'};
+        if(v === 'c') return {label:'Completed', cls:'s-completed'};
+        if(v === 'r') return {label:'Received', cls:'s-received'};
+        return {label: String(s), cls:'s-unknown'};
+      }
+
+      // Parse date value to ms timestamp or NaN
+      function parseDateValue(v){
+        if(v === undefined || v === null || v === '') return NaN;
+        if(typeof v === 'number') return v;
+        const s = String(v).trim();
+        if(/^\d+$/.test(s)){
+          if(s.length >= 12) return Number(s);
+          if(s.length === 10) return Number(s) * 1000;
+        }
+        const d = new Date(s);
+        if(!isNaN(d)) return d.getTime();
+        return NaN;
+      }
+
+      // Build header mapping and detect special columns
+      function buildHeaderIndex(headerRow){
+        headers = headerRow.map(h => (h||'').toString());
+        const lower = headers.map(h => h.toLowerCase().trim());
+
+        const findIndex = (pred) => {
+          for(let i=0;i<lower.length;i++) if(pred(lower[i])) return i;
+          return -1;
+        };
+
+        const m = {
+          dateIdx: findIndex(h=>/date|timestamp|time/.test(h)),
+          statusIdx: findIndex(h=>/status|progress|state/.test(h)),
+          categoryIdx: findIndex(h=>/select one|category|type|kind/.test(h)), // select-one field likely uses "select one" text
+          descriptionIdx: findIndex(h=>/description|details|what happened|issue|problem|bug/.test(h)),
+          mainFallbackIdx: findIndex(h=>/request|what|description|main|text|title|details/.test(h)),
+          // explicit named columns
+          movieNameIdx: findIndex(h => h.includes('name') && h.includes('movie')),
+          gameNameIdx: findIndex(h => (h.includes('name') && (h.includes('game') || h.includes('games'))) || h.includes("games' name"))
+        };
+
+        // sensible fallbacks
+        if(m.dateIdx === -1) m.dateIdx = 0;
+        if(m.statusIdx === -1) m.statusIdx = headers.length - 1;
+        if(m.mainFallbackIdx === -1) m.mainFallbackIdx = 1;
+        if(m.categoryIdx === -1) m.categoryIdx = -1; // if missing, treat as unknown
+        if(m.descriptionIdx === -1) m.descriptionIdx = -1;
+        if(m.movieNameIdx === -1) m.movieNameIdx = -1;
+        if(m.gameNameIdx === -1) m.gameNameIdx = -1;
+
+        return m;
+      }
+
+      // Categorize strictly by literal text in "select one" column:
+      // only exact values "Game"/"Games", "Movie"/"Movies", "Glitch"/"Glitches" map to their categories.
+      // Any other text -> "other".
+      function categorizeByLiteral(rawCategory){
+        if(!rawCategory) return 'other';
+        const v = String(rawCategory).trim().toLowerCase();
+        if(v === 'game' || v === 'games') return 'games';
+        if(v === 'movie' || v === 'movies') return 'movies';
+        if(v === 'glitch' || v === 'glitches') return 'glitches';
+        return 'other';
+      }
+
+      // Format date
+      function fmtDate(ms){
+        if(!ms || isNaN(ms)) return '';
+        return new Date(ms).toLocaleString();
+      }
+
+      // Create DOM row for an item (supports highlighting by regex)
+      function makeRow(item, queryRegex){
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.dataset.category = (item.category || 'other').toString().toLowerCase();
+
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'date';
+        dateDiv.textContent = fmtDate(item._ts) || item.date || '';
+
+        const mainDiv = document.createElement('div');
+        mainDiv.className = 'main';
+        if(queryRegex && item.main){
+          const html = item.main.replace(queryRegex, (m)=>`<span class="highlight">${m}</span>`);
+          mainDiv.innerHTML = html;
+        } else {
+          mainDiv.textContent = item.main || '(no description)';
+        }
+
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'status';
+        const s = normalizeStatus(item.status);
+        const pill = document.createElement('span');
+        pill.className = 'pill ' + s.cls;
+        pill.textContent = s.label;
+        statusDiv.appendChild(pill);
+
+        row.appendChild(dateDiv);
+        row.appendChild(mainDiv);
+        row.appendChild(statusDiv);
+        return row;
+      }
+
+      // Render visible items (apply tab filter, search, and newest-first sort)
+      function renderVisibleItems(){
+        const list = document.getElementById('list');
+        list.innerHTML = '';
+
+        const searchTerm = (document.getElementById('search').value || '').trim();
+        const q = searchTerm ? new RegExp(escapeRegExp(searchTerm), 'ig') : null;
+
+        // filter by tab (using strict category names above)
+        let filtered = ITEMS.filter(it => {
+          const cat = it.category || 'other';
+          if(currentTab === 'games') return cat === 'games';
+          if(currentTab === 'movies') return cat === 'movies';
+          if(currentTab === 'glitches') return cat === 'glitches';
+          if(currentTab === 'other') return cat === 'other';
+          return true;
+        });
+
+        // apply search if present (search in main, date, status)
+        if(q){
+          const lowerSearch = searchTerm.toLowerCase();
+          filtered = filtered.filter(it => {
+            const combined = `${it.main||''} ${it.date||''} ${it.status||''}`.toLowerCase();
+            return combined.indexOf(lowerSearch) !== -1;
+          });
+        }
+
+        // sort by timestamp descending (newest first)
+        filtered.sort((a,b)=>{
+          const ta = a._ts || NaN;
+          const tb = b._ts || NaN;
+          if(!isNaN(ta) && !isNaN(tb)) return tb - ta;
+          if(!isNaN(ta)) return -1;
+          if(!isNaN(tb)) return 1;
+          return 0;
+        });
+
+        const frag = document.createDocumentFragment();
+        filtered.forEach(it => frag.appendChild(makeRow(it, q)));
+        list.appendChild(frag);
+
+        updateCounts();
+      }
+
+      // Update counts across all categories
+      function updateCounts(){
+        const totals = {games:0, movies:0, glitches:0, other:0};
+        ITEMS.forEach(it=>{
+          if(it.category === 'games') totals.games++;
+          else if(it.category === 'movies') totals.movies++;
+          else if(it.category === 'glitches') totals.glitches++;
+          else totals.other++;
+        });
+        const total = totals.games + totals.movies + totals.glitches + totals.other;
+        const countsEl = document.getElementById('counts');
+        countsEl.textContent = `${total} items • Games ${totals.games} · Movies ${totals.movies} · Glitches ${totals.glitches} · Other ${totals.other}`;
+      }
+
+      // Escape regex special chars in search term
+      function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+
+      // Load sheet values and build ITEMS using the strict categorization rules
+      async function loadFromSheet(){
+        const info = document.getElementById('loaded-info');
+        info.textContent = 'Fetching sheet…';
+        try {
+          const res = await fetch(sheetUrl);
+          if(!res.ok) throw new Error(`Sheet fetch failed: ${res.status}`);
+          const json = await res.json();
+          if(!json.values || json.values.length < 2) {
+            info.textContent = 'No data in sheet';
+            ITEMS = [];
+            renderVisibleItems();
+            return;
+          }
+          const headerRow = json.values[0];
+          mapping = buildHeaderIndex(headerRow);
+
+          const rows = json.values.slice(1);
+          const parsed = rows.map(row => {
+            const cell = idx => (idx >= 0 && row[idx] !== undefined ? row[idx] : '');
+            const rawDate = cell(mapping.dateIdx);
+            const ts = parseDateValue(rawDate);
+            const rawCategory = mapping.categoryIdx >= 0 ? cell(mapping.categoryIdx) : '';
+            const status = cell(mapping.statusIdx);
+            const desc = mapping.descriptionIdx >= 0 ? cell(mapping.descriptionIdx) : '';
+            const fallbackMain = cell(mapping.mainFallbackIdx);
+            const movieName = mapping.movieNameIdx >= 0 ? cell(mapping.movieNameIdx) : '';
+            const gameName  = mapping.gameNameIdx >= 0 ? cell(mapping.gameNameIdx) : '';
+
+            // categorize strictly by literal value
+            const category = categorizeByLiteral(rawCategory);
+
+            // Decide main text according to rules:
+            // - Glitches: main = description column (if present), otherwise fallbackMain
+            // - Movies: main = movieName column when present, otherwise fallbackMain
+            // - Games: main = gameName column when present, otherwise fallbackMain
+            // - Other: main = the select-one column (rawCategory)
+            let main = '';
+            if(category === 'glitches') main = desc || fallbackMain || '';
+            else if(category === 'movies') main = movieName || fallbackMain || '';
+            else if(category === 'games') main = gameName || fallbackMain || '';
+            else /* other */ main = rawCategory || fallbackMain || '';
+
+            return {
+              date: rawDate,
+              _ts: isNaN(ts) ? NaN : ts,
+              main: String(main || '').trim(),
+              category: category,
+              status: status || '',
+              _rawRow: row
+            };
+          });
+
+          ITEMS = parsed;
+          info.textContent = `${ITEMS.length} requests loaded`;
+          renderVisibleItems();
+        } catch (err) {
+          console.error('Sheet load error', err);
+          document.getElementById('loaded-info').textContent = 'Failed to load sheet';
+          ITEMS = [];
+          renderVisibleItems();
+        }
+      }
+
+      // Setup tabs interactions
+      function setupTabs(){
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(t=>{
+          t.addEventListener('click', ()=>{
+            tabs.forEach(x=>x.classList.remove('active'));
+            t.classList.add('active');
+            currentTab = t.dataset.type;
+            renderVisibleItems();
+          });
+        });
+      }
+
+      // Setup search interactions
+      function setupSearch(){
+        const input = document.getElementById('search');
+        let timer = null;
+        input.addEventListener('input', ()=>{
+          clearTimeout(timer);
+          timer = setTimeout(()=>renderVisibleItems(), 180);
+        });
+        input.addEventListener('keydown', (e)=>{
+          if(e.key === 'Escape'){
+            input.value = '';
+            renderVisibleItems();
+            input.blur();
+          }
+          if(e.key === 'Enter'){
+            renderVisibleItems();
+            const first = document.querySelector('.list .row');
+            if(first) first.scrollIntoView({behavior:'smooth', block:'center'});
+          }
+        });
+      }
+
+      // Open form button behavior
+      document.getElementById('open-form').addEventListener('click', ()=>{
+        window.open('https://forms.gle/cVCC9Mzd8VZ3jjsMA', '_blank', 'noopener');
+      });
+
+      // Boot sequence
+      (function init(){
+        setupTabs();
+        setupSearch();
+        // load sheet and populate; placeholders removed as requested
+        loadFromSheet();
+        // refresh periodically
+        setInterval(loadFromSheet, 120_000);
+      })();
+
+    })();
+  </script>
+</body>
+</html>
