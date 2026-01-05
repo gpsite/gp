@@ -462,7 +462,7 @@
             <div class="logo-container">
                 <div class="logo">
                     Clanker Workspace
-                    <div class="version">v1.0.2</div>
+                    <div class="version">v1.1.2</div>
                 </div>
             </div>
 
@@ -1381,65 +1381,99 @@ ${memory.summary}`
 
 
 
-        let imageGallery = JSON.parse(localStorage.getItem('imageGallery') || '[]');
+        const DB_NAME = 'GPClankerStorage';
+        const STORE_NAME = 'images';
 
-        function saveImageToGallery(imageUrl, prompt) {
-            const imageData = {
-                url: imageUrl,
-                prompt: prompt,
-                timestamp: Date.now()
-            };
-            imageGallery.unshift(imageData);
-
-
-            if (imageGallery.length > 50) {
-                imageGallery = imageGallery.slice(0, 50);
-            }
-
-            localStorage.setItem('imageGallery', JSON.stringify(imageGallery));
-            renderGallery();
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
         }
 
-        function renderGallery() {
+        async function saveImageToGallery(imageUrl, prompt) {
+            try {
+                const db = await initDB();
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    const base64data = reader.result;
+                    const transaction = db.transaction(STORE_NAME, 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    store.add({
+                        data: base64data,
+                        prompt: prompt,
+                        timestamp: Date.now()
+                    });
+
+                    transaction.oncomplete = () => {
+                        renderGallery();
+                    };
+                };
+            } catch (err) {
+                console.error('Local storage error:', err);
+            }
+        }
+
+        async function renderGallery() {
             const galleryGrid = document.getElementById('galleryGrid');
             if (!galleryGrid) return;
 
-            galleryGrid.innerHTML = '';
+            const db = await initDB();
+            const transaction = db.transaction(STORE_NAME, 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
 
-            imageGallery.forEach((item, index) => {
-                const galleryItem = document.createElement('div');
-                galleryItem.className = 'gallery-item';
-                galleryItem.title = item.prompt;
+            request.onsuccess = () => {
+                const images = request.result.sort((a, b) => b.timestamp - a.timestamp).slice(0, 50);
+                galleryGrid.innerHTML = '';
 
-                const img = document.createElement('img');
-                img.src = item.url;
-                img.alt = item.prompt;
+                images.forEach((item) => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item';
+                    galleryItem.title = item.prompt;
 
-                galleryItem.onclick = () => {
-                    const imagePanel = document.getElementById('imagePanel');
-                    document.getElementById('imageWelcome').style.display = 'none';
-                    document.getElementById('imageInputArea').style.display = 'none';
-                    imagePanel.style.display = 'flex';
-                    imagePanel.innerHTML = '';
-                    const fullImg = document.createElement('img');
-                    fullImg.src = item.url;
-                    fullImg.style.maxWidth = '100%';
-                    fullImg.style.borderRadius = '8px';
-                    imagePanel.appendChild(fullImg);
+                    const img = document.createElement('img');
+                    img.src = item.data;
+                    img.alt = item.prompt;
 
-                    const promptDiv = document.createElement('div');
-                    promptDiv.style.marginTop = '12px';
-                    promptDiv.style.padding = '12px';
-                    promptDiv.style.background = '#1d2350';
-                    promptDiv.style.borderRadius = '6px';
-                    promptDiv.style.fontSize = '13px';
-                    promptDiv.textContent = `Prompt: ${item.prompt}`;
-                    imagePanel.appendChild(promptDiv);
-                };
+                    galleryItem.onclick = () => {
+                        const imagePanel = document.getElementById('imagePanel');
+                        document.getElementById('imageWelcome').style.display = 'none';
+                        document.getElementById('imageInputArea').style.display = 'none';
+                        imagePanel.style.display = 'flex';
+                        imagePanel.innerHTML = '';
 
-                galleryItem.appendChild(img);
-                galleryGrid.appendChild(galleryItem);
-            });
+                        const fullImg = document.createElement('img');
+                        fullImg.src = item.data;
+                        fullImg.style.maxWidth = '100%';
+                        fullImg.style.borderRadius = '8px';
+                        imagePanel.appendChild(fullImg);
+
+                        const promptDiv = document.createElement('div');
+                        promptDiv.style.marginTop = '12px';
+                        promptDiv.style.padding = '12px';
+                        promptDiv.style.background = '#1d2350';
+                        promptDiv.style.borderRadius = '6px';
+                        promptDiv.style.fontSize = '13px';
+                        promptDiv.textContent = `Prompt: ${item.prompt}`;
+                        imagePanel.appendChild(promptDiv);
+                    };
+
+                    galleryItem.appendChild(img);
+                    galleryGrid.appendChild(galleryItem);
+                });
+            };
         }
 
 
@@ -1825,4 +1859,3 @@ ${memory.summary}`
 </body>
 
 </html>
-
