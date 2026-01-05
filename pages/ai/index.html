@@ -462,7 +462,7 @@
             <div class="logo-container">
                 <div class="logo">
                     Clanker Workspace
-                    <div class="version">v1.1.2</div>
+                    <div class="version">v1.1.3</div>
                 </div>
             </div>
 
@@ -1398,27 +1398,20 @@ ${memory.summary}`
             });
         }
 
-        async function saveImageToGallery(imageUrl, prompt) {
+        async function saveImageToGallery(blob, prompt) {
             try {
                 const db = await initDB();
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
 
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => {
-                    const base64data = reader.result;
-                    const transaction = db.transaction(STORE_NAME, 'readwrite');
-                    const store = transaction.objectStore(STORE_NAME);
-                    store.add({
-                        data: base64data,
-                        prompt: prompt,
-                        timestamp: Date.now()
-                    });
+                store.add({
+                    data: blob,
+                    prompt: prompt,
+                    timestamp: Date.now()
+                });
 
-                    transaction.oncomplete = () => {
-                        renderGallery();
-                    };
+                transaction.oncomplete = () => {
+                    renderGallery();
                 };
             } catch (err) {
                 console.error('Local storage error:', err);
@@ -1443,8 +1436,9 @@ ${memory.summary}`
                     galleryItem.className = 'gallery-item';
                     galleryItem.title = item.prompt;
 
+                    const localUrl = URL.createObjectURL(item.data);
                     const img = document.createElement('img');
-                    img.src = item.data;
+                    img.src = localUrl;
                     img.alt = item.prompt;
 
                     galleryItem.onclick = () => {
@@ -1455,7 +1449,7 @@ ${memory.summary}`
                         imagePanel.innerHTML = '';
 
                         const fullImg = document.createElement('img');
-                        fullImg.src = item.data;
+                        fullImg.src = localUrl;
                         fullImg.style.maxWidth = '100%';
                         fullImg.style.borderRadius = '8px';
                         imagePanel.appendChild(fullImg);
@@ -1476,52 +1470,41 @@ ${memory.summary}`
             };
         }
 
-
         async function generateImage(prompt) {
             const imagePanel = document.getElementById('imagePanel');
             imagePanel.style.display = 'flex';
-            imagePanel.innerHTML = '<p>Generating image... (Applying settings)</p>';
+            imagePanel.innerHTML = '<p>Establishing local data pipe... (fetching binary data)</p>';
 
             try {
-
-                const model = document.getElementById('imageModel').value || 'flux';
+                const modelValue = document.getElementById('imageModel').value || 'flux';
                 const resolution = document.getElementById('imageResolution').value || '1024x1024';
                 const [width, height] = resolution.split('x');
                 const enhance = document.getElementById('imageEnhance').checked;
                 const fixedSeed = document.getElementById('imageSeed').value.trim();
-
-
                 const seed = fixedSeed || Math.floor(Math.random() * 1000000000);
 
-
                 const encodedPrompt = encodeURIComponent(prompt);
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=${model}&nologo=true&enhance=${enhance}&seed=${seed}`;
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=${modelValue}&nologo=true&enhance=${enhance}&seed=${seed}`;
 
-                console.log("Generating with URL:", imageUrl);
+                const response = await fetch(imageUrl);
+                if (!response.ok) throw new Error('Network refused the request. (Source domain might be blocked)');
+
+                const blob = await response.blob();
+                const localUrl = URL.createObjectURL(blob);
 
                 const img = new Image();
                 img.style.maxWidth = '100%';
                 img.style.borderRadius = '8px';
-                img.style.display = 'none';
+                img.src = localUrl;
 
-                img.onload = () => {
-                    img.style.display = 'block';
-                    imagePanel.innerHTML = '';
-                    imagePanel.appendChild(img);
+                imagePanel.innerHTML = '';
+                imagePanel.appendChild(img);
 
-
-                    saveImageToGallery(imageUrl, prompt);
-                };
-
-                img.onerror = () => {
-                    throw new Error('Failed to load generated image');
-                };
-
-                img.src = imageUrl;
+                await saveImageToGallery(blob, prompt);
 
             } catch (err) {
                 console.error('Image generation error:', err);
-                imagePanel.innerHTML = '<p>Error generating image: ' + err.message + '</p>';
+                imagePanel.innerHTML = '<p>Error: ' + err.message + '</p>';
             }
         }
 
