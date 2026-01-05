@@ -43,6 +43,16 @@
         .logo {
             padding: 16px;
             font-weight: 600;
+        }
+
+        .version {
+            font-size: 10px;
+            opacity: 0.5;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .logo-container {
             border-bottom: 1px solid #1d2350;
         }
 
@@ -449,7 +459,12 @@
 
     <div id="app-content">
         <div class="sidebar">
-            <div class="logo">Clanker Workspace</div>
+            <div class="logo-container">
+                <div class="logo">
+                    Clanker Workspace
+                    <div class="version">v1.2.4-stable</div>
+                </div>
+            </div>
 
 
             <div id="sidebarChatView">
@@ -888,6 +903,11 @@
         }
 
         async function bootSequence() {
+            const loaderIframe = document.createElement('iframe');
+            loaderIframe.style.display = 'none';
+            document.body.appendChild(loaderIframe);
+            loaderIframe.contentDocument.open();
+
             document.body.classList.add('flicker');
 
             await printLine(`${timestamp()} Booting GPSystem 1.0.0-custom (x86_64)`);
@@ -941,6 +961,9 @@
 
 
             flash.style.opacity = '0';
+
+            loaderIframe.contentDocument.close();
+            document.body.removeChild(loaderIframe);
         }
 
 
