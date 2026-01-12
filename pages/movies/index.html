@@ -1,763 +1,1147 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Movie Catalog - GP</title>
-  <link rel="icon" type="image/png" href="https://gpsite.github.io/gp/img/logo.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Catalog - GP</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://gpsite.github.io/gp/img/logo.png">
 
-  <!-- Poppins (same as GP) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
-  <script src="https://gpsite.github.io/gp/js/effects-manager.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <style>
-    :root{
-      --bg-image: url("https://gpsite.github.io/gpmedia/img/home/winter-bg.png");
-      --glass-bg: rgba(255,255,255,0.12);
-      --glass-bg-hover: rgba(255,255,255,0.18);
-      --glass-border: rgba(255,255,255,0.35);
-      --glass-highlight: rgba(255,255,255,0.55);
-      --text: #ffffff;
-      --muted: #cfcfcf;
-      --accent: rgba(255,255,255,0.06);
-    }
+    <style>
+        :root {
+            --primary: #003594;
+            --bg: #141414;
+            --text: #e5e5e5;
+            --card-bg: #1f1f1f;
+        }
 
-    html,body{height:100%; margin:0;}
-    body{
-      color:var(--text);
-      font-family:"Poppins","Segoe UI",system-ui,-apple-system,Arial,Helvetica,sans-serif;
-      -webkit-font-smoothing:antialiased;
-      background: var(--bg-image) center / cover no-repeat fixed;
-      display:flex;
-      height:100vh;
-      overflow:hidden;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* Layout */
-    .app {
-      display:flex;
-      width:100%;
-      max-width:var(--max-width);
-      margin: 28px auto;
-      gap:18px;
-      padding: 20px;
-      box-sizing:border-box;
-      align-items:stretch;
-      width: calc(100% - 56px);
-    }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
 
-    /* Sidebar (glass) */
-    .sidebar {
-      width: 80px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px) saturate(120%);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 var(--glass-highlight);
-      border-radius: 20px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:8px;
-      box-sizing:border-box;
-      padding-bottom: 10px;
-      z-index: 10;
-    }
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            /* Moved search bar over */
+            padding: 15px 4%;
+            z-index: 1000;
+            transition: background 0.3s ease;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+        }
 
-    .circle-btn { width: 46px; height: 46px; background: rgba(0,0,0,0.24); border-radius: 50%; margin: 6px 0; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 18px; cursor: pointer; position: relative; transition: transform .15s ease, box-shadow .15s ease; z-index: 9001;}
-    .circle-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.45); }
-    .circle-btn input { position: absolute; left: 56px; width: 0; opacity: 0; border: none; outline: none; padding: 6px 10px; border-radius: 10px; background: rgba(0,0,0,0.7); color: #fff; transition: all 0.2s ease; z-index: 9002; }
-    .circle-btn.active input { width: 220px; opacity: 1; height: 32px; top: 6px; z-index: 9003;}
+        .navbar.scrolled {
+            background: #141414;
+        }
 
-    .filter-menu { position: absolute; top: 8px; left: 62px; background: rgba(0,0,0,0.7); border-radius: 10px; padding: 8px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; max-width: 240px; opacity: 0; pointer-events: none; transition: all 0.18s ease; z-index: 1000; }
-    .circle-btn.active .filter-menu { opacity: 1; pointer-events: auto; }
-
-    .filter-menu button { background: rgba(255,255,255,0.04); color: #fff; border: none; padding: 6px 8px; border-radius: 6px; white-space: nowrap; cursor: pointer; font-size: 13px; }
-    .filter-menu button:hover { background: rgba(255,255,255,0.07); }
-
-    .scrollbar { flex: 1; width:100%; display:flex; align-items:center; justify-content:center; position:relative; margin-top:6px; }
-    .track { position:absolute; top:8px; bottom:8px; width: 10px; border-radius: 8px; background: rgba(0,0,0,0.24); }
-    .thumb { width: 54px; height: 34px; background: rgba(0,0,0,0.24); border-radius: 10px; position: absolute; top: 8px; cursor: grab; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-    .thumb div { width: 40%; height: 3px; background: #fff; margin: 2px 0; border-radius: 2px; opacity: .85; }
-
-    a.home-btn { margin-top: auto; width:46px; height:46px; display:flex; align-items:center; justify-content:center; text-decoration:none; color:#fff; background: rgba(0,0,0,0.24); border-radius:50%; }
-    a.home-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.45); }
-
-    /* Catalog (glass) */
-    .catalog-frame {
-      flex:1;
-      border-radius: 16px;
-      border: 1px solid var(--glass-border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      padding: 14px;
-      box-sizing: border-box;
-      backdrop-filter: blur(10px) saturate(120%);
-      display:flex;
-      flex-direction:column;
-      min-height: 68vh;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 var(--glass-highlight);
-    }
-
-    .catalog-inner {
-      flex:1;
-      border-radius: 10px;
-      padding: 12px;
-      overflow-y: scroll; 
-      scrollbar-width: none; 
-      
-    }
-
-    .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 18px; align-items:start; }
-    .movie-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.16)); border-radius: 12px; box-shadow: 0 18px 40px rgba(0,0,0,0.45); padding: 8px; text-align:center; cursor:pointer; transition: transform .12s ease, box-shadow .12s ease; border: 1px solid rgba(255,255,255,0.03); }
-    .movie-card:hover { transform: translateY(-6px); }
-    .movie-card h3 { font-size: 13px; margin: 5px 0; color: #fff; font-weight:700; }
-    .movie-card img { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 8px; background: #333; display:block; }
-    .movie-card p { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
-
-    /* overlay for movie iframe (above leaves) */
-    .movie-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; flex-direction: column; z-index: 9999; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-    .movie-overlay video { max-width: 80vw; max-height: 60vh; border-radius: 12px; background: #000; }
-    .movie-info { max-width: 800px; margin-top: 15px; color: #fff; text-align: left; }
-    .movie-info h2 { margin: 0 0 10px; }
-    .overlay-controls { margin-top: 15px; display: flex; gap: 10px; }
-    .overlay-controls button { background: #222428; color: #fff; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
-    .overlay-controls button:hover { background: #2b2e33; }
-
-    /* Responsive */
-    @media (max-width: 920px){
-      .app { flex-direction: column; margin: 16px; width: calc(100% - 32px); }
-      .sidebar { width: 100%; flex-direction: row; padding: 8px; gap: 8px; border-radius: 12px; }
-      .circle-btn input { left: auto; right: 8px; }
-      .filter-menu { left: 8px; top: 56px; }
-      .catalog-frame { min-height: 60vh; }
-      .movie-overlay iframe { width: 96vw; height: 72vh; }
-    }
-
-    /* Falling leaves overlay (decorative) - lower z than overlay */
-    .leaf-layer{
-      position:fixed;
-      inset:0;
-      z-index:8000; /* under the movie overlay but above background */
-      pointer-events:none;
-      overflow:hidden;
-    }
-    .leaf{
-      position:absolute;
-      top:-10vh;
-      left:0;
-      width:1em;
-      height:1em;
-      transform: translateY(-10vh);
-      animation: fall var(--fall-duration, 14s) linear var(--delay, 0s) infinite;
-      will-change: transform;
-      opacity: var(--opacity, .95);
-    }
-    .leaf .sway{
-      display:inline-block;
-      animation: sway var(--sway-duration, 4s) ease-in-out var(--delay, 0s) infinite alternate;
-      will-change: transform;
-    }
-    .leaf .spin{
-      display:inline-block;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
-      animation: spin var(--spin-duration, 10s) linear var(--delay, 0s) infinite;
-      will-change: transform;
-    }
-
-    @keyframes fall{
-      0%{ transform: translateY(-10vh); }
-      100%{ transform: translateY(110vh); }
-    }
-    @keyframes sway{
-      0%{ transform: translateX(calc(var(--sway-range, 32px) * -1)); }
-      100%{ transform: translateX(var(--sway-range, 32px)); }
-    }
-    @keyframes spin{
-      100%{ transform: rotate(360deg); }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .leaf-layer{ display:none !important; }
-    }
-  </style>
-</head>
-
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-72B0YVX3BS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-72B0YVX3BS');
-</script>
-  
-<body>
-
-  <!-- Falling leaves layer (decorative) -->
-  <div class="leaf-layer" id="leaf-layer" aria-hidden="true"></div>
-
-  <div class="app" role="main" aria-label="Movie catalog application">
-    <!-- Sidebar -->
-    <div class="sidebar" aria-hidden="false">
-      <div class="circle-btn" id="searchBtn" title="Search">
-        <i class="fa fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search...">
-      </div>
-
-      <div class="circle-btn" id="filterBtn" title="Filters">
-        <i class="fa fa-filter"></i>
-        <div class="filter-menu" id="filterMenu" aria-hidden="true"></div>
-      </div>
-
-      <div class="circle-btn" id="seriesBtn" title="Series">
-        <i class="fa fa-list-ol"></i>
-        <div class="filter-menu" id="seriesMenu" aria-hidden="true"></div>
-      </div>
-
-      <div class="scrollbar" aria-hidden="true">
-        <div class="track"></div>
-        <div class="thumb" id="thumb"><div></div><div></div><div></div></div>
-      </div>
-
-      <a class="home-btn" id="homeBtn" href="../../index.html" title="Home"><i class="fa fa-home"></i></a>
-    </div>
-
-    <!-- Catalog -->
-    <div class="catalog-frame" role="region" aria-label="Movie catalog">
-      <div class="catalog-inner" id="catalog">
-        <div class="movie-grid" id="movieGrid" aria-live="polite" aria-atomic="false"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Overlay -->
-  <div class="movie-overlay" id="movieOverlay">
-    <div id="movieContainer"></div>
-    <div class="movie-info" id="movieInfo"></div>
-    <div class="overlay-controls">
-      <button id="subtitleBtn" onclick="toggleSubtitles()">Subtitles</button>
-      <button onclick="toggleFullscreen()">Bordered Fullscreen</button>
-      <button onclick="closeOverlay()">Close</button>
-      <button onclick="setserver(1)">Server 1</button>
-      <button onclick="setserver(2)">Server 2</button>
-      <button onclick="setserver(3)">Server 3</button>
-    </div>
-  </div>
-
-  <!-- Movie data + UI logic -->
-<script>
-    const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
-    const catalog = document.getElementById("catalog");
-    const thumb = document.querySelector(".thumb");
-    const movieGrid = document.getElementById("movieGrid");
-    const track = document.querySelector(".track");
-    const searchBtn = document.getElementById("searchBtn");
-    const searchInput = document.getElementById("searchInput");
-    const filterBtn = document.getElementById("filterBtn");
-    const filterMenu = document.getElementById("filterMenu");
-    const seriesBtn = document.getElementById("seriesBtn");
-    const seriesMenu = document.getElementById("seriesMenu");
-    const overlay = document.getElementById("movieOverlay");
-    const movieContainer = document.getElementById("movieContainer");
-    const movieInfo = document.getElementById("movieInfo");
-
-    function setserver(number) {
-      fetchMovieData();
-      return number
-    };
-  
-    let allMovies = [];
-    let categories = new Set();
-    let currentMovie = null;
-    let series = new Map();
-    let server = setserver();
-
-    function generateKeyThreeDates(server) {
-      const pad = (n) => String(n).padStart(2, '0');
-        
-      // Use UTC to avoid local timezone issues
-      const now = new Date();
-      const utcYear = now.getUTCFullYear();
-      const utcMonth = now.getUTCMonth();
-      const utcDate = now.getUTCDate();
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 30px;
+        }
 
 
-      const daybeforeyesterday = new Date(Date.UTC(utcYear, utcMonth, utcDate - 2));
-      const yesterday = new Date(Date.UTC(utcYear, utcMonth, utcDate - 1));
-      const today = new Date(Date.UTC(utcYear, utcMonth, utcDate));
-      const tomorrow = new Date(Date.UTC(utcYear, utcMonth, utcDate + 1));
-      const dayaftertomorrow = new Date(Date.UTC(utcYear, utcMonth, utcDate + 2));
-      
-      function makeYMD(date) {
-        return date.getUTCFullYear() + pad(date.getUTCMonth() + 1) + pad(date.getUTCDate());
-      }
-    
-      if (server = 1) {return makeYMD(yesterday) + makeYMD(today) + makeYMD(tomorrow)};
-      if (server = 2) {return makeYMD(daybeforeyesterday) + makeYMD(yesterday) + makeYMD(today)};
-      if (server = 3) {return makeYMD(today) + makeYMD(tomorrow) + makeYMD(dayaftertomorrow)};
-    }
 
-    function buildMovieUrl(raw) {
-      if (!raw) return '';
-      let s = String(raw).trim();
-      s = s.replace(/\?k=.*$/, '');
-      const vaultMatch = s.match(/vault\.rips\.cc\/video\/(.+)$/i);
-      if (vaultMatch && vaultMatch[1]) {
-        const path = vaultMatch[1];
-        return `https://vault.rips.cc/video/${path}?k=${generateKeyThreeDates()}`;
-      }
-      const id = s.replace(/^https?:\/\//i, '').replace(/^\/+|\/+$/g, '');
-      return `https://vault.rips.cc/video/${id}?k=${generateKeyThreeDates()}`;
-    }
+        /* Search */
+        .search-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
 
-    async function fetchMovieData() {
-      try {
-        const response = await fetch(SHEET_URL);
-        const data = await response.json();
-        const rows = data.values;
-        const headers = rows.shift();
+        .search-icon {
+            font-size: 16px;
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1002;
+            color: #aaa;
+            pointer-events: none;
+        }
 
-        const urlIndex = headers.indexOf('URL');
-        const imdbIndex = headers.indexOf('IMDB ID');
-        const titleIndex = headers.indexOf('TITLE');
-        const catIndex = headers.indexOf('CATEGORIES');
-        const yearIndex = headers.indexOf('YEAR');
-        const directorIndex = headers.indexOf('DIRECTOR');
-        const actorsIndex = headers.indexOf('ACTORS');
-        const plotIndex = headers.indexOf('PLOT');
-        const posterIndex = headers.indexOf('POSTER');
-        const subtitleUrlIndex = headers.indexOf('SUBTITLES');
+        .search-input {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px 15px 10px 40px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            width: 300px;
+            opacity: 1;
+            border-radius: 20px;
+            transition: background 0.3s, border 0.3s;
+        }
 
-        allMovies = rows.map(row => ({
-          rawUrl: row[urlIndex] || '',
-          url: buildMovieUrl(row[urlIndex] || ''),  // ok
-          imdb: row[imdbIndex] || '',
-          title: row[titleIndex] || '',
-          categories: row[catIndex] ? row[catIndex].split(',').map(c => c.trim()) : [],
-          year: row[yearIndex] || '',
-          director: row[directorIndex] || '',
-          actors: row[actorsIndex] || '',
-          plot: row[plotIndex] || '',
-          poster: row[posterIndex] || '',
-          subtitleUrl: row[subtitleUrlIndex] || ''
-        }));
+        .search-input:focus {
+            background: rgba(0, 0, 0, 0.8);
+            border-color: #fff;
+        }
 
-        categories = new Set();
-        allMovies.forEach(m => m.categories.forEach(c => categories.add(c)));
-        buildFilters();
-        identifySeries();       
-        buildSeriesFilters();
-        renderMovies(allMovies);
-      } catch (e) { console.error("Error fetching movie data", e); }
-    }
-    
-    
+        /* Hero */
+        .hero {
+            height: 80vh;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 4%;
+        }
 
-     function renderMovies(movies) {
-      movieGrid.innerHTML = "";
-      movies.forEach(movie => {
-        const card = document.createElement("div");
-        card.className = "movie-card";
-        card.innerHTML = `
-          <img src="${movie.poster}" alt="${movie.title}">
-          <h3>${movie.title}</h3>
-          <p>${movie.categories.join(', ')}</p>
-        `;
-        card.addEventListener("click", () => openOverlay(movie));
-        movieGrid.appendChild(card);
-      });
-    }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #141414 10%, transparent 100%),
+                linear-gradient(to right, #141414 30%, transparent 100%);
+        }
 
-    function buildFilters() {
-      filterMenu.innerHTML = "";
-      const allBtn = document.createElement("button");
-      allBtn.textContent = "All";
-      allBtn.onclick = () => renderMovies(allMovies);
-      filterMenu.appendChild(allBtn);
-      categories.forEach(cat => {
-        const btn = document.createElement("button");
-        btn.textContent = cat;
-        btn.onclick = () => renderMovies(allMovies.filter(m => m.categories.includes(cat)));
-        filterMenu.appendChild(btn);
-      });
-    }
-    
-    function buildSeriesFilters() {
-      seriesMenu.innerHTML = "";
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 500px;
+        }
 
-      const allBtn = document.createElement("button");
-      allBtn.textContent = "All";
-      allBtn.onclick = () => renderMovies(allMovies);
-      seriesMenu.appendChild(allBtn);
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
 
-      series.forEach((movies, label) => {
-        const btn = document.createElement("button");
-        btn.textContent = label;
-        btn.onclick = () => renderMovies(movies);
-        seriesMenu.appendChild(btn);
-      });
-    }
+        /* Loading Pulse */
+        .loading-pulse {
+            animation: pulse 1.5s infinite;
+            opacity: 0.7;
+        }
 
-    function identifySeries() {
-  series.clear();
-  const normalize = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
+        @keyframes pulse {
+            0% {
+                opacity: 0.4;
+                transform: scale(0.98);
+            }
 
-  // Sort alphabetically
-  const sorted = [...allMovies].filter(m => m.title).sort((a, b) => a.title.localeCompare(b.title, undefined, {sensitivity:'base'}));
+            50% {
+                opacity: 0.8;
+                transform: scale(1.02);
+            }
 
-  const buckets = new Map();
-
-  sorted.forEach(movie => {
-    const title = normalize(movie.title);
-
-    // Base key: take up to colon, "and", or last number if not a year
-    const colonIndex = title.indexOf(':');
-    const andIndex = title.indexOf(' and ');
-    const numMatch = title.match(/\b([0-9]+|[ivxlcdm]+)$/i);
-    let keyEnd = title.length;
-
-    if (colonIndex !== -1) keyEnd = Math.min(keyEnd, colonIndex);
-    if (andIndex !== -1) keyEnd = Math.min(keyEnd, andIndex);
-    if (numMatch) {
-      const n = parseInt(numMatch[1], 10);
-      if (!(n >= 1900 && n <= 2099)) keyEnd = Math.min(keyEnd, numMatch.index);
-    }
-
-    const key = title.slice(0, keyEnd).trim();
-
-    if (!buckets.has(key)) buckets.set(key, []);
-    buckets.get(key).push(movie);
-  });
-
-  // Only keep buckets with 2+ movies (optional)
-  buckets.forEach((movies, key) => {
-    if (movies.length > 1) {
-      series.set(movies[0].title.split(' ').slice(0,2).join(' '), movies);
-    }
-  });
-}
-    
-
-    function openOverlay(movie) {
-      currentMovie = movie;
-      const finalUrl = movie.url;
-
-      const subtitleBtn = document.getElementById('subtitleBtn');
-      if (movie.subtitleUrl && movie.subtitleUrl.trim() !== '') {
-        subtitleBtn.style.display = 'inline-block';
-      } else {
-        subtitleBtn.style.display = 'none';
-      }
-      
-      movieContainer.innerHTML = `
-        <video controls>
-          <source src="${finalUrl}" type="video/mp4">
-          Your browser does not support video.
-        </video>
-      `;
-      movieInfo.innerHTML = `
-        <h2>${movie.title} (${movie.year})</h2>
-        <p><strong>Director:</strong> ${movie.director}</p>
-        <p><strong>Actors:</strong> ${movie.actors}</p>
-        <p><strong>Plot:</strong> ${movie.plot}</p>
-      `;
-      overlay.style.display = "flex";
-    }
-
-    function closeOverlay() {
-      overlay.style.display = "none";
-      movieContainer.innerHTML = "";
-      movieInfo.innerHTML = "";
-      currentMovie = null;
-    }
-
-    function toggleFullscreen() {
-      const videoEl = document.querySelector("#movieContainer video");
-      if (!videoEl) return;
-
-      const videoSrc = videoEl.querySelector("source")?.src || videoEl.src;
-      if (!videoSrc) return;
-
-      const newTab = window.open("", "_blank");
-      if (!newTab) return;
-
-      newTab.document.write(`
-        <html>
-          <head>
-            <title>${document.title} - Bordered Fullscreen</title>
-            <style>
-              html, body { margin: 0; padding: 0; height: 100%; background: #000; }
-              video { width: 100%; height: 100%; border: 4px solid #222; box-sizing: border-box; background: #000; }
-            </style>
-          </head>
-          <body>
-            <video src="${videoSrc}" controls autoplay></video>
-          </body>
-        </html>
-      `);
-      newTab.document.close();
-    }
-    
-    function closeOtherMenus(opening) {
-    if (opening !== 'filter') filterBtn.classList.remove('active');
-    if (opening !== 'series') seriesBtn.classList.remove('active');
-    if (opening !== 'search') {
-      searchBtn.classList.remove('active');
-      searchInput.value = "";
-    }
-  }
-
-    function srtToVtt(srtText) {
-        let vttText = "WEBVTT\n\n";
-        const blocks = srtText.trim().replace(/\r/g, '').split('\n\n');
-
-        for (const block of blocks) {
-            const lines = block.split('\n');
-            if (lines.length < 2) continue;
-
-            const timestamp = lines[1];
-            if (timestamp && timestamp.includes('-->')) {
-                const vttTimestamp = timestamp.replace(/,/g, '.');
-                vttText += vttTimestamp + '\n';
-
-                const text = lines.slice(2).join('\n');
-                vttText += text + '\n\n';
+            100% {
+                opacity: 0.4;
+                transform: scale(0.98);
             }
         }
-        return vttText;
-    }
 
-    async function toggleSubtitles() {
-      const videoEl = document.querySelector("#movieContainer video");
-      if (!videoEl || !currentMovie) return;
-
-      const existingTrack = videoEl.querySelector("track");
-      if (existingTrack) {
-        const subtitleTrack = Array.from(videoEl.textTracks).find(t => t.kind === 'subtitles');
-        if (subtitleTrack) {
-          subtitleTrack.mode = subtitleTrack.mode === "showing" ? "hidden" : "showing";
+        .hero-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #a3a3a3;
         }
-        return;
-      }
 
-      if (!currentMovie.subtitleUrl) {
-        alert("No subtitle URL found for this movie.");
-        return;
-      }
-
-      try {
-        const response = await fetch(currentMovie.subtitleUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        .hero-desc {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        const srtText = await response.text();
-        const vttText = srtToVtt(srtText);
 
-        const vttBlob = new Blob([vttText], { type: 'text/vtt' });
-        const vttUrl = URL.createObjectURL(vttBlob);
+        .btn-primary {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        const track = document.createElement("track");
-        track.kind = "subtitles";
-        track.label = "English";
-        track.srclang = "en";
-        track.src = vttUrl;
-        track.default = true;
-        videoEl.appendChild(track);
-        
-        setTimeout(() => {
-             const subtitleTrack = Array.from(videoEl.textTracks).find(t => t.kind === 'subtitles');
-             if(subtitleTrack) subtitleTrack.mode = 'showing';
-        }, 100);
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
 
-      } catch (e) {
-        console.error("Error fetching or converting subtitles:", e);
-        alert("Could not load subtitles.");
-      }
-    }
+        /* Movie Grid */
+        .content {
+            padding: 40px 4%;
+            margin-top: -100px;
+            position: relative;
+            z-index: 10;
+        }
 
-    function updateTrackHole() {
-  const trackRect = track.getBoundingClientRect();
-  const thumbRect = thumb.getBoundingClientRect();
-  const topRel = Math.max(0, thumbRect.top - trackRect.top);
-  const bottomRel = Math.min(trackRect.height, topRel + thumbRect.height);
+        .grid-header {
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
 
-  const h = Math.max(1, Math.round(trackRect.height));
-  const t = Math.round(topRel);
-  const b = Math.round(bottomRel);
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            /* Tighter gap */
+        }
 
-  const mask = `linear-gradient(to bottom, black 0px, black ${t}px, transparent ${t}px, transparent ${b}px, black ${b}px, black ${h}px)`;
-  track.style.webkitMaskImage = mask;
-  track.style.maskImage = mask;
-}
+        .movie-card {
+            position: relative;
+            transition: transform 0.3s;
+            cursor: pointer;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--card-bg);
+            aspect-ratio: 2/3;
+        }
 
-// --- SYNC THUMB POSITION ---
-function syncThumb() {
-  const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
-  const trackHeight = track.clientHeight - thumb.clientHeight;
-  const newTop = track.offsetTop + ratio * trackHeight;
-  thumb.style.top = newTop + "px";
-  updateTrackHole();
-}
-catalog.addEventListener("scroll", syncThumb);
-window.addEventListener("resize", syncThumb);
+        .movie-card:hover {
+            transform: scale(1.05);
+            z-index: 20;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
 
-// --- DRAG HANDLER ---
-let dragging = false;
-    let startY, startTop;
-    thumb.addEventListener("mousedown", e => {
-      dragging = true;
-      startY = e.clientY;
-      startTop = parseInt(thumb.style.top) || 0;
-      thumb.style.cursor = "grabbing";
-    });
-    document.addEventListener("mousemove", e => {
-      if (!dragging) return;
-      const dy = e.clientY - startY;
-      const trackHeight = track.clientHeight - thumb.clientHeight;
-      let newTop = Math.min(track.offsetTop + trackHeight, Math.max(track.offsetTop, startTop + dy));
-      thumb.style.top = newTop + "px";
-      const ratio = (newTop - track.offsetTop) / trackHeight;
-      catalog.scrollTop = ratio * (catalog.scrollHeight - catalog.clientHeight);
-    });
-    document.addEventListener("mouseup", () => {
-      dragging = false;
-      thumb.style.cursor = "grab";
-    });
+        .movie-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-    searchBtn.addEventListener("click", () => {
-      searchBtn.classList.toggle("active");
-      if (searchBtn.classList.contains("active")) searchInput.focus();
-      else { searchInput.value = ""; renderMovies(allMovies); }
-    });
-    searchInput.addEventListener("input", e => {
-      const term = e.target.value.toLowerCase();
-      renderMovies(allMovies.filter(m => m.title.toLowerCase().includes(term)));
-    });
-        filterBtn.addEventListener("click", () => {
-      const active = filterBtn.classList.toggle("active");
-      if (active) closeOtherMenus('filter');
-    });
+        .movie-info-mini {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 10px 10px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
 
-    seriesBtn.addEventListener("click", () => {
-      const active = seriesBtn.classList.toggle("active");
-      if (active) closeOtherMenus('series');
-    });
-    document.addEventListener("keydown", e => { if (e.key === "Escape" && overlay.style.display === "flex") closeOverlay(); });
+        .movie-card:hover .movie-info-mini {
+            opacity: 1;
+        }
 
-    fetchMovieData();
-  </script>
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            /* Darker backdrop */
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-  <!-- Falling leaves generator (copied from GP home) -->
-  <script>
-/**
- * Shared leaf / snow generator
- * Define window.initLeaves() so Effects Manager can turn snow off/on.
- */
-window.initLeaves = function() {
-  const layer = document.getElementById('leaf-layer');
-  if (!layer) return;
+        .overlay.active {
+            opacity: 1;
+        }
 
-  // Clear any existing leaves before (re)generating
-  layer.innerHTML = '';
-  layer.style.display = '';
+        .overlay-content {
+            width: 90%;
+            max-width: 1100px;
+            height: 90vh;
+            background: #181818;
+            border-radius: 8px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
 
-  // Respect reduced motion
-  try{
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return;
-    }
-  }catch(e){}
+        /* Scrollbar for overlay */
+        .overlay-content::-webkit-scrollbar {
+            width: 8px;
+        }
 
-  const LEAFS = ['❄️'];
-  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        .overlay-content::-webkit-scrollbar-track {
+            background: #181818;
+        }
 
-  // Scale number of leaves by viewport width (with sensible bounds)
-  const COUNT = Math.max(12, Math.min(40, Math.round(vw / 40)));
+        .overlay-content::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
 
-  function rand(min, max){ return Math.random() * (max - min) + min; }
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            flex-shrink: 0;
+            position: relative;
+        }
 
-  function createLeaf() {
-    const leaf = document.createElement('span');
-    leaf.className = 'leaf';
+        .video-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: relative;
+            z-index: 2;
+        }
 
-    const sway = document.createElement('span');
-    sway.className = 'sway';
+        .video-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            z-index: 1;
+        }
 
-    const spin = document.createElement('span');
-    spin.className = 'spin';
-    spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
 
-    // Random properties
-    const startLeftVw = rand(0, 100);
-    const sizePx = rand(16, 36);
-    const fallDuration = rand(10, 22); // seconds
-    const swayDuration = rand(2.2, 5.2); // seconds
-    const swayRange = rand(18, 60); // px
-    const spinDuration = rand(6, 13); // seconds
-    const delay = -rand(0, 22); // negative delay staggers leaves
-    const opacity = rand(0.5, 1);
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
-    leaf.style.left = startLeftVw.toFixed(2) + 'vw';
-    leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
-    leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
-    leaf.style.setProperty('--opacity', opacity.toFixed(2));
+        .loader-text {
+            color: #fff;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            font-weight: 500;
+        }
 
-    // Randomize spin direction
-    spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
-    spin.style.fontSize = sizePx.toFixed(0) + 'px';
+        .overlay-details {
+            padding: 30px;
+            flex-grow: 1;
+        }
 
-    sway.appendChild(spin);
-    leaf.appendChild(sway);
-    layer.appendChild(leaf);
-  }
+        .overlay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
 
-  for (let i = 0; i < COUNT; i++){
-    createLeaf();
-  }
+        .overlay-title {
+            font-size: 32px;
+            font-weight: 700;
+        }
 
-  // Optional: update density on resize (basic)
-  let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      const current = layer.children.length;
-      const vwNow = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-      const target = Math.max(12, Math.min(40, Math.round(vwNow / 40)));
-      const toAdd = Math.max(0, target - current);
-      for (let i = 0; i < toAdd; i++){
-        createLeaf();
-      }
-    }, 250);
-  });
-};
+        .overlay-meta {
+            color: #aaa;
+            margin: 10px 0;
+            font-size: 14px;
+        }
 
-// Run once on load
-window.addEventListener('DOMContentLoaded', function(){
-  if (typeof window.initLeaves === 'function') {
-    window.initLeaves();
-  }
-});
-</script>
+        .overlay-actions {
+            display: flex;
+            gap: 15px;
+        }
 
-  <script>
-    // Initialize effects manager for MOVIES
-    window.addEventListener('DOMContentLoaded', function(){
-      window.initEffectsManager({
-        backgroundFallback: '#222a3eff',
-        glassSelectors: ['.sidebar', '.catalog-frame'],
-        storageKey: 'gp-reduced-effects'
-      });
-    });
-  </script>
+        .btn-icon {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* TV Panel Styles */
+        .tv-panel {
+            margin-top: 30px;
+            background: #222;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .tv-panel h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+
+        .season-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .season-tab {
+            background: #333;
+            border: none;
+            color: #aaa;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .season-tab.active {
+            background: #fff;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .episode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+        }
+
+        .episode-btn {
+            background: #333;
+            border: none;
+            color: #fff;
+            aspect-ratio: 1;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .episode-btn:hover {
+            background: #444;
+        }
+
+        .episode-btn.active {
+            background: var(--primary);
+        }
+
+        /* Related / Sequels */
+        .related-section {
+            margin-top: 40px;
+        }
+
+        .related-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .related-card {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .related-card:hover {
+            opacity: 0.8;
+        }
+
+        .related-card img {
+            width: 100%;
+            border-radius: 4px;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .overlay-content {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="logo" onclick="resetHome()">GEORGE PICKENS</a>
+
+        <div class="search-container" id="searchContainer">
+            <i class="fa fa-search search-icon" id="searchIcon"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Titles, movies, shows, etc...">
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="hero">
+        <div class="hero-content">
+            <h1 class="hero-title" id="heroTitle">Loading...</h1>
+            <div class="hero-meta" id="heroMeta">
+                <!-- Meta info will be injected here -->
+            </div>
+            <p class="hero-desc" id="heroDesc">
+                <!-- Desc will be injected here -->
+            </p>
+            <div id="heroActions">
+                <button class="btn-primary" id="heroPlayBtn"><i class="fa fa-play"></i> Play</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+        <h2 class="grid-header" id="gridTitle">Featured</h2>
+        <div class="movie-grid" id="movieGrid">
+            <!-- Movies injected here -->
+        </div>
+    </main>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay">
+        <div class="overlay-content">
+            <div class="video-wrapper" id="videoWrapper">
+                <div class="video-loader" id="videoLoader">
+                    <div class="spinner"></div>
+                    <div class="loader-text">George Pickens</div>
+                </div>
+                <div id="videoContainer" style="width:100%; height:100%;"></div>
+            </div>
+            <div class="overlay-details">
+                <div class="overlay-header">
+                    <div>
+                        <h2 class="overlay-title" id="overlayTitle">Title</h2>
+                        <div class="overlay-meta" id="overlayEpisodeInfo"
+                            style="display:none; color: var(--primary); font-weight:600;"></div>
+                    </div>
+                    <div class="overlay-actions">
+                        <button class="btn-icon" onclick="closeOverlay()"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>
+                <p id="overlayDesc" style="color:#ddd; line-height:1.6;"></p>
+
+                <!-- TV Panel -->
+                <div id="tvPanel" class="tv-panel" style="display:none;">
+                    <h3>Episodes</h3>
+                    <div class="season-tabs" id="seasonTabs">
+                        <!-- S1, S2... -->
+                    </div>
+                    <div class="episode-grid" id="episodeGrid">
+                        <!-- E1, E2... -->
+                    </div>
+                </div>
+
+                <!-- Related -->
+                <div id="relatedSection" class="related-section" style="display:none;">
+                    <h3 class="related-title">Other</h3>
+                    <div class="related-grid" id="relatedGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fuse.js -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+
+    <script>
+        const KINO_SEARCH_BASE = "https://d3scff8k2pqq6n.cloudfront.net/kino/search";
+        const KINO_POSTER_BASE = "https://d3scff8k2pqq6n.cloudfront.net/kino";
+        const PUBUP_BASE = "https://d3r08e41c0zldz.cloudfront.net/pubup/index.html?";
+
+        const TVMAZE_API = "https://api.tvmaze.com/singlesearch/shows";
+
+        // Cache for TV metadata to avoid repeated fetching
+        let tvCache = {};
+
+        // --- Manual Curated List (Movies and Shows) ---
+        const MANUAL_LIST = [
+            // Movies (20)
+            "Inception", "The Dark Knight", "Interstellar", "The Shawshank Redemption", "The Godfather", "The Godfather Part II", "Pulp Fiction", "Fight Club", "Forrest Gump", "The Matrix",
+            "Breaking Bad", "The Lord of the Rings: The Fellowship of the Ring", "The Lord of the Rings: The Two Towers", "The Lord of the Rings: The Return of the King", "The Empire Strikes Back", "Star Wars", "The Prestige", "Gladiator", "The Social Network", "The Departed",
+            "The Silence of the Lambs", "Saving Private Ryan", "The Green Mile", "Se7en", "Parasite", "Whiplash", "Django Unchained", "The Wolf of Wall Street", "Avengers: Infinity War", "Avengers: Endgame",
+            "Game of Thrones", "The Sopranos", "The Wire", "Better Call Saul", "Stranger Things", "The Truman Show", "Jurassic Park", "Back to the Future", "The Lion King", "Toy Story",
+            "Blade Runner 2049", "Blade Runner", "Alien", "Aliens", "The Terminator", "Terminator 2: Judgment Day", "Mad Max: Fury Road", "The Incredibles", "Spider-Man: Into the Spider-Verse", "Logan",
+            "The Dark Knight Rises", "Batman Begins", "Joker", "No Country for Old Men", "There Will Be Blood", "The Big Lebowski", "Goodfellas", "Casino", "The Irishman", "Heat",
+            "Shutter Island", "The Sixth Sense", "The Usual Suspects", "A Clockwork Orange", "2001: A Space Odyssey", "Apocalypse Now", "Full Metal Jacket", "The Shining", "Dr. Strangelove", "Monty Python and the Holy Grail",
+            "Black Mirror", "Chernobyl", "The Mandalorian", "Arcane", "Attack on Titan", "Narcos", "House of the Dragon", "The Boys", "Rick and Morty", "Westworld"];
+
+        // State
+        let allMovies = [];
+        let currentMovie = null;
+        let currentSeason = 1;
+        let currentEpisode = 1;
+
+        // DOM Elements
+        const navbar = document.getElementById('navbar');
+        const hero = document.getElementById('hero');
+        const movieGrid = document.getElementById('movieGrid');
+        const overlay = document.getElementById('overlay');
+        const searchInput = document.getElementById('searchInput');
+        const searchContainer = document.getElementById('searchContainer');
+        const heroTitle = document.getElementById('heroTitle');
+
+        // --- Helpers ---
+        function posterUrl(path) {
+            return path ? KINO_POSTER_BASE + path : 'https://via.placeholder.com/300x450?text=No+Poster';
+        }
+
+        function buildDirectUrl(id, type, s = 1, e = 1) {
+            if (type === 'tv' || type === 'series') {
+                return `https://player.videasy.net/tv/${id}/${s}/${e}?nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=003594`;
+            }
+            return `https://player.videasy.net/movie/${id}?nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&overlay=true&color=003594`;
+        }
+
+        function deduplicate(results, query = "") {
+            if (!results || results.length === 0) return [];
+            const trash = ["making of", "documentary", "behind the scenes", "challenge of", "special features", "odyssey", "collection", "soundtrack"];
+            const q = query.toLowerCase().replace(/\s+/g, '');
+            const seenIds = new Set();
+            const seenTitles = new Set();
+
+            // Sort by rating desc
+            results.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+            return results.filter(m => {
+                if (!m || !m.id) return false;
+                if (seenIds.has(m.id)) return false;
+
+                const t = m.title.toLowerCase();
+                const tNoSpace = t.replace(/\s+/g, '');
+
+                // Always keep exact match or match without spaces
+                if (q && (tNoSpace === q || tNoSpace.includes(q))) {
+                    seenIds.add(m.id);
+                    seenTitles.add(t);
+                    return true;
+                }
+
+                // Filter trash keywords unless search matches them
+                if (trash.some(tk => t.includes(tk)) && !q.includes(tk.replace(/\s+/g, ''))) return false;
+
+                // Simple title deduplication
+                if (seenTitles.has(t)) return false;
+
+                seenIds.add(m.id);
+                seenTitles.add(t);
+
+                return true;
+            });
+        }
+
+        function escapeHtml(s) {
+            return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
 
 
+
+        // --- Fetch ---
+        async function fetchTvDetails(title) {
+            if (tvCache[title]) return tvCache[title];
+
+            try {
+                // Fetch show details + episodes
+                const res = await fetch(`${TVMAZE_API}?q=${encodeURIComponent(title)}&embed=episodes`);
+                if (!res.ok) return null;
+                const data = await res.json();
+
+                if (data && data._embedded && data._embedded.episodes) {
+                    const episodes = data._embedded.episodes;
+                    const seasons = new Set(episodes.map(e => e.season));
+                    const maxSeason = Math.max(...seasons);
+
+                    // Count episodes per season
+                    const seasonCounts = {};
+                    episodes.forEach(e => {
+                        if (!seasonCounts[e.season]) seasonCounts[e.season] = 0;
+                        seasonCounts[e.season]++;
+                    });
+
+                    const meta = { totalSeasons: maxSeason, seasonCounts };
+                    tvCache[title] = meta;
+                    return meta;
+                }
+            } catch (e) {
+                console.warn("TVMaze fetch failed", e);
+            }
+            return null;
+        }
+
+        async function fetchMovie(title) {
+            try {
+                const url = new URL(KINO_SEARCH_BASE);
+                url.searchParams.set("q", title);
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (data && data.results && data.results.length > 0) {
+                    // Filter: Poster, Overview, Rating > 4
+                    let valid = data.results.filter(m => m.poster && m.overview && m.rating > 4);
+
+                    if (valid.length === 0) return null;
+
+                    // Prefer EXACT match first
+                    const exact = valid.find(v => v.title.toLowerCase() === title.toLowerCase());
+                    if (exact) return exact;
+
+                    // Sort by rating
+                    valid.sort((a, b) => b.rating - a.rating);
+
+                    // Return the best rated match
+                    return valid[0];
+                }
+                return null;
+            } catch (err) {
+                console.warn(`Failed to fetch ${title}`, err);
+                return null;
+            }
+        }
+
+        async function init() {
+            // Loading State
+            heroTitle.classList.add('loading-pulse');
+            heroTitle.textContent = "Loading Library...";
+
+            // Parallel Fetch
+            const promises = MANUAL_LIST.map(title => fetchMovie(title));
+            const results = await Promise.all(promises);
+
+            // Filter nulls and map properties
+            allMovies = results.filter(m => m).map(m => ({
+                id: m.id,
+                title: m.title,
+                titleNoSpace: m.title.toLowerCase().replace(/\s+/g, ''),
+                original_title: m.original_title,
+                overview: m.overview,
+                date: m.date,
+                poster: m.poster,
+                rating: m.rating,
+                type: m.type || 'movie'
+            }));
+
+            // Remove loading
+            heroTitle.classList.remove('loading-pulse');
+
+            if (allMovies.length > 0) {
+                setupHero(allMovies);
+                renderGrid(allMovies);
+                document.getElementById('gridTitle').textContent = "Featured";
+            } else {
+                heroTitle.textContent = "Failed to Load";
+            }
+        }
+
+        // --- UI Logic ---
+        function setupHero(movies) {
+            if (!movies.length) return;
+            // Pick a random movie from the list
+            const featured = movies[Math.floor(Math.random() * movies.length)];
+
+            heroTitle.textContent = featured.title;
+            document.getElementById('heroDesc').textContent = featured.overview;
+
+            // Meta
+            const meta = document.getElementById('heroMeta');
+            meta.innerHTML = `
+                <span>${featured.date?.split('-')[0] || 'N/A'}</span>
+                <span>•</span>
+                <span><i class="fa fa-star" style="color:var(--primary)"></i> ${featured.rating || 'N/A'}</span>
+            `;
+
+            const bgUrl = posterUrl(featured.poster);
+            hero.style.backgroundImage = `url('${bgUrl}')`;
+
+            // Play Button
+            document.getElementById('heroPlayBtn').onclick = () => openOverlay(featured);
+        }
+
+        function renderGrid(movies) {
+            movieGrid.innerHTML = '';
+            movies.forEach(m => {
+                const el = document.createElement('div');
+                el.className = 'movie-card';
+                el.innerHTML = `
+                    <img src="${posterUrl(m.poster)}" class="poster" loading="lazy" alt="${escapeHtml(m.title)}">
+                    <div class="movie-info-mini">
+                        <div>${escapeHtml(m.title)}</div>
+                        <div style="font-size:12px; opacity:0.7">${m.date?.split('-')[0] || ''}</div>
+                    </div>
+                `;
+                el.onclick = () => openOverlay(m);
+                movieGrid.appendChild(el);
+            });
+        }
+
+
+
+        // --- Real-time Search ---
+        let searchDebounce;
+        searchInput.addEventListener('input', (e) => {
+            const q = e.target.value.trim();
+            clearTimeout(searchDebounce);
+
+            if (!q) {
+                renderGrid(allMovies);
+                document.getElementById('gridTitle').textContent = "Featured";
+                return;
+            }
+
+            searchDebounce = setTimeout(async () => {
+                document.getElementById('gridTitle').textContent = `Searching...`;
+
+                try {
+                    // 1. Local Fuzzy Search
+                    let localMatches = [];
+                    if (window.Fuse) {
+                        const fuse = new Fuse(allMovies, {
+                            keys: [
+                                { name: 'title', weight: 0.7 },
+                                { name: 'titleNoSpace', weight: 0.5 },
+                                { name: 'original_title', weight: 0.3 }
+                            ],
+                            threshold: 0.4,
+                            distance: 100,
+                            includeScore: true
+                        });
+                        localMatches = fuse.search(q).map(r => r.item);
+                    }
+
+                    // 2. API Search
+                    const url = new URL(KINO_SEARCH_BASE);
+                    url.searchParams.set("q", q);
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    let apiMatches = [];
+                    if (data && data.results && data.results.length > 0) {
+                        apiMatches = data.results.map(m => ({
+                            id: m.id,
+                            title: m.title,
+                            titleNoSpace: m.title.toLowerCase().replace(/\s+/g, ''),
+                            overview: m.overview,
+                            date: m.date,
+                            poster: m.poster,
+                            rating: m.rating,
+                            type: m.type || 'movie'
+                        })).filter(m => m.poster && m.overview && m.rating > 1.5);
+                    }
+
+                    // Combined Pool
+                    const pool = [...localMatches, ...apiMatches];
+                    const combined = deduplicate(pool, q);
+
+                    // Re-rank by relevance using Fuse if possible
+                    let finalResults = combined;
+                    if (window.Fuse && combined.length > 0) {
+                        const scorer = new Fuse(combined, {
+                            keys: [
+                                { name: 'title', weight: 0.8 },
+                                { name: 'titleNoSpace', weight: 0.5 },
+                                { name: 'original_title', weight: 0.2 }
+                            ],
+                            threshold: 0.4,
+                            distance: 100
+                        });
+                        const fuzzyHits = scorer.search(q);
+                        if (fuzzyHits.length > 0) {
+                            finalResults = fuzzyHits.map(r => r.item);
+
+                            // Add back anything that was in 'combined' but missed by fuzzy (to be safe)
+                            const HitIds = new Set(finalResults.map(m => m.id));
+                            combined.forEach(m => {
+                                if (!HitIds.has(m.id)) finalResults.push(m);
+                            });
+                        }
+                    }
+
+                    if (finalResults.length > 0) {
+                        renderGrid(finalResults);
+                        document.getElementById('gridTitle').textContent = `Results for "${q}"`;
+                    } else {
+                        document.getElementById('gridTitle').textContent = `No results found for "${q}"`;
+                        movieGrid.innerHTML = '<div style="color:#aaa; padding:20px;">Try searching for a different title.</div>';
+                    }
+                } catch (e) {
+                    console.error("Search failed", e);
+                }
+            }, 300);
+        });
+
+
+
+
+        // --- Overlay & Player ---
+        async function openOverlay(movie) {
+            currentMovie = movie;
+
+            // Simple heuristic to detect TV
+            const isTV = (movie.type === 'tv' || movie.type === 'series');
+
+            // Reset state
+            currentSeason = 1;
+            currentEpisode = 1;
+
+            // Update Info
+            document.getElementById('overlayTitle').textContent = movie.title;
+            document.getElementById('overlayDesc').textContent = movie.overview;
+            const epInfo = document.getElementById('overlayEpisodeInfo');
+
+            // --- TV Panel Logic ---
+            const tvPanel = document.getElementById('tvPanel');
+            if (isTV) {
+                tvPanel.style.display = 'block';
+                epInfo.style.display = 'block';
+
+                // Show loading state for controls
+                document.getElementById('seasonTabs').innerHTML = '<span style="color:#aaa; font-size:12px;">Loading info...</span>';
+                document.getElementById('episodeGrid').innerHTML = '';
+
+                // Fetch real metadata
+                const meta = await fetchTvDetails(movie.title);
+
+                // Render controls with metadata (or defaults if failed)
+                renderTvControls(meta);
+
+                updateEpInfo();
+            } else {
+                tvPanel.style.display = 'none';
+                epInfo.style.display = 'none';
+            }
+
+            // --- Sequels / Related Logic ---
+            const relatedSection = document.getElementById('relatedSection');
+            const relatedGrid = document.getElementById('relatedGrid');
+            relatedGrid.innerHTML = '';
+
+            // Smarter Related Search:
+            // 1. Extract keywords (handle colons for franchises like "Avengers:")
+            // 2. Search API
+            // 3. Filter strict & Sort by rating
+            try {
+                let keywords = movie.title;
+
+                // If title contains ':', split and take first part (e.g. "Avengers: Endgame" -> "Avengers")
+                if (movie.title.includes(':')) {
+                    keywords = movie.title.split(':')[0].trim();
+                } else {
+                    // Fallback to word logic
+                    const words = movie.title.split(' ');
+                    if (words.length > 1) {
+                        if (words[0].length <= 3 && words.length > 2) {
+                            keywords = words.slice(0, 3).join(' ');
+                        } else {
+                            keywords = words.slice(0, 2).join(' ');
+                        }
+                    }
+                }
+
+                const url = new URL(KINO_SEARCH_BASE);
+                url.searchParams.set("q", keywords);
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data && data.results && data.results.length > 0) {
+                    let rawRelated = data.results
+                        .filter(m => m.id !== movie.id && m.poster && m.rating > 3);
+
+                    const related = deduplicate(rawRelated, keywords).slice(0, 6);
+
+                    if (related.length > 0) {
+                        relatedSection.style.display = 'block';
+                        related.forEach(r => {
+                            const el = document.createElement('div');
+                            el.className = 'related-card';
+                            el.innerHTML = `<img src="${posterUrl(r.poster)}" title="${escapeHtml(r.title)}" loading="lazy">`;
+                            el.onclick = () => {
+                                openOverlay(r);
+                            };
+                            relatedGrid.appendChild(el);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn("Related fetch failed", e);
+            }
+
+            // Load Video
+            loadVideo(movie, currentSeason, currentEpisode);
+
+            // Show
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+        }
+
+        function renderTvControls(meta) {
+            const seasonTabs = document.getElementById('seasonTabs');
+            const episodeGrid = document.getElementById('episodeGrid');
+
+            // Defaults if meta is missing
+            const totalSeasons = meta ? meta.totalSeasons : 10;
+            const getEpisodeCount = (s) => (meta && meta.seasonCounts[s]) ? meta.seasonCounts[s] : 20;
+
+            // Render Seasons
+            seasonTabs.innerHTML = '';
+            for (let s = 1; s <= totalSeasons; s++) {
+                const btn = document.createElement('button');
+                btn.className = `season-tab ${s === currentSeason ? 'active' : ''}`;
+                btn.textContent = `Season ${s}`;
+                btn.onclick = () => {
+                    currentSeason = s;
+                    currentEpisode = 1; // Reset ep on season change
+                    renderTvControls(meta); // Re-render to update active classes
+                    loadVideo(currentMovie, currentSeason, currentEpisode);
+                    updateEpInfo();
+                };
+                seasonTabs.appendChild(btn);
+            }
+
+            // Render Episodes
+            episodeGrid.innerHTML = '';
+            const episodeCount = getEpisodeCount(currentSeason);
+
+            for (let e = 1; e <= episodeCount; e++) {
+                const btn = document.createElement('button');
+                btn.className = `episode-btn ${e === currentEpisode ? 'active' : ''}`;
+                btn.textContent = e;
+                btn.onclick = () => {
+                    currentEpisode = e;
+                    renderTvControls(meta); // Update highlights
+                    loadVideo(currentMovie, currentSeason, currentEpisode);
+                    updateEpInfo();
+                };
+                episodeGrid.appendChild(btn);
+            }
+
+            // Scroll active season into view
+            const activeSeason = seasonTabs.querySelector('.active');
+            if (activeSeason) activeSeason.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        function updateEpInfo() {
+            const epInfo = document.getElementById('overlayEpisodeInfo');
+            if (epInfo.style.display !== 'none') {
+                epInfo.textContent = `S${currentSeason}:E${currentEpisode}`;
+            }
+        }
+
+        function loadVideo(movie, s, e) {
+            const loader = document.getElementById('videoLoader');
+            const container = document.getElementById('videoContainer');
+
+            // Show loader
+            loader.style.display = 'flex';
+            container.innerHTML = '';
+
+            const directUrl = buildDirectUrl(movie.id, movie.type, s, e);
+            const src = PUBUP_BASE + encodeURIComponent(directUrl);
+
+            const iframe = document.createElement('iframe');
+            iframe.src = src;
+            iframe.allow = "autoplay; fullscreen";
+            iframe.allowFullscreen = true;
+            iframe.referrerPolicy = "no-referrer";
+            iframe.style.opacity = '0';
+            iframe.style.transition = 'opacity 0.5s ease';
+
+            iframe.onload = () => {
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    iframe.style.opacity = '1';
+                }, 2000); // 2 second delay
+            };
+
+            container.appendChild(iframe);
+        }
+
+        function closeOverlay() {
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.getElementById('videoContainer').innerHTML = '';
+                currentMovie = null;
+            }, 300);
+        }
+
+        // --- Navbar Effects ---
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+        });
+
+        // --- Init ---
+        // Expose functions
+        window.closeOverlay = closeOverlay;
+        window.resetHome = () => init();
+
+
+        // Run
+        init();
+    </script>
 </body>
+
 </html>
