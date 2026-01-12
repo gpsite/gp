@@ -1,512 +1,504 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>GP</title>
-<link rel="icon" type="image/png" href="https://gpsite.github.io/gpmedia/img/logo.png">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GP | Final Portal</title>
+    <link rel="icon" type="image/png" href="https://gpsite.github.io/gpmedia/img/logo.png">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="prefetch" href="https://gpsite.github.io/gp/pages/games/index.html" as="document" />
-<link rel="prefetch" href="https://gpsite.github.io/gp/pages/movies/index.html" as="document" />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-<script src="https://gpsite.github.io/gp/js/effects-manager.js"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
-<style>
-:root{
-  --bg-image: url("https://gpsite.github.io/gpmedia/img/home/winter-bg.png"); /* Replace with your preferred background image */
-  --glass-bg: rgba(255,255,255,0.12);
-  --glass-bg-hover: rgba(255,255,255,0.18);
-  --glass-border: rgba(255,255,255,0.35);
-  --glass-highlight: rgba(255,255,255,0.55);
-  --text:#fff;
-  --panel-radius: 22px;
-  --button-radius: 18px;
-  --max-width: 1250px;
-}
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-html,body{height:100%; margin:0;}
-body{
-  color:var(--text);
-  font-family:"Poppins","Segoe UI",system-ui,-apple-system,Arial,Helvetica,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  background: var(--bg-image) center / cover no-repeat fixed;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
+    <style>
+        :root {
+            /* Theme Config - Dark */
+            --bg-dark: url("https://gpsite.github.io/gpmedia/gpjump/dark.png");
+            --bg-light: url("https://gpsite.github.io/gpmedia/gpjump/light.jpg");
 
-/* Center wrapper */
-.center-wrap{
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:40px 32px;
-  box-sizing:border-box;
-}
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent: #60a5fa;
+            --accent-glow: rgba(96, 165, 250, 0.4);
 
-/* Layout grid */
-.main{
-  display:grid;
-  gap:42px;
-  width:100%;
-  max-width: var(--max-width);
-  grid-template-columns: 1fr;
-}
+            --pill-bg: rgba(255, 255, 255, 0.08);
+            --pill-hover: rgba(255, 255, 255, 0.15);
 
-@media (min-width: 980px){
-  .main{
-    grid-template-columns: 340px 1fr;
-    align-items:stretch;
-  }
-}
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
 
-/* Glass */
-.glass{
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(14px) saturate(130%);
-  box-shadow:
-    0 12px 34px rgba(0,0,0,0.35),
-    inset 0 1px 0 var(--glass-highlight);
-  border-radius: var(--panel-radius);
-}
-.glass.simple-btn{
-  border-radius: var(--button-radius);
-  box-shadow:
-    0 10px 28px rgba(0,0,0,0.32),
-    inset 0 1px 0 rgba(255,255,255,0.5);
-}
+            --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 
-nav.menu .logo-box{
-  padding:0;
-  background:none;
-  border:none;
-  box-shadow:none;
-}
-nav.menu .logo-box img{
-  display:block;
-  width:260px;
-  height:auto;
-  margin:0 auto;
-}
+            /* Scalable Units */
+            --font-main: clamp(0.85rem, 1.2vw, 1.05rem);
+            --header-padding: clamp(15px, 2.5vw, 40px);
+            --nav-inner-gap: clamp(8px, 1.5vw, 20px);
+        }
 
-nav.menu{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  align-self:center;
-}
-a.btn{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  text-decoration:none;
-  color:#fff;
-  font-weight:700;
-  font-size:26px;
-  letter-spacing:1px;
-  padding:18px 24px;
-  transition:background .2s ease, transform .1s ease, box-shadow .25s ease;
-}
-a.btn:not(.disabled):hover{
-  background: var(--glass-bg-hover);
-  transform:translateY(-2px);
-  box-shadow:0 14px 40px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.55);
-}
-a.btn .meta{
-  font-weight:600;
-  opacity:.9;
-  font-size:.8em;
-  margin-left:6px;
-}
+        [data-theme="light"] {
+            --glass: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(0, 0, 0, 0.06);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.2);
 
-/* Disabled / down state for buttons */
-a.btn.disabled{
-  opacity:0.55;
-  filter:grayscale(60%);
-  pointer-events:none; /* disable mouse interactions */
-  cursor:default;
-  color: rgba(255,255,255,0.75);
-  box-shadow:none;
-  transform:none;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
-}
+            --pill-bg: rgba(0, 0, 0, 0.03);
+            --pill-hover: rgba(0, 0, 0, 0.06);
 
-/* Announcements panel */
-.announcements{
-  padding:36px 38px 30px;
-  min-height:480px;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  border-radius: var(--panel-radius);
-}
-.announcements h2{
-  margin:0 0 24px;
-  font-size: clamp(42px, 5vw, 70px);
-  font-weight:800;
-  line-height:1.05;
-  text-shadow: 0 4px 20px rgba(0,0,0,.35);
-  letter-spacing:1px;
-  text-align:left;
-}
-.announcements-content{
-  flex:1;
-  font-size: clamp(18px, 2vw, 26px);
-  font-weight:700;
-  letter-spacing:.5px;
-  text-align:left;
-  overflow:auto;
-  padding:0 6px;
-}
-.announcements-content ul{
-  list-style:none;
-  margin:0;
-  padding:0;
-}
-.announcements-content li{
-  margin:18px 0;
-  text-shadow:0 2px 10px rgba(0,0,0,.35);
-}
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
 
-/* Scrollbar (optional subtle) */
-.announcements-content::-webkit-scrollbar{ width:10px; }
-.announcements-content::-webkit-scrollbar-track{ background:rgba(255,255,255,0.06); border-radius:6px; }
-.announcements-content::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.22); border-radius:6px; }
-.announcements-content::-webkit-scrollbar-thumb:hover{ background:rgba(255,255,255,0.30); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
 
-/* Mobile */
-@media (max-width:600px){
-  a.btn{ font-size:22px; padding:16px 20px; }
-  .announcements{ padding:30px 26px 26px; }
-  .announcements h2{ font-size:48px; }
-}
+        body {
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            background-color: #000;
+            color: var(--text-primary);
+        }
 
-/* Falling leaves overlay */
-.leaf-layer{
-  position:fixed;
-  inset:0;
-  z-index:9999; /* above content, click-through enabled */
-  pointer-events:none;
-  overflow:hidden;
-}
-.leaf{
-  position:absolute;
-  top:-10vh;
-  left:0;
-  width:1em;
-  height:1em;
-  transform: translateY(-10vh);
-  animation: fall var(--fall-duration, 14s) linear var(--delay, 0s) infinite;
-  will-change: transform;
-  opacity: var(--opacity, .95);
-}
-.leaf .sway{
-  display:inline-block;
-  animation: sway var(--sway-duration, 4s) ease-in-out var(--delay, 0s) infinite alternate;
-  will-change: transform;
-}
-.leaf .spin{
-  display:inline-block;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
-  animation: spin var(--spin-duration, 10s) linear var(--delay, 0s) infinite;
-  will-change: transform;
-}
+        /* Dynamic Background Layer */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            z-index: -2;
+            transition: background-image 0.8s ease;
+            filter: brightness(0.8);
+        }
 
-@keyframes fall{
-  0%{ transform: translateY(-10vh); }
-  100%{ transform: translateY(110vh); }
-}
-@keyframes sway{
-  0%{ transform: translateX(calc(var(--sway-range, 32px) * -1)); }
-  100%{ transform: translateX(var(--sway-range, 32px)); }
-}
-@keyframes spin{
-  100%{ transform: rotate(360deg); }
-}
+        /* Overlay Jump Layer */
+        .jump-layer {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            z-index: 1000;
+            /* Ontop of everything */
+            pointer-events: none;
+            /* Click through to buttons */
+            transition: background-image 0.8s ease;
+        }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce){
-  .leaf-layer{ display:none !important; }
-}
-</style>
+        [data-theme="dark"] .bg-layer {
+            background-image: var(--bg-dark);
+        }
+
+        [data-theme="light"] .bg-layer {
+            background-image: var(--bg-light);
+            filter: brightness(1.02);
+        }
+
+        [data-theme="dark"] .jump-layer {
+            background-image: url("https://gpsite.github.io/gpmedia/gpjump/jumpdark.png");
+        }
+
+        [data-theme="light"] .jump-layer {
+            background-image: url("https://gpsite.github.io/gpmedia/gpjump/jumplight.png");
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 40%, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        [data-theme="light"] .vignette {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, transparent 40%, transparent 60%, rgba(255, 255, 255, 0.3) 100%);
+        }
+
+        /* --- CONNECTED NAVIGATION BAR --- */
+        header {
+            width: 100%;
+            padding: var(--header-padding);
+            display: flex;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .unified-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1400px;
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            padding: 8px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: var(--font-main);
+            border-radius: 100px;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            background: var(--pill-hover);
+            transform: scale(1.02);
+            color: var(--accent);
+        }
+
+        .nav-link i {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2.5px;
+        }
+
+        /* --- THEME TOGGLE (Integrated into Bar) --- */
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: var(--pill-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: var(--text-primary);
+            margin-left: 10px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--pill-hover);
+            transform: rotate(20deg);
+        }
+
+        /* --- PERSISTENT ANNOUNCEMENTS (BOTTOM) --- */
+        footer {
+            width: 100%;
+            padding: var(--header-padding);
+            padding-top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer-container {
+            width: 100%;
+            max-width: 1600px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .announcements-pane {
+            width: 100%;
+            max-width: 600px;
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 40vh;
+        }
+
+        .logo-container {
+            flex-shrink: 0;
+        }
+
+        .logo-container img {
+            height: clamp(60px, 8vw, 100px);
+            width: auto;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        .announcements-pane h2 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ann-list-container {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .ann-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ann-list li {
+            font-size: clamp(0.95rem, 1.1vw, 1.15rem);
+            line-height: 1.5;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent);
+        }
+
+        [data-theme="light"] .ann-list li {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        /* --- Scrollbar --- */
+        .ann-list-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .ann-list-container::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+
+        .beta-tag {
+            font-size: 0.55em;
+            background: var(--accent);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 900px) {
+            .unified-nav {
+                border-radius: 30px;
+                flex-direction: column;
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .nav-group {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-link {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .theme-toggle {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+            }
+
+            .announcements-pane {
+                max-height: 35vh;
+                border-radius: 20px;
+            }
+        }
+    </style>
 </head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G6Q6EXT0RV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-G6Q6EXT0RV');
-</script>
 
 <body>
-  <!-- Falling leaves layer (decorative) -->
-  <div class="leaf-layer" id="leaf-layer" aria-hidden="true"></div>
+    <div class="bg-layer"></div>
+    <div class="jump-layer"></div>
+    <div class="vignette"></div>
 
-  <!-- Centered layout -->
-  <div class="center-wrap">
-    <main class="main">
-      <!-- Left menu -->
-      <nav class="menu">
-          <div class="logo-box">
-             <img src="https://gpsite.github.io/gpmedia/img/logo.png" alt="GP Logo">
-          </div>
-  
+    <!-- Connected Top Nav -->
+    <header>
+        <div class="unified-nav">
+            <div class="nav-group">
+                <a href="pages/movies/index.html" class="nav-link"><i data-lucide="film"></i> Movies <span
+                        class="beta-tag">1.5 Million Added</span></a>
+                <a href="pages/games/index.html" class="nav-link"><i data-lucide="gamepad-2"></i> Games</a>
+                <a href="pages/ai/index.html" class="nav-link"><i data-lucide="cpu"></i> GP-Clanker <span
+                        class="beta-tag">BETA</span></a>
+            </div>
 
-        <a class="btn glass simple-btn" href="pages/games/index.html" aria-label="Games">GAMES</a>
-        <a class="btn glass simple-btn" href="pages/movies/index.html" aria-label="Movies">MOVIES</a>
-        <a class="btn glass simple-btn" href="pages/requests/index.html" aria-label="Form">REQUESTS</a>
-        <a class="btn glass simple-btn" href="pages/ai/index.html" aria-label="GP-CLANKER" aria-label="AI" tabindex="-1">GP-CLANKER <span class="meta">(Beta)</span></a>
-        <a class="btn glass simple-btn" href="pages/chat/index.html" aria-label="Chat" aria-label="Chat" tabindex="-1">CHAT</a>
-      </nav>
-
-      <!-- Announcements -->
-      <section id="announcementsBox" class="announcements glass">
-        
-        <h2>Announcements</h2>
-        <div class="announcements-content" id="announcementsContent">
-          <ul>
-            <li>LOADING ANNOUNCEMENTS...</li>
-          </ul>
+            <div style="display: flex; align-items: center;">
+                <div class="nav-group">
+                    <a href="pages/requests/index.html" class="nav-link"><i data-lucide="send"></i> Requests</a>
+                    <a href="pages/chat/index.html" class="nav-link"><i data-lucide="sparkles"></i> Experimental <span
+                            class="beta-tag">Coming Soon</span></a>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+                    <i data-lucide="moon" id="moonIcon"></i>
+                    <i data-lucide="sun" id="sunIcon" style="display: none;"></i>
+                </button>
+            </div>
         </div>
-      </section>
-    </main>
-  </div>
+    </header>
 
-  <!-- Announcements fetch + safe markup parser -->
-  <script>
-  (function(){
-    const SHEETS_ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/home?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
-    const contentEl = document.getElementById('announcementsContent');
-    if (!contentEl) return;
+    <!-- Clear Center -->
+    <div style="flex: 1;"></div>
 
-    const ALLOWED_NAMED_COLORS = new Set([
-      'black','white','gray','grey','silver','lightgray','darkgray',
-      'red','crimson','maroon','orange','coral','tomato',
-      'yellow','gold','khaki',
-      'green','lime','olive','seagreen','teal',
-      'blue','navy','royalblue','dodgerblue','deepskyblue','skyblue',
-      'indigo','violet','purple','magenta','fuchsia','pink','hotpink',
-      'cyan','aqua','turquoise'
-    ]);
+    <!-- Persistent Announcements -->
+    <footer>
+        <div class="footer-container">
+            <section class="announcements-pane">
+                <h2><i data-lucide="megaphone" style="width: 14px; height: 14px;"></i> ANNOUNCEMENTS</h2>
+                <div class="ann-list-container" id="annContainer">
+                    <ul class="ann-list">
+                        <li>Establishing connection to database...</li>
+                    </ul>
+                </div>
+            </section>
+            <div class="logo-container">
+                <img src="https://gpsite.github.io/gpmedia/img/logo.png" alt="GP Logo">
+            </div>
+        </div>
+    </footer>
 
-    function normalizeColor(input){
-      if(!input) return null;
-      const c = String(input).trim().toLowerCase();
-      if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c)) return c;
-      if(ALLOWED_NAMED_COLORS.has(c)) return c;
-      return null;
-    }
+    <!-- Scripts -->
+    <script>lucide.createIcons();</script>
 
-    function nodesFromMarkup(text){
-      const frag = document.createDocumentFragment();
-      let i=0, bold=false, color=null;
-      const colorStack=[];
-      let buf='';
-      function flush(){
-        if(!buf) return;
-        let node;
-        if(color && bold){
-          node=document.createElement('b');
-          node.style.color=color;
-          node.textContent=buf;
-        }else if(color){
-          node=document.createElement('span');
-          node.style.color=color;
-          node.textContent=buf;
-        }else if(bold){
-          node=document.createElement('b');
-          node.textContent=buf;
-        }else{
-          node=document.createTextNode(buf);
-        }
-        frag.appendChild(node);
-        buf='';
-      }
-      while(i<text.length){
-        if(text.startsWith('**',i)){ flush(); bold=!bold; i+=2; continue; }
-        if(text.startsWith('[b]',i)){ flush(); bold=true; i+=3; continue; }
-        if(text.startsWith('[/b]',i)){ flush(); bold=false; i+=4; continue; }
-        if(text.startsWith('[color=',i)){
-          const endBracket=text.indexOf(']',i+7);
-          if(endBracket!==-1){
-            const raw=text.slice(i+7,endBracket);
-            const ok=normalizeColor(raw);
-            flush();
-            colorStack.push(color);
-            color= ok!==null ? ok : color;
-            i=endBracket+1;
-            continue;
-          }
-        }
-        if(text.startsWith('[/color]',i)){ flush(); color=colorStack.length?colorStack.pop():null; i+=8; continue; }
-        buf+=text[i++];
-      }
-      flush();
-      return frag;
-    }
+    <script>
+        // Theme
+        const themeBtn = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const html = document.documentElement;
 
-    let ul = contentEl.querySelector('ul');
-    if(!ul){
-      ul=document.createElement('ul');
-      contentEl.innerHTML='';
-      contentEl.appendChild(ul);
-    }
+        const applyTheme = (theme) => {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('gp-final-theme', theme);
+            sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
+            moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
+        };
 
-    function render(items){
-      ul.innerHTML='';
-      for(const raw of items){
-        const text=String(raw||'').trim();
-        if(!text) continue;
-        const li=document.createElement('li');
-        li.appendChild(nodesFromMarkup(text));
-        ul.appendChild(li);
-      }
-    }
+        themeBtn.addEventListener('click', () => {
+            applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        });
 
-    async function fetchAnnouncements(){
-      try{
-        const res=await fetch(SHEETS_ENDPOINT+'&t='+Date.now(),{cache:'no-store'});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const data=await res.json();
-        const rows=Array.isArray(data.values)?data.values:[];
-        const items=rows
-          .map(r=> (r && r.length ? r[0] : ''))
-          .map(v=> (v==null ? '' : String(v).trim()))
-          .filter(v=> v.length>0 && !/^announcements?$/i.test(v));
-        if(items.length){
-          render(items);
-        }else{
-          ul.innerHTML='<li>No announcements found.</li>';
-        }
-      }catch(err){
-        console.error('Failed to load announcements from Google Sheets:', err);
-        ul.innerHTML='<li>FAILED TO LOAD ANNOUNCEMENTS DATA</li>';
-      }
-    }
+        applyTheme(localStorage.getItem('gp-final-theme') || 'dark');
+    </script>
 
-    fetchAnnouncements();
-    setInterval(fetchAnnouncements, 5*60*1000);
-  })();
-  </script>
+    <script>
+        // Announcements + Full Color System
+        (function () {
+            const ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/home?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
+            const container = document.getElementById('annContainer');
 
-  <!-- Falling leaves generator -->
-  <script>
-/**
- * Shared leaf / snow generator
- * Define window.initLeaves() so Effects Manager can turn snow off/on.
- */
-window.initLeaves = function() {
-  const layer = document.getElementById('leaf-layer');
-  if (!layer) return;
+            const ALLOWED_COLORS = new Set([
+                'black', 'white', 'gray', 'grey', 'silver', 'lightgray', 'darkgray',
+                'red', 'crimson', 'maroon', 'orange', 'coral', 'tomato',
+                'yellow', 'gold', 'khaki', 'green', 'lime', 'olive', 'seagreen', 'teal',
+                'blue', 'navy', 'royalblue', 'dodgerblue', 'deepskyblue', 'skyblue',
+                'indigo', 'violet', 'purple', 'magenta', 'fuchsia', 'pink', 'hotpink',
+                'cyan', 'aqua', 'turquoise'
+            ]);
 
-  // Clear any existing leaves before (re)generating
-  layer.innerHTML = '';
-  layer.style.display = '';
+            function normalizeColor(c) {
+                if (!c) return null;
+                c = c.trim().toLowerCase();
+                if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c)) return c;
+                return ALLOWED_COLORS.has(c) ? c : null;
+            }
 
-  // Respect reduced motion
-  try{
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return;
-    }
-  }catch(e){}
+            function parseMarkup(text) {
+                const frag = document.createDocumentFragment();
+                let i = 0, bold = false, color = null;
+                const colorStack = [];
+                let buf = '';
 
-  const LEAFS = ['❄️'];
-  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+                const flush = () => {
+                    if (!buf) return;
+                    let node;
+                    if (color || bold) {
+                        node = document.createElement(bold ? 'b' : 'span');
+                        if (color) node.style.color = color;
+                        node.textContent = buf;
+                    } else {
+                        node = document.createTextNode(buf);
+                    }
+                    frag.appendChild(node);
+                    buf = '';
+                };
 
-  // Scale number of leaves by viewport width (with sensible bounds)
-  const COUNT = Math.max(12, Math.min(40, Math.round(vw / 40)));
+                while (i < text.length) {
+                    if (text.startsWith('**', i)) { flush(); bold = !bold; i += 2; continue; }
+                    if (text.startsWith('[b]', i)) { flush(); bold = true; i += 3; continue; }
+                    if (text.startsWith('[/b]', i)) { flush(); bold = false; i += 4; continue; }
+                    if (text.startsWith('[color=', i)) {
+                        const end = text.indexOf(']', i + 7);
+                        if (end !== -1) {
+                            flush();
+                            colorStack.push(color);
+                            const raw = text.slice(i + 7, end);
+                            const ok = normalizeColor(raw);
+                            color = ok || color;
+                            i = end + 1; continue;
+                        }
+                    }
+                    if (text.startsWith('[/color]', i)) { flush(); color = colorStack.pop() || null; i += 8; continue; }
+                    buf += text[i++];
+                }
+                flush();
+                return frag;
+            }
 
-  function rand(min, max){ return Math.random() * (max - min) + min; }
+            async function load() {
+                try {
+                    const res = await fetch(ENDPOINT + '&t=' + Date.now());
+                    const data = await res.json();
+                    const items = (data.values || []).map(r => r[0]).filter(v => v && !/^announcements?$/i.test(v));
 
-  function createLeaf() {
-    const leaf = document.createElement('span');
-    leaf.className = 'leaf';
+                    const ul = document.createElement('ul');
+                    ul.className = 'ann-list';
+                    items.forEach(t => {
+                        const li = document.createElement('li');
+                        li.appendChild(parseMarkup(t));
+                        ul.appendChild(li);
+                    });
 
-    const sway = document.createElement('span');
-    sway.className = 'sway';
+                    container.innerHTML = '';
+                    container.appendChild(ul);
+                } catch (e) {
+                    container.innerHTML = '<ul class="ann-list"><li>System offline. Retrying...</li></ul>';
+                }
+            }
 
-    const spin = document.createElement('span');
-    spin.className = 'spin';
-    spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
-
-    // Random properties
-    const startLeftVw = rand(0, 100);
-    const sizePx = rand(16, 36);
-    const fallDuration = rand(10, 22); // seconds
-    const swayDuration = rand(2.2, 5.2); // seconds
-    const swayRange = rand(18, 60); // px
-    const spinDuration = rand(6, 13); // seconds
-    const delay = -rand(0, 22); // negative delay staggers leaves
-    const opacity = rand(0.5, 1);
-
-    leaf.style.left = startLeftVw.toFixed(2) + 'vw';
-    leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
-    leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
-    leaf.style.setProperty('--opacity', opacity.toFixed(2));
-
-    // Randomize spin direction
-    spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
-    spin.style.fontSize = sizePx.toFixed(0) + 'px';
-
-    sway.appendChild(spin);
-    leaf.appendChild(sway);
-    layer.appendChild(leaf);
-  }
-
-  for (let i = 0; i < COUNT; i++){
-    createLeaf();
-  }
-
-  // Optional: update density on resize (basic)
-  let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      const current = layer.children.length;
-      const vwNow = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-      const target = Math.max(12, Math.min(40, Math.round(vwNow / 40)));
-      const toAdd = Math.max(0, target - current);
-      for (let i = 0; i < toAdd; i++){
-        createLeaf();
-      }
-    }, 250);
-  });
-};
-
-// Run once on load
-window.addEventListener('DOMContentLoaded', function(){
-  if (typeof window.initLeaves === 'function') {
-    window.initLeaves();
-  }
-});
-</script>
-
-<script>
-  // Initialize effects manager for HOME
-  window.addEventListener('DOMContentLoaded', function(){
-    window.initEffectsManager({
-      backgroundFallback: '#222a3eff',
-      glassSelectors: ['.glass', '.announcements'], // extra, optional
-      storageKey: 'gp-reduced-effects'
-    });
-  });
-
-})();
-</script>
-
+            load();
+            setInterval(load, 300000);
+        })();
+    </script>
 </body>
+
 </html>
-
-
-
-
