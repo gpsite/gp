@@ -609,16 +609,48 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
     <script>
-        const KINO_SEARCH_BASE = "https://d3scff8k2pqq6n.cloudfront.net/kino/search";
-        const KINO_POSTER_BASE = "https://d3scff8k2pqq6n.cloudfront.net/kino";
-        const PUBUP_BASE = "https://d3r08e41c0zldz.cloudfront.net/pubup/index.html?";
+        const CONFIG_SHEET_URL = "https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/movies?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M";
 
-        const TVMAZE_API = "https://api.tvmaze.com/singlesearch/shows";
+        let KINO_SEARCH_BASE = "";
+        let KINO_POSTER_BASE = "";
+        let PUBUP_BASE = "";
+        let TVMAZE_API = "";
+
+        async function fetchConfig() {
+            try {
+                console.log("Syncing configuration from Google Sheets...");
+                const res = await fetch(CONFIG_SHEET_URL);
+                const data = await res.json();
+
+                if (data && data.values) {
+                    data.values.slice(1).forEach((row) => {
+                        const key = row[0] ? row[0].toString().trim() : null;
+                        const value = row[1] ? row[1].toString().trim() : null;
+
+                        if (!key || !value) return;
+
+                        // Only Swap URLs
+                        if (key === 'KINO_SEARCH_BASE') KINO_SEARCH_BASE = value;
+                        else if (key === 'KINO_POSTER_BASE') {
+                            // Safety check: Remove /search or /searchh if present in the poster URL
+                            KINO_POSTER_BASE = value.replace(/\/searchh?$/, '');
+                        }
+                        else if (key === 'PUBUP_BASE') PUBUP_BASE = value;
+                        else if (key === 'TVMAZE_API') TVMAZE_API = value;
+                    });
+
+                    console.log("Config Synchronized:", { KINO_SEARCH_BASE, KINO_POSTER_BASE, PUBUP_BASE, TVMAZE_API });
+                }
+            } catch (err) {
+                console.error("Critical: Failed to sync remote config", err);
+                alert("Critical: Could not load configuration from the cloud. The site may not function correctly.");
+            }
+        }
 
         // Cache for TV metadata to avoid repeated fetching
         let tvCache = {};
 
-        // --- Manual Curated List (Movies and Shows) ---
+        // --- Manual Curated List (Original) ---
         const MANUAL_LIST = [
             // Movies (20)
             "Inception", "The Dark Knight", "Interstellar", "The Shawshank Redemption", "The Godfather", "The Godfather Part II", "Pulp Fiction", "Fight Club", "Forrest Gump", "The Matrix",
@@ -628,7 +660,8 @@
             "Blade Runner 2049", "Blade Runner", "Alien", "Aliens", "The Terminator", "Terminator 2: Judgment Day", "Mad Max: Fury Road", "The Incredibles", "Spider-Man: Into the Spider-Verse", "Logan",
             "The Dark Knight Rises", "Batman Begins", "Joker", "No Country for Old Men", "There Will Be Blood", "The Big Lebowski", "Goodfellas", "Casino", "The Irishman", "Heat",
             "Shutter Island", "The Sixth Sense", "The Usual Suspects", "A Clockwork Orange", "2001: A Space Odyssey", "Apocalypse Now", "Full Metal Jacket", "The Shining", "Dr. Strangelove", "Monty Python and the Holy Grail",
-            "Black Mirror", "Chernobyl", "The Mandalorian", "Arcane", "Attack on Titan", "Narcos", "House of the Dragon", "The Boys", "Rick and Morty", "Westworld"];
+            "Black Mirror", "Chernobyl", "The Mandalorian", "Arcane", "Attack on Titan", "Narcos", "House of the Dragon", "The Boys", "Rick and Morty", "Westworld"
+        ];
 
         // State
         let allMovies = [];
@@ -763,6 +796,9 @@
         }
 
         async function init() {
+            // Fetch remote config first
+            await fetchConfig();
+
             // Loading State
             heroTitle.classList.add('loading-pulse');
             heroTitle.textContent = "Loading Library...";
