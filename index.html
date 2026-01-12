@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GP | Final Portal</title>
+    <title>GEORGE PICKENS</title>
     <link rel="icon" type="image/png" href="https://gpsite.github.io/gpmedia/img/logo.png">
 
     <!-- Fonts -->
@@ -96,9 +96,7 @@
             background-position: center top;
             background-repeat: no-repeat;
             z-index: 1000;
-            /* Ontop of everything */
             pointer-events: none;
-            /* Click through to buttons */
             transition: background-image 0.8s ease;
         }
 
@@ -182,6 +180,12 @@
             width: 18px;
             height: 18px;
             stroke-width: 2.5px;
+        }
+
+        .nav-link.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(1);
         }
 
         /* --- THEME TOGGLE (Integrated into Bar) --- */
@@ -329,7 +333,7 @@
             }
 
             .announcements-pane {
-                max-height: 35vh;
+                max-height: 40vh;
                 border-radius: 20px;
             }
         }
@@ -355,7 +359,7 @@
             <div style="display: flex; align-items: center;">
                 <div class="nav-group">
                     <a href="pages/requests/index.html" class="nav-link"><i data-lucide="send"></i> Requests</a>
-                    <a href="pages/chat/index.html" class="nav-link"><i data-lucide="sparkles"></i> Experimental <span
+                    <a class="nav-link disabled"><i data-lucide="sparkles"></i> Experimental <span
                             class="beta-tag">Coming Soon</span></a>
                 </div>
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
