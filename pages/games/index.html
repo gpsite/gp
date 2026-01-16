@@ -944,12 +944,49 @@
             <title>GEORGE PICKENS</title>
             <script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>
             <style>
-              body { margin:0; padding:0; height:100vh; width:100vw; background:#000; display:flex; justify-content:center; align-items:center; overflow:hidden; }
-              #player { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-              ruffle-player { width: 100vh !important; height: 100vh !important; } 
+              body { margin:0; padding:0; height:100vh; width:100vw; background:#000; display:flex; justify-content:center; align-items:center; overflow:hidden; font-family: sans-serif; }
+              #player { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.5s; }
+              ruffle-player { width: 100vh !important; height: 100vh !important; }
+              
+              /* Loader */
+              .video-loader {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: #000;
+                z-index: 10;
+              }
+              .spinner {
+                width: 50px;
+                height: 50px;
+                border: 3px solid rgba(255, 255, 255, 0.1);
+                border-top-color: #60a5fa;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 15px;
+              }
+              @keyframes spin { to { transform: rotate(360deg); } }
+              .loader-text {
+                color: #fff;
+                font-size: 14px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                opacity: 0.8;
+                font-weight: 500;
+              }
             </style>
           </head>
           <body>
+            <div class="video-loader" id="loader">
+              <div class="spinner"></div>
+              <div class="loader-text">George Pickens</div>
+            </div>
             <div id="player"></div>
             <script>
               window.RufflePlayer = window.RufflePlayer || {};
@@ -957,8 +994,16 @@
                   const ruffle = window.RufflePlayer.newest();
                   const player = ruffle.createPlayer();
                   const container = document.getElementById('player');
+                  const loader = document.getElementById('loader');
+                  
                   container.appendChild(player);
-                  player.load("${currentGameUrl}");
+                  
+                  player.load("${currentGameUrl}").then(() => {
+                    setTimeout(() => {
+                      loader.style.display = 'none';
+                      container.style.opacity = '1';
+                    }, 2000);
+                  });
               });
             <\/script>
           </body>
@@ -970,12 +1015,67 @@
         win.document.write(`
           <!DOCTYPE html>
           <html style="margin:0; padding:0; height:100%; overflow:hidden; background:#000;">
-          <head><title>Game Selection</title></head>
+          <head>
+            <title>GEORGE PICKENS</title>
+            <style>
+              body { margin:0; padding:0; height:100vh; width:100vw; background:#000; overflow:hidden; font-family: sans-serif; }
+              iframe { border:0; width:100vw; height:100vh; opacity: 0; transition: opacity 0.5s; }
+              
+              /* Loader */
+              .video-loader {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: #000;
+                z-index: 10;
+              }
+              .spinner {
+                width: 50px;
+                height: 50px;
+                border: 3px solid rgba(255, 255, 255, 0.1);
+                border-top-color: #60a5fa;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 15px;
+              }
+              @keyframes spin { to { transform: rotate(360deg); } }
+              .loader-text {
+                color: #fff;
+                font-size: 14px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                opacity: 0.8;
+                font-weight: 500;
+              }
+            </style>
+          </head>
           <body>
-            <iframe src="${currentGameUrl}" style="border:0; width:100vw; height:100vh;" allow="autoplay; fullscreen"></iframe>
+            <div class="video-loader" id="loader">
+              <div class="spinner"></div>
+              <div class="loader-text">George Pickens</div>
+            </div>
+            <iframe id="gameFrame" src="${currentGameUrl}" allow="autoplay; fullscreen"></iframe>
+            <script>
+              const iframe = document.getElementById('gameFrame');
+              const loader = document.getElementById('loader');
+              
+              iframe.onload = () => {
+                setTimeout(() => {
+                  loader.style.display = 'none';
+                  iframe.style.opacity = '1';
+                }, 2000);
+              };
+            <\/script>
           </body>
           </html>
         `);
+        win.document.close();
       }
     }
 
