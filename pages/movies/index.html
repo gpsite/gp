@@ -530,7 +530,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
-        <a href="#" class="logo" href="https://gpsite.github.io/gp">GEORGE PICKENS</a>
+        <a href="#" class="logo" onclick="resetHome()">GEORGE PICKENS</a>
 
         <div class="search-container" id="searchContainer">
             <i class="fa fa-search search-icon" id="searchIcon"></i>
@@ -656,7 +656,7 @@
             "Inception", "The Dark Knight", "Interstellar", "The Shawshank Redemption", "The Godfather", "The Godfather Part II", "Pulp Fiction", "Fight Club", "Forrest Gump", "The Matrix",
             "Breaking Bad", "The Lord of the Rings: The Fellowship of the Ring", "The Lord of the Rings: The Two Towers", "The Lord of the Rings: The Return of the King", "The Empire Strikes Back", "Star Wars", "The Prestige", "Gladiator", "The Social Network", "The Departed",
             "The Silence of the Lambs", "Saving Private Ryan", "The Green Mile", "Se7en", "Parasite", "Whiplash", "Django Unchained", "The Wolf of Wall Street", "Avengers: Infinity War", "Avengers: Endgame",
-            "Game of Thrones", "The Sopranos", "The Wire", "Better Call Saul", "Stranger Things (2016)", "The Truman Show", "Jurassic Park", "Back to the Future", "The Lion King", "Toy Story",
+            "Game of Thrones", "The Sopranos", "The Wire", "Better Call Saul", "The Truman Show", "Jurassic Park", "Back to the Future", "The Lion King", "Toy Story",
             "Blade Runner 2049", "Blade Runner", "Alien", "Aliens", "The Terminator", "Terminator 2: Judgment Day", "Mad Max: Fury Road", "The Incredibles", "Spider-Man: Into the Spider-Verse", "Logan",
             "The Dark Knight Rises", "Batman Begins", "Joker", "No Country for Old Men", "There Will Be Blood", "The Big Lebowski", "Goodfellas", "Casino", "The Irishman", "Heat",
             "Shutter Island", "The Sixth Sense", "The Usual Suspects", "A Clockwork Orange", "2001: A Space Odyssey", "Apocalypse Now", "Full Metal Jacket", "The Shining", "Dr. Strangelove", "Monty Python and the Holy Grail",
@@ -766,31 +766,34 @@
         }
 
         async function fetchMovie(title) {
-  try {
-    const res = await fetch(
-      `${KINO_SEARCH_BASE}/${encodeURIComponent(title)}`
-    );
-    if (!res.ok) return null;
+            try {
+                const url = new URL(KINO_SEARCH_BASE);
+                url.searchParams.set("q", title);
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (data && data.results && data.results.length > 0) {
+                    // Filter: Poster, Overview, Rating > 4
+                    let valid = data.results.filter(m => m.poster && m.overview && m.rating > 4);
 
-    const data = await res.json();
-    if (!data?.results?.length) return null;
+                    if (valid.length === 0) return null;
 
-    let valid = data.results.filter(
-      m => m.poster && m.overview && m.rating > 4
-    );
+                    // Prefer EXACT match first
+                    const exact = valid.find(v => v.title.toLowerCase() === title.toLowerCase());
+                    if (exact) return exact;
 
-    if (!valid.length) return null;
+                    // Sort by rating
+                    valid.sort((a, b) => b.rating - a.rating);
 
-    const exact = valid.find(
-      v => v.title.toLowerCase() === title.toLowerCase()
-    );
-
-    return exact || valid.sort((a, b) => b.rating - a.rating)[0];
-  } catch (e) {
-    console.warn(`Failed to fetch ${title}`, e);
-    return null;
-  }
-}
+                    // Return the best rated match
+                    return valid[0];
+                }
+                return null;
+            } catch (err) {
+                console.warn(`Failed to fetch ${title}`, err);
+                return null;
+            }
+        }
 
         async function init() {
             // Fetch remote config first
@@ -905,10 +908,10 @@
                     }
 
                     // 2. API Search
-                    const res = await fetch(
-  `${KINO_SEARCH_BASE}/${encodeURIComponent(q)}`
-);
-const data = await res.json();
+                    const url = new URL(KINO_SEARCH_BASE);
+                    url.searchParams.set("q", q);
+                    const res = await fetch(url);
+                    const data = await res.json();
 
                     let apiMatches = [];
                     if (data && data.results && data.results.length > 0) {
