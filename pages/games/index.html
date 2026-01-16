@@ -1,460 +1,919 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
+
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Game Catalog - GP</title>
-  <link rel="icon" type="image/png" href="https://gpsite.github.io/gp/img/logo.png">
+  <link rel="icon" type="image/png" href="https://gpsite.github.io/gpmedia/img/logo.png">
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Fuse.js -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+
+  <!-- Ruffle (Flash Emulator) -->
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
-  <script src="https://gpsite.github.io/gp/js/effects-manager.js"></script>
 
   <style>
-    :root{
-      --bg-image: url("https://gpsite.github.io/gpmedia/img/home/winter-bg.png");
-      --glass-bg: rgba(255,255,255,0.12);
-      --glass-bg-hover: rgba(255,255,255,0.18);
-      --glass-border: rgba(255,255,255,0.35);
-      --glass-highlight: rgba(255,255,255,0.55);
-      --text: #ffffff;
-      --muted: #cfcfcf;
-      --accent: rgba(255,255,255,0.06);
+    :root {
+      /* Theme Config - Dark */
+      --bg-dark: url("https://gpsite.github.io/gpmedia/img/g-page/gamedark.png");
+      --bg-light: url("https://gpsite.github.io/gpmedia/img/g-page/gamelight.jpg");
+
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-strong: rgba(20, 20, 20, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --accent: #60a5fa;
+      --accent-glow: rgba(96, 165, 250, 0.4);
+
+      --pill-bg: rgba(255, 255, 255, 0.08);
+      --pill-hover: rgba(255, 255, 255, 0.15);
+
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
+
+      --transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+      /* Scalable Units */
+      --font-main: clamp(0.9rem, 1.2vw, 1.05rem);
+      --header-padding: clamp(15px, 2.5vw, 40px);
     }
 
-    html,body{height:100%; margin:0;}
-    body{
-      color:var(--text);
-      font-family:"Poppins","Segoe UI",system-ui,-apple-system,Arial,Helvetica,sans-serif;
-      -webkit-font-smoothing:antialiased;
-      background: var(--bg-image) center / cover no-repeat fixed;
-      display:flex;
-      height:100vh;
-      overflow:hidden;
+    [data-theme="light"] {
+      /* Light Theme Overrides */
+      --glass: rgba(255, 255, 255, 0.75);
+      --glass-strong: rgba(255, 255, 255, 0.9);
+      --glass-border: rgba(0, 0, 0, 0.06);
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --accent: #2563eb;
+      --accent-glow: rgba(37, 99, 235, 0.2);
+      --pill-bg: rgba(0, 0, 0, 0.04);
+      --pill-hover: rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.15);
     }
 
-    /* Layout */
-    .app {
-      display:flex;
-      width:100%;
-      max-width:var(--max-width);
-      margin: 28px auto;
-      gap:18px;
-      padding: 20px;
-      box-sizing:border-box;
-      align-items:stretch;
-      width: calc(100% - 56px);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Sidebar (glass) */
-    .sidebar {
-      width: 80px;
-      background: var(--glass-bg);
+    body {
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #000;
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* Dynamic Background Layer */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: -2;
+      transition: background-image 0.8s ease;
+      filter: saturate(40%);
+    }
+
+    [data-theme="dark"] .bg-layer {
+      background-image: var(--bg-dark);
+    }
+
+    [data-theme="light"] .bg-layer {
+      background-image: var(--bg-light);
+      filter: brightness(1.02);
+    }
+
+    /* --- NAVIGATION --- */
+    header {
+      width: 100%;
+      padding: var(--header-padding);
+      padding-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      z-index: 100;
+      position: relative;
+    }
+
+    /* Unified Navbar Pill */
+    .nav-pill {
+      display: flex;
+      align-items: center;
+      background: var(--glass);
       border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px) saturate(120%);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 var(--glass-highlight);
-      border-radius: 20px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:8px;
-      box-sizing:border-box;
-      padding-bottom: 10px;
+      border-radius: 100px;
+      padding: 6px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 900px;
+      gap: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 100px;
+      transition: var(--transition);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: var(--pill-hover);
+    }
+
+    .nav-item i {
+      width: 18px;
+      height: 18px;
+    }
+
+    .search-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--pill-bg);
+      border-radius: 100px;
+      padding: 2px;
+      transition: var(--transition);
+    }
+
+    .search-container:focus-within {
+      background: var(--pill-hover);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    .search-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 10px 16px;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    /* --- CONTENT GRIDS --- */
+    main {
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 var(--header-padding) 60px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
       z-index: 10;
     }
 
-    .circle-btn { width: 46px; height: 46px; background: rgba(0,0,0,0.24); border-radius: 50%; margin: 6px 0; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 18px; cursor: pointer; position: relative; transition: transform .15s ease, box-shadow .15s ease; z-index: 9001;}
-    .circle-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.45); }
-    .circle-btn input { position: absolute; left: 56px; width: 0; opacity: 0; border: none; outline: none; padding: 6px 10px; border-radius: 10px; background: rgba(0,0,0,0.7); color: #fff; transition: all 0.2s ease; z-index: 9002; }
-    .circle-btn.active input { width: 220px; opacity: 1; height: 32px; top: 6px; z-index: 9003;}
+    /* Top Grid */
+    .top-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 24px;
+      width: 100%;
+    }
 
-    .filter-menu { position: absolute; top: 8px; left: 62px; background: rgba(0,0,0,0.7); border-radius: 10px; padding: 8px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px; min-width: 240px; opacity: 0; pointer-events: none; transition: all 0.18s ease; z-index: 1000; }
-    .circle-btn.active .filter-menu { opacity: 1; pointer-events: auto; }
+    /* Featured Divider */
+    .featured-divider {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      margin: 10px 0;
+      opacity: 0.9;
+    }
 
-    .filter-menu button { background: rgba(255,255,255,0.04); color: #fff; border: none; padding: 6px 8px; border-radius: 6px; white-space: nowrap; cursor: pointer; font-size: 13px; }
-    .filter-menu button:hover { background: rgba(255,255,255,0.07); }
+    .diamond {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      transform: rotate(45deg);
+      box-shadow: 0 0 10px var(--accent);
+    }
 
-    .scrollbar { flex: 1; width:100%; display:flex; align-items:center; justify-content:center; position:relative; margin-top:6px; }
-    .track { position:absolute; top:8px; bottom:8px; width: 10px; border-radius: 8px; background: rgba(0,0,0,0.24); }
-    .thumb { width: 54px; height: 34px; background: rgba(0,0,0,0.24); border-radius: 10px; position: absolute; top: 8px; cursor: grab; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-    .thumb div { width: 40%; height: 3px; background: #fff; margin: 2px 0; border-radius: 2px; opacity: .85; }
+    .divider-line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+      border-radius: 1px;
+    }
 
-    a.home-btn { margin-top: auto; width:46px; height:46px; display:flex; align-items:center; justify-content:center; text-decoration:none; color:#fff; background: rgba(0,0,0,0.24); border-radius:50%; }
-    a.home-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.45); }
+    .divider-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
 
-    /* Catalog (glass) */
-    .catalog-frame {
-      flex:1;
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 24px;
+      /* More breathing room for text below */
+      width: 100%;
+      align-items: start;
+    }
+
+    /* Game Card Styling (Redesigned) */
+    .game-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .card-image-wrapper {
+      aspect-ratio: 1;
       border-radius: 16px;
+      overflow: hidden;
       border: 1px solid var(--glass-border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      padding: 14px;
-      box-sizing: border-box;
-      backdrop-filter: blur(10px) saturate(120%);
-      display:flex;
-      flex-direction:column;
-      min-height: 68vh;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 var(--glass-highlight);
+      background: var(--glass);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
     }
 
-    .catalog-inner {
-      flex:1;
-      border-radius: 10px;
-      padding: 12px;
-      overflow-y: scroll; 
-      scrollbar-width: none; 
-      
+    .card-image-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transition: var(--transition);
     }
 
-    .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 18px; align-items:start; }
-    .game-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.16)); border-radius: 12px; box-shadow: 0 18px 40px rgba(0,0,0,0.45); padding: 8px; text-align:center; cursor:pointer; transition: transform .12s ease, box-shadow .12s ease; border: 1px solid rgba(255,255,255,0.03); }
-    .game-card:hover { transform: translateY(-6px); }
-    .game-card h3 { font-size: 13px; margin: 6px 0; color: #fff; font-weight:700; }
-    .game-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; background: #333; display:block; }
-    .game-card p { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
+    .game-card:hover .card-image-wrapper {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent);
+    }
 
-    /* overlay for game iframe (above leaves) */
+    .game-card:hover .card-image-wrapper::after {
+      opacity: 1;
+    }
+
+    .game-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .card-title {
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.05rem;
+      line-height: 1.3;
+    }
+
+    .card-meta {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    /* Loading State */
+    .loader {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    /* GAME OVERLAY */
     .game-overlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.88);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(14px);
+      z-index: 9999;
       display: none;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      z-index: 9999; /* above the leaves */
-      padding: 24px;
-      box-sizing: border-box;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
-    .game-overlay iframe, .game-overlay object {
-      width: 86vw;
-      height: 82vh;
+
+    .game-overlay.active {
+      opacity: 1;
+    }
+
+    .game-wrapper {
+      width: 90vw;
+      height: 80vh;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    .game-wrapper iframe,
+    .game-wrapper object {
+      width: 100%;
+      height: 100%;
       border: none;
-      border-radius: 12px;
-      background: #fff;
-    }
-    .overlay-controls { margin-top: 12px; display:flex; gap:10px; }
-    .overlay-controls button { background: rgba(255,255,255,0.04); color:#fff; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
-    .overlay-controls button:hover { background: rgba(255,255,255,0.07); }
-
-    /* Responsive */
-    @media (max-width: 920px){
-      .app { flex-direction: column; margin: 16px; width: calc(100% - 32px); }
-      .sidebar { width: 100%; flex-direction: row; padding: 8px; gap: 8px; border-radius: 12px; }
-      .circle-btn input { left: auto; right: 8px; }
-      .filter-menu { left: 8px; top: 56px; }
-      .catalog-frame { min-height: 60vh; }
-      .game-overlay iframe { width: 96vw; height: 72vh; }
     }
 
-    /* Falling leaves overlay (decorative) - lower z than overlay */
-    .leaf-layer{
-      position:fixed;
-      inset:0;
-      z-index:8000; /* under the game overlay but above background */
-      pointer-events:none;
-      overflow:hidden;
-    }
-    .leaf{
-      position:absolute;
-      top:-10vh;
-      left:0;
-      width:1em;
-      height:1em;
-      transform: translateY(-10vh);
-      animation: fall var(--fall-duration, 14s) linear var(--delay, 0s) infinite;
-      will-change: transform;
-      opacity: var(--opacity, .95);
-    }
-    .leaf .sway{
-      display:inline-block;
-      animation: sway var(--sway-duration, 4s) ease-in-out var(--delay, 0s) infinite alternate;
-      will-change: transform;
-    }
-    .leaf .spin{
-      display:inline-block;
-      filter: drop-shadow(0 6px 10px rgba(0,0,0,.25));
-      animation: spin var(--spin-duration, 10s) linear var(--delay, 0s) infinite;
-      will-change: transform;
+    .overlay-controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
     }
 
-    @keyframes fall{
-      0%{ transform: translateY(-10vh); }
-      100%{ transform: translateY(110vh); }
-    }
-    @keyframes sway{
-      0%{ transform: translateX(calc(var(--sway-range, 32px) * -1)); }
-      100%{ transform: translateX(var(--sway-range, 32px)); }
-    }
-    @keyframes spin{
-      100%{ transform: rotate(360deg); }
+    .control-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 50px;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    @media (prefers-reduced-motion: reduce){
-      .leaf-layer{ display:none !important; }
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .control-btn i {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Split Button Group */
+    .control-group {
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .control-group .control-btn {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      margin: 0;
+    }
+
+    .control-group .control-btn:last-child {
+      border-right: none;
+    }
+
+    .control-group .control-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .filter-modal {
+      position: absolute;
+      top: 100%;
+      margin-top: -10px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 16px;
+      border-radius: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 200px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--glass-border);
+      z-index: 200;
+
+      /* Scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: var(--glass-border) transparent;
+    }
+
+    .filter-modal::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .filter-modal::-webkit-scrollbar-thumb {
+      background: var(--glass-border);
+      border-radius: 4px;
+    }
+
+    .filter-modal.active {
+      display: flex;
+    }
+
+    .filter-option {
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: var(--transition);
+    }
+
+    .filter-option:hover {
+      background: var(--pill-bg);
+    }
+
+    @media (max-width: 768px) {
+      .nav-pill {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 24px;
+        /* Keep the container glass style active */
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(16px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .nav-item {
+        width: 100%;
+        justify-content: center;
+        /* Remove the individual item box styling we added previously */
+        background: transparent;
+        border: none;
+        backdrop-filter: none;
+        padding: 10px;
+        border-radius: 12px;
+      }
+
+      .nav-item:hover {
+        background: var(--pill-hover);
+      }
+
+      .search-container {
+        width: 100%;
+        /* Use standard pill internal bg */
+        background: var(--pill-bg);
+        border: none;
+        padding: 4px;
+      }
+
+      /* Responsive Grid Sizing: Keep cards explicitly same size as desktop */
+      .top-grid,
+      .main-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+      }
+    }
+
+    /* --- UNIFIED LOADER STYLES --- */
+    .video-loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      z-index: 10;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loader-text {
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      font-weight: 500;
+      font-family: 'Outfit', sans-serif;
     }
   </style>
 </head>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JWW3SX1V75"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-JWW3SX1V75');
-</script>
-  
 <body>
+  <div class="bg-layer"></div>
 
-  <!-- Falling leaves layer (decorative) -->
-  <div class="leaf-layer" id="leaf-layer" aria-hidden="true"></div>
+  <header>
+    <div class="nav-pill">
+      <a href="../../index.html" class="nav-item">
+        <i data-lucide="home"></i> Home
+      </a>
 
-  <div class="app" role="main" aria-label="Game catalog application">
-    <!-- Sidebar -->
-    <div class="sidebar" aria-hidden="false">
-      <div class="circle-btn" id="searchBtn" title="Search">
-        <i class="fa fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search...">
+      <div class="nav-item" id="filterBtn">
+        <i data-lucide="filter"></i> Filters
       </div>
 
-      <div class="circle-btn" id="filterBtn" title="Filters">
-        <i class="fa fa-filter"></i>
-        <div class="filter-menu" id="filterMenu" aria-hidden="true"></div>
-      </div>
-
-      <div class="circle-btn" id="seriesBtn" title="Series">
-        <i class="fa fa-list-ol"></i>
-        <div class="filter-menu" id="seriesMenu" aria-hidden="true"></div>
-      </div>
-
-      <div class="scrollbar" aria-hidden="true">
-        <div class="track"></div>
-        <div class="thumb" id="thumb"><div></div><div></div><div></div></div>
-      </div>
-
-      <a class="home-btn" id="homeBtn" href="../../index.html" title="Home"><i class="fa fa-home"></i></a>
-    </div>
-
-    <!-- Catalog -->
-    <div class="catalog-frame" role="region" aria-label="Game catalog">
-      <div class="catalog-inner" id="catalog">
-        <div class="game-grid" id="gameGrid" aria-live="polite" aria-atomic="false"></div>
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search games...">
       </div>
     </div>
-  </div>
 
-  <!-- Overlay -->
-  <div class="game-overlay" id="gameOverlay" role="dialog" aria-modal="true" aria-hidden="true">
-    <div id="gameContainer" aria-label="Game container"></div>
+    <!-- Simple Filter Dropdown (Placeholder for logic) -->
+    <div class="filter-modal" id="filterMenu">
+      <div class="filter-option" onclick="filterBy('All')">All Categories</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Top Featured Grid (Marked with *) -->
+    <div class="top-grid" id="topGrid">
+      <div class="loader">Loading Library...</div>
+    </div>
+
+    <!-- Divider -->
+    <div class="featured-divider">
+      <div class="diamond"></div>
+      <span class="divider-text">All Games</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Main Catalog Grid -->
+    <div class="main-grid" id="mainGrid">
+      <!-- Injected via JS -->
+    </div>
+  </main>
+
+  <!-- Game Overlay -->
+  <div class="game-overlay" id="gameOverlay">
+    <div class="game-wrapper" id="gameWrapper">
+      <!-- Loader -->
+      <div class="video-loader" id="videoLoader">
+        <div class="spinner"></div>
+        <div class="loader-text">George Pickens</div>
+      </div>
+      <!-- Content Container -->
+      <div id="gameContainer" style="width:100%; height:100%;"></div>
+    </div>
     <div class="overlay-controls">
-      <button id="fsBtn" onclick="toggleFullscreen()">Fullscreen</button>
-      <button onclick="toggleBorderdFullscreen()">Bordered Fullscreen</button>
-      <button onclick="closeOverlay()">Close</button>
+      <div class="control-group">
+        <button class="control-btn" onclick="toggleFullscreen()"><i data-lucide="maximize"></i> Fullscreen</button>
+        <button class="control-btn" onclick="openWindowed()"><i data-lucide="external-link"></i> Windowed</button>
+      </div>
+      <button class="control-btn" onclick="closeOverlay()"><i data-lucide="x"></i> Close</button>
     </div>
   </div>
 
-  <!-- Game data + UI logic -->
-<script>
+  <!-- Scripts -->
+  <script>lucide.createIcons();</script>
+
+  <script>
+    // --- THEME ENGINE ---
+    const html = document.documentElement;
+    const currentTheme = localStorage.getItem('gp-final-theme') || 'dark';
+    html.setAttribute('data-theme', currentTheme);
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'gp-final-theme') {
+        html.setAttribute('data-theme', e.newValue);
+      }
+    });
+
+    // --- DATA & LOGIC ---
     const SHEET_URL = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/games?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
-    const catalog = document.getElementById("catalog");
-    const thumb = document.querySelector(".thumb");
-    const gameGrid = document.getElementById("gameGrid");
-    const track = document.querySelector(".track");
-    const searchBtn = document.getElementById("searchBtn");
-    const searchInput = document.getElementById("searchInput");
-    const filterBtn = document.getElementById("filterBtn");
-    const filterMenu = document.getElementById("filterMenu");
-    const seriesBtn = document.getElementById("seriesBtn");
-    const seriesMenu = document.getElementById("seriesMenu");
-    const overlay = document.getElementById("gameOverlay");
-    const gameContainer = document.getElementById("gameContainer");
 
     let allGames = [];
     let categories = new Set();
-    let series = new Map();
+    let fuse;
+    let currentGameUrl = null;
 
-    // Fetch game data from Google Sheets
-    async function fetchGameData() {
+    const topGrid = document.getElementById('topGrid');
+    const mainGrid = document.getElementById('mainGrid');
+    const searchInput = document.getElementById('searchInput');
+    const filterBtn = document.getElementById('filterBtn');
+    const filterMenu = document.getElementById('filterMenu');
+    const gameOverlay = document.getElementById('gameOverlay');
+    const gameWrapper = document.getElementById('gameWrapper');
+    const gameContainer = document.getElementById('gameContainer');
+    const videoLoader = document.getElementById('videoLoader');
+
+    async function fetchGames() {
       try {
-        const response = await fetch(SHEET_URL);
-        const data = await response.json();
+        const res = await fetch(SHEET_URL);
+        const data = await res.json();
         const rows = data.values;
-        const headers = rows.shift();
-        const titleIndex = headers.indexOf('Title');
-        const categoryIndex = headers.indexOf('Category');
-        const urlIndex = headers.indexOf('URL');
-        const thumbnailIndex = headers.indexOf('Thumbnail');
-      
-        allGames = rows.map(row => ({
-          title: row[titleIndex],
-          categories: row[categoryIndex] ? row[categoryIndex].split(',').map(c => c.trim()) : [],
-          url: row[urlIndex],
-          thumbnail: row[thumbnailIndex]
-        }));
-      
-        // Build categories and filters
-        categories = new Set();
-        allGames.forEach(g => g.categories.forEach(c => categories.add(c)));
-        buildFilters();
-      
-        // ALWAYS render first so the grid shows even if series logic fails
-        renderGames(allGames);
-      
-        // Then try series (won't block initial render if it fails)
-        try {
-          identifySeries();       // your function (any version)
-          buildSeriesFilters();   // guarded below
-        } catch (e) {
-          console.warn('Series disabled due to error:', e);
-        }
-      } catch (e) {
-        console.error("Error fetching game data", e);
+        const headers = rows.shift(); // Remove header row
+
+        const titleIdx = headers.indexOf('Title');
+        const catIdx = headers.indexOf('Category');
+        const urlIdx = headers.indexOf('URL');
+        const thumbIdx = headers.indexOf('Thumbnail');
+
+        allGames = rows.map(row => {
+          let rawTitle = row[titleIdx] || '';
+          let isFeatured = false;
+
+          // Check for * prefix (handle optional space)
+          if (rawTitle.trim().startsWith('*')) {
+            isFeatured = true;
+            rawTitle = rawTitle.trim().substring(1).trim();
+          }
+
+          const cats = row[catIdx] ? row[catIdx].split(',').map(c => c.trim()) : [];
+          cats.forEach(c => categories.add(c));
+
+          return {
+            title: rawTitle,
+            isFeatured: isFeatured,
+            categories: cats,
+            url: row[urlIdx] ? row[urlIdx].trim() : '',
+            thumbnail: row[thumbIdx],
+            titleNoSpace: rawTitle.toLowerCase().replace(/\s+/g, '')
+          };
+        }).filter(g => g.title && g.url);
+
+        initFuse();
+        populateFilters();
+        renderAll(allGames);
+        lucide.createIcons();
+
+      } catch (err) {
+        console.error('Failed to load games:', err);
+        topGrid.innerHTML = '<div class="loader" style="color:var(--accent);">Failed to load games. Check connection.</div>';
       }
     }
 
-    // Render game cards
-    function renderGames(games) {
-      gameGrid.innerHTML = "";
-      games.forEach(game => {
-        const card = document.createElement("div");
-        card.className = "game-card";
-        card.innerHTML = `
-          <h3>${game.title}</h3>
-          <img src="${game.thumbnail}" alt="${game.title}">
-          <p>${game.categories.join(', ')}</p>
-        `;
-        card.addEventListener("click", () => openOverlay(game));
-        gameGrid.appendChild(card);
+    function initFuse() {
+      fuse = new Fuse(allGames, {
+        keys: [
+          { name: 'title', weight: 0.7 },
+          { name: 'titleNoSpace', weight: 0.5 },
+          { name: 'categories', weight: 0.3 }
+        ],
+        threshold: 0.4,
+        distance: 100,
+        includeScore: true
       });
     }
 
-    // Build filter buttons
-    function buildFilters() {
-      filterMenu.innerHTML = "";
-      const allBtn = document.createElement("button");
-      allBtn.textContent = "All";
-      allBtn.onclick = () => renderGames(allGames);
-      filterMenu.appendChild(allBtn);
-      categories.forEach(cat => {
-        const btn = document.createElement("button");
-        btn.textContent = cat;
-        btn.onclick = () => renderGames(allGames.filter(g => g.categories.includes(cat)));
-        filterMenu.appendChild(btn);
+    function populateFilters() {
+      filterMenu.innerHTML = '<div class="filter-option" onclick="filterBy(\'All\')">All Categories</div>';
+      const sortedCats = Array.from(categories).sort();
+      sortedCats.forEach(cat => {
+        const div = document.createElement('div');
+        div.className = 'filter-option';
+        div.textContent = cat;
+        div.onclick = () => filterBy(cat);
+        filterMenu.appendChild(div);
       });
     }
 
-    function buildSeriesFilters() {
-      seriesMenu.innerHTML = "";
-
-      const allBtn = document.createElement("button");
-      allBtn.textContent = "All";
-      allBtn.onclick = () => renderGames(allGames);
-      seriesMenu.appendChild(allBtn);
-
-      series.forEach((games, label) => {
-        const btn = document.createElement("button");
-        btn.textContent = label;
-        btn.onclick = () => renderGames(games);
-        seriesMenu.appendChild(btn);
-      });
-    }
-
-    function identifySeries() {
-      try {
-        const sorted = [...allGames]
-          .filter(g => g && g.title)
-          .sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
-      
-        const normalize = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
-        const numRegex = /(.+?)\s+([0-9]+|[IVXLCDM]+)$/i;
-      
-        function baseKey(title) {
-          const t = normalize(title);
-        
-          // If title ends with a number/Roman numeral (not a year), strip it
-          const m = t.match(numRegex);
-          if (m) {
-            const suffix = m[2];
-            const n = parseInt(suffix, 10);
-            if (!(n >= 1900 && n <= 2099)) return normalize(m[1]);
-          }
-        
-          // Otherwise first two words
-          return t.split(" ").slice(0, 2).join(" ");
-        }
-      
-        // Step 1: build raw adjacency groups
-        const buckets = new Map();
-        let i = 0;
-      
-        while (i < sorted.length) {
-          const key = baseKey(sorted[i].title);
-          let run = [sorted[i]];
-          let j = i + 1;
-
-          while (j < sorted.length && baseKey(sorted[j].title) === key) {
-            run.push(sorted[j]);
-            j++;
-          }
-        
-          if (run.length > 1) buckets.set(key, run);
-        
-          i = j;
-        }
-      
-        // Step 2: retroactively pull in first non-numbered entry
-        for (let [key, run] of buckets.entries()) {
-          const first = run[0];
-          const standaloneCandidateIndex = sorted.findIndex(g => normalize(g.title) === key);
-        
-          // If the base name appears exactly and isn't already included, add it
-          if (standaloneCandidateIndex !== -1) {
-            const standalone = sorted[standaloneCandidateIndex];
-            if (!run.some(g => g.title === standalone.title)) {
-              run.unshift(standalone);
-            }
-          }
-        }
-      
-        // Step 3: finalize to global map
-        series.clear();
-        for (const [key, run] of buckets.entries()) {
-          const label = run[0].title.split(" ").slice(0, 2).join(" ");
-          if (run.length > 1) series.set(label, run);
-        }
-      } catch (e) {
-        console.error("identifySeries dynamic error:", e);
-        series.clear();
-      }
-    }
-
-    // Open game overlay
-    function openOverlay(game) {
-      gameContainer.innerHTML = "";
-      if (game.url.endsWith(".swf")) {
-        gameContainer.innerHTML = `
-          <object id="gameObject" type="application/x-shockwave-flash" data="${game.url}" width="650" height="450">
-            <param name="movie" value="${game.url}">
-            <param name="quality" value="high">
-            <param name="wmode" value="transparent">
-          </object>
-        `;
+    function filterBy(cat) {
+      filterMenu.classList.remove('active');
+      if (cat === 'All') {
+        renderAll(allGames);
       } else {
-        gameContainer.innerHTML = `<iframe id="gameIframe" src="${game.url}" class="embed"></iframe>`;
+        const filtered = allGames.filter(g => g.categories.includes(cat));
+        renderAll(filtered);
       }
-      overlay.style.display = "flex";
+    }
+
+    // Toggle Filter Menu
+    filterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      filterMenu.classList.toggle('active');
+    });
+
+    // Close menu on click outside
+    document.addEventListener('click', (e) => {
+      if (!filterMenu.contains(e.target) && !filterBtn.contains(e.target)) {
+        filterMenu.classList.remove('active');
+      }
+    });
+
+    function createCard(game) {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.innerHTML = `
+                <div class="card-image-wrapper">
+                    <img src="${game.thumbnail || 'https://via.placeholder.com/300?text=No+Image'}" alt="${game.title}" loading="lazy">
+                </div>
+                <div class="card-info">
+                    <div class="card-title">${game.title}</div>
+                    <div class="card-meta">${game.categories.slice(0, 2).join(', ')}</div>
+                </div>
+            `;
+      card.onclick = () => openGame(game);
+      return card;
+    }
+
+    function renderAll(games) {
+      topGrid.innerHTML = '';
+      mainGrid.innerHTML = '';
+
+      if (games.length === 0) {
+        topGrid.innerHTML = '<div class="loader">No games found.</div>';
+        return;
+      }
+
+      const isFullList = games.length === allGames.length;
+
+      if (isFullList) {
+        // Default View: Featured (*) in Top Grid, Rest in Main
+        const featured = games.filter(g => g.isFeatured);
+        const rest = games.filter(g => !g.isFeatured);
+
+        if (featured.length > 0) {
+          featured.forEach(g => topGrid.appendChild(createCard(g)));
+        } else {
+          topGrid.style.display = 'none'; // Hide if none
+          document.querySelector('.featured-divider').style.display = 'none';
+        }
+
+        rest.forEach(g => mainGrid.appendChild(createCard(g)));
+      } else {
+        // Search Results / Filter View: Hide Featured Section, dump all in Main for clarity
+        topGrid.style.display = 'none';
+        document.querySelector('.featured-divider').style.display = 'none';
+        games.forEach(g => mainGrid.appendChild(createCard(g)));
+      }
+
+      // Re-show sections if we reset and there are featured games
+      if (isFullList && topGrid.children.length > 0) {
+        topGrid.style.display = 'grid';
+        document.querySelector('.featured-divider').style.display = 'flex';
+      }
+    }
+
+    // --- SEARCH ---
+    let debounceTimer;
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      clearTimeout(debounceTimer);
+
+      debounceTimer = setTimeout(() => {
+        if (!query) {
+          renderAll(allGames);
+          return;
+        }
+
+        if (fuse) {
+          const results = fuse.search(query).map(r => r.item);
+          renderAll(results);
+        }
+      }, 300);
+    });
+
+    // --- OVERLAY & PLAYER ---
+
+    async function openGame(game) {
+      currentGameUrl = game.url;
+      // 1. Reset & Show Overlay with Loader
+      gameContainer.innerHTML = '';
+      videoLoader.style.display = 'flex';
+      gameOverlay.style.display = 'flex';
+      requestAnimationFrame(() => gameOverlay.classList.add('active'));
+
+      // 2. Determine Type
+      // Check for .swf (case insensitive, allowing query params)
+      const isSwf = /\.swf($|\?)/i.test(game.url);
+
+      if (isSwf) {
+        await loadSwfGame(game.url);
+      } else {
+        await loadIframeGame(game.url);
+      }
+    }
+
+    function loadSwfGame(url) {
+      return new Promise((resolve) => {
+        // Create Ruffle Player
+        const ruffle = window.RufflePlayer.newest();
+        const player = ruffle.createPlayer();
+
+        player.style.width = '100%';
+        player.style.height = '100%';
+        player.id = 'gameObject'; // for fullscreen
+
+        // Hide initially
+        player.style.opacity = '0';
+        player.style.transition = 'opacity 0.5s ease';
+
+        gameContainer.appendChild(player);
+
+        // Load
+        player.load(url).then(() => {
+          console.log("Ruffle loaded SWF");
+          // 2-second delay for branding/smoothness
+          setTimeout(() => {
+            videoLoader.style.display = 'none';
+            player.style.opacity = '1';
+            resolve();
+          }, 2000);
+        }).catch(e => {
+          console.error("Ruffle failed to load:", e);
+          videoLoader.innerHTML = '<div style="color:red">Failed to load content.</div>';
+        });
+      });
+    }
+
+    function loadIframeGame(url) {
+      return new Promise((resolve) => {
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.allow = "autoplay; fullscreen";
+        iframe.id = "gameIframe";
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        iframe.style.opacity = '0';
+        iframe.style.transition = 'opacity 0.5s ease';
+
+        iframe.onload = () => {
+          setTimeout(() => {
+            videoLoader.style.display = 'none';
+            iframe.style.opacity = '1';
+            resolve();
+          }, 2000); // 2 second delay
+        };
+
+        gameContainer.appendChild(iframe);
+      });
     }
 
     function closeOverlay() {
-      overlay.style.display = "none";
-      gameContainer.innerHTML = "";
+      gameOverlay.classList.remove('active');
+      setTimeout(() => {
+        gameOverlay.style.display = 'none';
+        gameContainer.innerHTML = '';
+        videoLoader.style.display = 'none'; // reset
+      }, 300);
     }
 
     function toggleFullscreen() {
@@ -467,253 +926,68 @@
       }
     }
 
-    function toggleBorderdFullscreen() {
-    const iframe = document.querySelector("#gameIframe");
-    const swf = document.querySelector("#gameObject");
-      
-    let src = "";
-    if (iframe) src = iframe.src;
-    else if (swf) src = swf.getAttribute("data");
-    if (!src) return;
-      
-    const newTab = window.open("", "_blank");
-    if (!newTab) return;
-      
-    newTab.document.write(`
-      <html>
-        <head>
-          <title>${document.title} - Bordered Fullscreen</title>
-          <style>
-            html, body {
-              margin: 0;
-              padding: 0;
-              width: 100%;
-              height: 100%;
-              background: #fff;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-            }
-            iframe, object {
-              width: 100%;
-              height: 100%;
-              border: 4px solid #222;
-              box-sizing: border-box;
-              background: #fff;
-            }
-          </style>
-        </head>
-        <body>
-          ${iframe ? `<iframe src="${src}" allowfullscreen></iframe>` : `<object type="application/x-shockwave-flash" data="${src}"></object>`}
-        </body>
-      </html>
-    `);
-  }
+    function openWindowed() {
+      if (!currentGameUrl) return;
 
-  function closeOtherMenus(opening) {
-    if (opening !== 'filter') filterBtn.classList.remove('active');
-    if (opening !== 'series') seriesBtn.classList.remove('active');
-    if (opening !== 'search') {
-      searchBtn.classList.remove('active');
-      searchInput.value = "";
-    }
-  }
+      const win = window.open('about:blank', '_blank');
+      if (!win) return;
 
+      // Check for .swf (case insensitive, allowing query params)
+      const isSwf = /\.swf($|\?)/i.test(currentGameUrl);
 
-    fetchGameData();
-
-    // Sync scrollbar thumb position
-  function updateTrackHole() {
-  const trackRect = track.getBoundingClientRect();
-  const thumbRect = thumb.getBoundingClientRect();
-  const topRel = Math.max(0, thumbRect.top - trackRect.top);
-  const bottomRel = Math.min(trackRect.height, topRel + thumbRect.height);
-
-  const h = Math.max(1, Math.round(trackRect.height));
-  const t = Math.round(topRel);
-  const b = Math.round(bottomRel);
-}
-
-// --- SYNC THUMB POSITION ---
-function syncThumb() {
-  const ratio = catalog.scrollTop / (catalog.scrollHeight - catalog.clientHeight);
-  const trackHeight = track.clientHeight - thumb.clientHeight;
-  const newTop = track.offsetTop + ratio * trackHeight;
-  thumb.style.top = newTop + "px";
-  updateTrackHole();
-}
-catalog.addEventListener("scroll", syncThumb);
-window.addEventListener("resize", syncThumb);
-
-// --- DRAG HANDLER ---
-let dragging = false;
-    let startY, startTop;
-    thumb.addEventListener("mousedown", e => {
-      dragging = true;
-      startY = e.clientY;
-      startTop = parseInt(thumb.style.top) || 0;
-      thumb.style.cursor = "grabbing";
-    });
-    document.addEventListener("mousemove", e => {
-      if (!dragging) return;
-      const dy = e.clientY - startY;
-      const trackHeight = track.clientHeight - thumb.clientHeight;
-      let newTop = Math.min(track.offsetTop + trackHeight, Math.max(track.offsetTop, startTop + dy));
-      thumb.style.top = newTop + "px";
-      const ratio = (newTop - track.offsetTop) / trackHeight;
-      catalog.scrollTop = ratio * (catalog.scrollHeight - catalog.clientHeight);
-    });
-    document.addEventListener("mouseup", () => {
-      dragging = false;
-      thumb.style.cursor = "grab";
-    });
-
-    // --- Search functionality ---
-    searchBtn.addEventListener("click", () => {
-      const active = searchBtn.classList.toggle("active");
-      if (active) {
-        closeOtherMenus('search');
-        searchInput.focus();
+      if (isSwf) {
+        // Embed Ruffle in new window
+        win.document.write(`
+          <!DOCTYPE html>
+          <html style="margin:0; padding:0; height:100%; overflow:hidden; background:#000;">
+          <head>
+            <title>GEORGE PICKENS</title>
+            <script src="https://unpkg.com/@ruffle-rs/ruffle"><\/script>
+            <style>
+              body { margin:0; padding:0; height:100vh; width:100vw; background:#000; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+              #player { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+              ruffle-player { width: 100vh !important; height: 100vh !important; } 
+            </style>
+          </head>
+          <body>
+            <div id="player"></div>
+            <script>
+              window.RufflePlayer = window.RufflePlayer || {};
+              window.addEventListener('DOMContentLoaded', () => {
+                  const ruffle = window.RufflePlayer.newest();
+                  const player = ruffle.createPlayer();
+                  const container = document.getElementById('player');
+                  container.appendChild(player);
+                  player.load("${currentGameUrl}");
+              });
+            <\/script>
+          </body>
+          </html>
+        `);
+        win.document.close();
       } else {
-        searchInput.value = "";
-        renderGames(allGames);
+        // Generic Iframe
+        win.document.write(`
+          <!DOCTYPE html>
+          <html style="margin:0; padding:0; height:100%; overflow:hidden; background:#000;">
+          <head><title>Game Selection</title></head>
+          <body>
+            <iframe src="${currentGameUrl}" style="border:0; width:100vw; height:100vh;" allow="autoplay; fullscreen"></iframe>
+          </body>
+          </html>
+        `);
       }
-    });
+    }
 
-    searchInput.addEventListener("input", e => {
-      const term = e.target.value.toLowerCase();
-      renderGames(
-        allGames.filter(g => (g.title || "").toLowerCase().includes(term))
-      );
-    });
-
-    // --- Filter functionality ---
-    filterBtn.addEventListener("click", () => {
-      const active = filterBtn.classList.toggle("active");
-      if (active) closeOtherMenus('filter');
-    });
-
-    seriesBtn.addEventListener("click", () => {
-      const active = seriesBtn.classList.toggle("active");
-      if (active) closeOtherMenus('series');
-    });
-
-    // --- Overlay escape key close ---
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && overlay.style.display === "flex") {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && gameOverlay.classList.contains('active')) {
         closeOverlay();
       }
     });
 
+    fetchGames();
+
   </script>
-
-  <!-- Falling leaves generator (copied from GP home) -->
-  <script>
-/**
- * Shared leaf / snow generator
- * Define window.initLeaves() so Effects Manager can turn snow off/on.
- */
-window.initLeaves = function() {
-  const layer = document.getElementById('leaf-layer');
-  if (!layer) return;
-
-  // Clear any existing leaves before (re)generating
-  layer.innerHTML = '';
-  layer.style.display = '';
-
-  // Respect reduced motion
-  try{
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return;
-    }
-  }catch(e){}
-
-  const LEAFS = ['❄️'];
-  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-
-  // Scale number of leaves by viewport width (with sensible bounds)
-  const COUNT = Math.max(12, Math.min(40, Math.round(vw / 40)));
-
-  function rand(min, max){ return Math.random() * (max - min) + min; }
-
-  function createLeaf() {
-    const leaf = document.createElement('span');
-    leaf.className = 'leaf';
-
-    const sway = document.createElement('span');
-    sway.className = 'sway';
-
-    const spin = document.createElement('span');
-    spin.className = 'spin';
-    spin.textContent = LEAFS[Math.floor(Math.random() * LEAFS.length)];
-
-    // Random properties
-    const startLeftVw = rand(0, 100);
-    const sizePx = rand(16, 36);
-    const fallDuration = rand(10, 22); // seconds
-    const swayDuration = rand(2.2, 5.2); // seconds
-    const swayRange = rand(18, 60); // px
-    const spinDuration = rand(6, 13); // seconds
-    const delay = -rand(0, 22); // negative delay staggers leaves
-    const opacity = rand(0.5, 1);
-
-    leaf.style.left = startLeftVw.toFixed(2) + 'vw';
-    leaf.style.setProperty('--fall-duration', fallDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--sway-duration', swayDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--sway-range', swayRange.toFixed(0) + 'px');
-    leaf.style.setProperty('--spin-duration', spinDuration.toFixed(2) + 's');
-    leaf.style.setProperty('--delay', delay.toFixed(2) + 's');
-    leaf.style.setProperty('--opacity', opacity.toFixed(2));
-
-    // Randomize spin direction
-    spin.style.animationDirection = Math.random() < 0.5 ? 'normal' : 'reverse';
-    spin.style.fontSize = sizePx.toFixed(0) + 'px';
-
-    sway.appendChild(spin);
-    leaf.appendChild(sway);
-    layer.appendChild(leaf);
-  }
-
-  for (let i = 0; i < COUNT; i++){
-    createLeaf();
-  }
-
-  // Optional: update density on resize (basic)
-  let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      const current = layer.children.length;
-      const vwNow = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-      const target = Math.max(12, Math.min(40, Math.round(vwNow / 40)));
-      const toAdd = Math.max(0, target - current);
-      for (let i = 0; i < toAdd; i++){
-        createLeaf();
-      }
-    }, 250);
-  });
-};
-
-// Run once on load
-window.addEventListener('DOMContentLoaded', function(){
-  if (typeof window.initLeaves === 'function') {
-    window.initLeaves();
-  }
-});
-</script>
-
-  <script>
-    // Initialize effects manager for GAMES
-    window.addEventListener('DOMContentLoaded', function(){
-      window.initEffectsManager({
-        backgroundFallback: '#222a3eff',
-        glassSelectors: ['.sidebar', '.catalog-frame'],
-        storageKey: 'gp-reduced-effects'
-      });
-    });
-  </script>
-
 </body>
+
 </html>
-
-
