@@ -766,34 +766,31 @@
         }
 
         async function fetchMovie(title) {
-            try {
-                const url = new URL(KINO_SEARCH_BASE);
-                url.searchParams.set("q", title);
-                const res = await fetch(url);
-                if (!res.ok) return null;
-                const data = await res.json();
-                if (data && data.results && data.results.length > 0) {
-                    // Filter: Poster, Overview, Rating > 4
-                    let valid = data.results.filter(m => m.poster && m.overview && m.rating > 4);
+  try {
+    const res = await fetch(
+      `${KINO_SEARCH_BASE}/${encodeURIComponent(title)}`
+    );
+    if (!res.ok) return null;
 
-                    if (valid.length === 0) return null;
+    const data = await res.json();
+    if (!data?.results?.length) return null;
 
-                    // Prefer EXACT match first
-                    const exact = valid.find(v => v.title.toLowerCase() === title.toLowerCase());
-                    if (exact) return exact;
+    let valid = data.results.filter(
+      m => m.poster && m.overview && m.rating > 4
+    );
 
-                    // Sort by rating
-                    valid.sort((a, b) => b.rating - a.rating);
+    if (!valid.length) return null;
 
-                    // Return the best rated match
-                    return valid[0];
-                }
-                return null;
-            } catch (err) {
-                console.warn(`Failed to fetch ${title}`, err);
-                return null;
-            }
-        }
+    const exact = valid.find(
+      v => v.title.toLowerCase() === title.toLowerCase()
+    );
+
+    return exact || valid.sort((a, b) => b.rating - a.rating)[0];
+  } catch (e) {
+    console.warn(`Failed to fetch ${title}`, e);
+    return null;
+  }
+}
 
         async function init() {
             // Fetch remote config first
@@ -908,10 +905,10 @@
                     }
 
                     // 2. API Search
-                    const url = new URL(KINO_SEARCH_BASE);
-                    url.searchParams.set("q", q);
-                    const res = await fetch(url);
-                    const data = await res.json();
+                    const res = await fetch(
+  `${KINO_SEARCH_BASE}/${encodeURIComponent(q)}`
+);
+const data = await res.json();
 
                     let apiMatches = [];
                     if (data && data.results && data.results.length > 0) {
