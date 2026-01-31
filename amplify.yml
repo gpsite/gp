@@ -6,6 +6,7 @@ applications:
         build:
           commands:
             - npm install
+            - npx cdk bootstrap
             - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
     frontend:
       phases:
