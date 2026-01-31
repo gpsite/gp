@@ -1,0 +1,31 @@
+{
+    "auth": {
+        "user_pool_id": "us-east-1_xxxxxxxxx",
+        "aws_region": "us-east-1",
+        "user_pool_client_id": "xxxxxxxxxxxxxxxxx",
+        "identity_pool_id": "us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "mfa_methods": [],
+        "standard_required_attributes": [
+            "email"
+        ],
+        "username_attributes": [
+            "email"
+        ],
+        "user_verification_types": [
+            "email"
+        ],
+        "password_policy": {
+            "min_length": 8,
+            "require_numbers": true,
+            "require_lowercase": true,
+            "require_uppercase": true,
+            "require_symbols": true
+        },
+        "unauthenticated_identities_enabled": true
+    },
+    "storage": {
+        "aws_region": "us-east-1",
+        "bucket_name": "amplify-App-branch-bucketxxxxxx"
+    },
+    "version": "1"
+}
