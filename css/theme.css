@@ -1,0 +1,86 @@
+/**
+ * GP Site - Unified Theme Variables
+ * This file contains all shared CSS variables used across all pages.
+ * Change colors here to update them globally across the entire site.
+ */
+
+:root {
+    /* Theme Background Images */
+    --bg-dark: url("https://gpsite.github.io/gpmedia/gpjump/dark.png");
+    --bg-light: url("https://gpsite.github.io/gpmedia/gpjump/light.jpg");
+
+    /* Glass Effects */
+    --glass: rgba(255, 255, 255, 0.08);
+    --glass-strong: rgba(20, 20, 20, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.12);
+
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --accent: #60a5fa;
+    --accent-glow: rgba(96, 165, 250, 0.4);
+
+    /* UI Element Colors */
+    --pill-bg: rgba(255, 255, 255, 0.08);
+    --pill-hover: rgba(255, 255, 255, 0.15);
+    --pill-active: rgba(255, 255, 255, 0.2);
+
+    /* Shadows */
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
+
+    /* Status Colors */
+    --danger: #ef4444;
+    --success: #10b981;
+
+    /* Transitions */
+    --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* Typography */
+    --font-family: 'Outfit', sans-serif;
+    --font-main: clamp(0.85rem, 1.2vw, 1.05rem);
+
+    /* Spacing */
+    --header-padding: clamp(15px, 2.5vw, 40px);
+    --nav-inner-gap: clamp(8px, 1.5vw, 20px);
+}
+
+/* Light Theme Overrides */
+[data-theme="light"] {
+    /* Glass Effects */
+    --glass: rgba(255, 255, 255, 0.75);
+    --glass-strong: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(0, 0, 0, 0.06);
+
+    /* Text Colors */
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+
+    /* Accent Colors */
+    --accent: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.2);
+
+    /* UI Element Colors */
+    --pill-bg: rgba(0, 0, 0, 0.03);
+    --pill-hover: rgba(0, 0, 0, 0.06);
+    --pill-active: rgba(0, 0, 0, 0.12);
+
+    /* Shadows */
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* Universal Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-primary);
+}

@@ -22,11 +22,14 @@
   <!-- Ruffle (Flash Emulator) -->
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 
+  <!-- Shared Theme Variables -->
+  <link rel="stylesheet" href="../../css/theme.css">
+
   <style>
     :root {
       /* Theme Config - Dark */
-      --bg-dark: url("https://gpsite.github.io/gpmedia/img/g-page/gamedark.png");
-      --bg-light: url("https://gpsite.github.io/gpmedia/img/g-page/gamelight.jpg");
+      --bg-dark: url("https://gpsite.github.io/gpmedia/img/catalog/darkcatalog.png");
+      --bg-light: url("https://gpsite.github.io/gpmedia/img/catalog/lightcatalog.png");
 
       --glass: rgba(255, 255, 255, 0.08);
       --glass-strong: rgba(20, 20, 20, 0.6);
@@ -54,8 +57,8 @@
       --glass: rgba(255, 255, 255, 0.75);
       --glass-strong: rgba(255, 255, 255, 0.9);
       --glass-border: rgba(0, 0, 0, 0.06);
-      --text-primary: #1e293b;
-      --text-secondary: #475569;
+      --text-primary: #3f6cb6;
+      --text-secondary: #365e96;
       --accent: #2563eb;
       --accent-glow: rgba(37, 99, 235, 0.2);
       --pill-bg: rgba(0, 0, 0, 0.04);
@@ -79,6 +82,19 @@
       background-color: #000;
       color: var(--text-primary);
       overflow-x: hidden;
+    }
+
+    body.no-scroll {
+      overflow: hidden;
+    }
+
+    /* Content Blur */
+    body.blur-active main,
+    body.blur-active header {
+      filter: blur(8px);
+      transition: filter 0.3s ease;
+      pointer-events: none;
+      /* Prevent clicks on background */
     }
 
     /* Dynamic Background Layer */
@@ -564,6 +580,116 @@
       font-weight: 500;
       font-family: 'Outfit', sans-serif;
     }
+
+    /* Favorites Modal */
+    .favorites-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--glass-strong);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      padding: 24px;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .favorites-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .fav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .fav-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .fav-close {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .fav-close:hover {
+      color: var(--text-primary);
+    }
+
+    .fav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .fav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--pill-bg);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .fav-item:hover {
+      background: var(--pill-hover);
+      transform: translateX(4px);
+    }
+
+    .fav-item img {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .fav-item-info {
+      flex: 1;
+    }
+
+    .fav-item-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    .fav-item-remove {
+      background: transparent;
+      border: none;
+      color: #ef4444;
+      /* Red for remove */
+      cursor: pointer;
+      padding: 8px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .fav-item-remove:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -580,6 +706,10 @@
         <i data-lucide="filter"></i> Filters
       </div>
 
+      <div class="nav-item" id="favBtn">
+        <i data-lucide="heart"></i> Favorites
+      </div>
+
       <div class="search-container">
         <input type="text" id="searchInput" class="search-input" placeholder="Search games...">
       </div>
@@ -591,7 +721,17 @@
     </div>
   </header>
 
+
+
   <main>
+
+    <!-- Divider -->
+    <div class="featured-divider">
+      <div class="diamond"></div>
+      <span class="divider-text">Featured Games</span>
+      <div class="divider-line"></div>
+    </div>
+
     <!-- Top Featured Grid (Marked with *) -->
     <div class="top-grid" id="topGrid">
       <div class="loader">Loading Library...</div>
@@ -610,6 +750,17 @@
     </div>
   </main>
 
+  <!-- Favorites Modal -->
+  <div class="favorites-modal" id="favModal">
+    <div class="fav-header">
+      <div class="fav-title">Favorites</div>
+      <button class="fav-close" id="closeFavBtn"><i data-lucide="x"></i></button>
+    </div>
+    <div class="fav-list" id="favList">
+      <div style="text-align:center; padding: 20px; color: var(--text-secondary);">No favorites yet.</div>
+    </div>
+  </div>
+
   <!-- Game Overlay -->
   <div class="game-overlay" id="gameOverlay">
     <div class="game-wrapper" id="gameWrapper">
@@ -625,12 +776,15 @@
       <div class="control-group">
         <button class="control-btn" onclick="toggleFullscreen()"><i data-lucide="maximize"></i> Fullscreen</button>
         <button class="control-btn" onclick="openWindowed()"><i data-lucide="external-link"></i> Windowed</button>
+        <button class="control-btn" onclick="toggleCurrentFavorite()" id="overlayFavBtn"><i
+            data-lucide="heart"></i></button>
       </div>
       <button class="control-btn" onclick="closeOverlay()"><i data-lucide="x"></i> Close</button>
     </div>
   </div>
 
   <!-- Scripts -->
+  <script src="../../js/settings.js"></script>
   <script>lucide.createIcons();</script>
 
   <script>
@@ -662,6 +816,14 @@
     const gameWrapper = document.getElementById('gameWrapper');
     const gameContainer = document.getElementById('gameContainer');
     const videoLoader = document.getElementById('videoLoader');
+
+    const favBtn = document.getElementById('favBtn');
+    const favModal = document.getElementById('favModal');
+    const closeFavBtn = document.getElementById('closeFavBtn');
+    const favList = document.getElementById('favList');
+    const overlayFavBtn = document.getElementById('overlayFavBtn');
+
+    let favorites = JSON.parse(localStorage.getItem('gp-favorites')) || [];
 
     async function fetchGames() {
       try {
@@ -757,6 +919,117 @@
       }
     });
 
+    // --- FAVORITES SYSTEM ---
+    function updateFavoritesUI() {
+      if (!favorites || favorites.length === 0) {
+        favList.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-secondary);">No favorites yet.</div>';
+        return;
+      }
+
+      favList.innerHTML = '';
+      favorites.forEach(gameTitle => {
+        const game = allGames.find(g => g.title === gameTitle);
+        if (!game) return;
+
+        const item = document.createElement('div');
+        item.className = 'fav-item';
+        item.innerHTML = `
+                <img src="${game.thumbnail || 'https://via.placeholder.com/40'}" alt="${game.title}">
+                <div class="fav-item-info">
+                    <div class="fav-item-title">${game.title}</div>
+                </div>
+                <button class="fav-item-remove" onclick="removeFavorite('${game.title}', event)"><i data-lucide="trash-2"></i></button>
+            `;
+        item.addEventListener('click', (e) => {
+          if (!e.target.closest('.fav-item-remove')) {
+            closeFavMenu();
+            openGame(game);
+          }
+        });
+        favList.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    function removeFavorite(title, e) {
+      if (e) e.stopPropagation();
+      favorites = favorites.filter(t => t !== title);
+      localStorage.setItem('gp-favorites', JSON.stringify(favorites));
+      updateFavoritesUI();
+
+      // Update overlay button if currently open game is removed
+      if (currentGameUrl) {
+        const openGameObj = allGames.find(g => g.url === currentGameUrl);
+        if (openGameObj && openGameObj.title === title) {
+          checkOverlayFavStatus(openGameObj);
+        }
+      }
+    }
+
+    function toggleCurrentFavorite() {
+      if (!currentGameUrl) return;
+      const game = allGames.find(g => g.url === currentGameUrl);
+      if (!game) return;
+
+      const index = favorites.indexOf(game.title);
+      if (index === -1) {
+        favorites.push(game.title);
+      } else {
+        favorites.splice(index, 1);
+      }
+      localStorage.setItem('gp-favorites', JSON.stringify(favorites));
+      checkOverlayFavStatus(game);
+      updateFavoritesUI();
+    }
+
+    function checkOverlayFavStatus(game) {
+      if (!game) return;
+      const isFav = favorites.includes(game.title);
+
+      // Lucide replaces <i> with <svg> at runtime, so we must check for both.
+      // We prioritize SVG if it exists.
+      const icon = overlayFavBtn.querySelector('svg') || overlayFavBtn.querySelector('i');
+
+      // Safety check: if icon is not found for some reason, abort to prevent crash
+      if (!icon) return;
+
+      if (isFav) {
+        overlayFavBtn.style.background = 'var(--accent)';
+        overlayFavBtn.style.color = '#fff';
+        // Removed fill as requested by user
+        if (icon.hasAttribute('fill')) icon.removeAttribute('fill');
+      } else {
+        overlayFavBtn.style.background = '';
+        overlayFavBtn.style.color = '';
+        if (icon.hasAttribute('fill')) icon.removeAttribute('fill');
+      }
+    }
+
+    // Modal Events
+    favBtn.addEventListener('click', () => {
+      updateFavoritesUI();
+      favModal.classList.add('active');
+      document.body.classList.add('no-scroll');
+      document.body.classList.add('blur-active');
+    });
+
+    function closeFavMenu() {
+      favModal.classList.remove('active');
+      document.body.classList.remove('no-scroll');
+      document.body.classList.remove('blur-active');
+    }
+
+    closeFavBtn.addEventListener('click', closeFavMenu);
+
+    // Close on outside click
+    document.addEventListener('mousedown', (e) => {
+      if (favModal.classList.contains('active') &&
+        !favModal.contains(e.target) &&
+        !favBtn.contains(e.target)) {
+        closeFavMenu();
+      }
+    });
+
     function createCard(game) {
       const card = document.createElement('div');
       card.className = 'game-card';
@@ -834,11 +1107,19 @@
 
     async function openGame(game) {
       currentGameUrl = game.url;
+
+      // Ensure Favorites Menu is closed and effects are reset
+      favModal.classList.remove('active');
+      document.body.classList.remove('blur-active');
+
       // 1. Reset & Show Overlay with Loader
       gameContainer.innerHTML = '';
       videoLoader.style.display = 'flex';
       gameOverlay.style.display = 'flex';
       requestAnimationFrame(() => gameOverlay.classList.add('active'));
+      document.body.classList.add('no-scroll');
+
+      checkOverlayFavStatus(game);
 
       // 2. Determine Type
       // Check for .swf (case insensitive, allowing query params)
@@ -909,6 +1190,9 @@
 
     function closeOverlay() {
       gameOverlay.classList.remove('active');
+      document.body.classList.remove('no-scroll');
+      document.body.classList.remove('blur-active'); // Force removal of blur
+      currentGameUrl = null;
       setTimeout(() => {
         gameOverlay.style.display = 'none';
         gameContainer.innerHTML = '';

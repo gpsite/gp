@@ -16,328 +16,8 @@
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <style>
-        :root {
-            /* Theme Config - Dark */
-            --bg-dark: url("https://gpsite.github.io/gpmedia/gpjump/dark.png");
-            --bg-light: url("https://gpsite.github.io/gpmedia/gpjump/light.jpg");
-
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --accent: #60a5fa;
-            --accent-glow: rgba(96, 165, 250, 0.4);
-
-            --pill-bg: rgba(255, 255, 255, 0.08);
-            --pill-hover: rgba(255, 255, 255, 0.15);
-
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
-
-            --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-
-            /* Scalable Units */
-            --font-main: clamp(0.85rem, 1.2vw, 1.05rem);
-            --header-padding: clamp(15px, 2.5vw, 40px);
-            --nav-inner-gap: clamp(8px, 1.5vw, 20px);
-        }
-
-        [data-theme="light"] {
-            --glass: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(0, 0, 0, 0.06);
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --accent: #2563eb;
-            --accent-glow: rgba(37, 99, 235, 0.2);
-
-            --pill-bg: rgba(0, 0, 0, 0.03);
-            --pill-hover: rgba(0, 0, 0, 0.06);
-
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.15);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-            background-color: #000;
-            color: var(--text-primary);
-        }
-
-        /* Dynamic Background Layer */
-        .bg-layer {
-            position: fixed;
-            inset: 0;
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
-            z-index: -2;
-            transition: background-image 0.8s ease;
-            filter: brightness(0.8);
-        }
-
-        /* Overlay Jump Layer */
-        .jump-layer {
-            position: fixed;
-            inset: 0;
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
-            z-index: 1000;
-            pointer-events: none;
-            transition: background-image 0.8s ease;
-        }
-
-        [data-theme="dark"] .bg-layer {
-            background-image: var(--bg-dark);
-        }
-
-        [data-theme="light"] .bg-layer {
-            background-image: var(--bg-light);
-            filter: brightness(1.02);
-        }
-
-        [data-theme="dark"] .jump-layer {
-            background-image: url("https://gpsite.github.io/gpmedia/gpjump/jumpdark.png");
-        }
-
-        [data-theme="light"] .jump-layer {
-            background-image: url("https://gpsite.github.io/gpmedia/gpjump/jumplight.png");
-        }
-
-        .vignette {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 40%, transparent 60%, rgba(0, 0, 0, 0.6) 100%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        [data-theme="light"] .vignette {
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, transparent 40%, transparent 60%, rgba(255, 255, 255, 0.3) 100%);
-        }
-
-        /* --- CONNECTED NAVIGATION BAR --- */
-        header {
-            width: 100%;
-            padding: var(--header-padding);
-            display: flex;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .unified-nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 1400px;
-            background: var(--glass);
-            backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
-            border-radius: 100px;
-            padding: 8px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .nav-group {
-            display: flex;
-            gap: 6px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 24px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: var(--font-main);
-            border-radius: 100px;
-            transition: var(--transition);
-        }
-
-        .nav-link:hover {
-            background: var(--pill-hover);
-            transform: scale(1.02);
-            color: var(--accent);
-        }
-
-        .nav-link i {
-            width: 18px;
-            height: 18px;
-            stroke-width: 2.5px;
-        }
-
-        .nav-link.disabled {
-            opacity: 0.4;
-            pointer-events: none;
-            filter: grayscale(1);
-        }
-
-        /* --- THEME TOGGLE (Integrated into Bar) --- */
-        .theme-toggle {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: var(--pill-bg);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            color: var(--text-primary);
-            margin-left: 10px;
-        }
-
-        .theme-toggle:hover {
-            background: var(--pill-hover);
-            transform: rotate(20deg);
-        }
-
-        /* --- PERSISTENT ANNOUNCEMENTS (BOTTOM) --- */
-        footer {
-            width: 100%;
-            padding: var(--header-padding);
-            padding-top: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-        }
-
-        .footer-container {
-            width: 100%;
-            max-width: 1600px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .announcements-pane {
-            width: 100%;
-            max-width: 600px;
-            background: var(--glass);
-            backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 40vh;
-        }
-
-        .logo-container {
-            flex-shrink: 0;
-        }
-
-        .logo-container img {
-            height: clamp(60px, 8vw, 100px);
-            width: auto;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
-        }
-
-        .announcements-pane h2 {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.6;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .ann-list-container {
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .ann-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .ann-list li {
-            font-size: clamp(0.95rem, 1.1vw, 1.15rem);
-            line-height: 1.5;
-            padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border-left: 3px solid var(--accent);
-        }
-
-        [data-theme="light"] .ann-list li {
-            background: rgba(0, 0, 0, 0.02);
-        }
-
-        /* --- Scrollbar --- */
-        .ann-list-container::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .ann-list-container::-webkit-scrollbar-thumb {
-            background: var(--glass-border);
-            border-radius: 10px;
-        }
-
-        .beta-tag {
-            font-size: 0.55em;
-            background: var(--accent);
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 5px;
-            vertical-align: middle;
-        }
-
-        @media (max-width: 900px) {
-            .unified-nav {
-                border-radius: 30px;
-                flex-direction: column;
-                padding: 15px;
-                gap: 10px;
-            }
-
-            .nav-group {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .nav-link {
-                padding: 8px 16px;
-                font-size: 0.85rem;
-            }
-
-            .theme-toggle {
-                position: absolute;
-                top: 15px;
-                right: 15px;
-            }
-
-            .announcements-pane {
-                max-height: 40vh;
-                border-radius: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/index.css">
 </head>
 
 <body>
@@ -349,9 +29,10 @@
     <header>
         <div class="unified-nav">
             <div class="nav-group">
-                <a href="pages/movies/index.html" class="nav-link disabled"><i data-lucide="film"></i> Movies <span
-                        class="beta-tag">Blocked :(</span></a>
-                <a href="pages/games/index.html" class="nav-link"><i data-lucide="gamepad-2"></i> Games</a>
+                <a href="pages/movies/index.html" class="nav-link"><i data-lucide="film"></i> Movies <span
+                        class="beta-tag">Fixed</span></a>
+                <a href="pages/games/index.html" class="nav-link"><i data-lucide="gamepad-2"></i> Games <span
+                        class="beta-tag">Updated</span></a>
                 <a href="pages/ai/index.html" class="nav-link"><i data-lucide="cpu"></i> GP-Clanker <span
                         class="beta-tag">BETA</span></a>
             </div>
@@ -362,9 +43,8 @@
                     <a class="nav-link disabled"><i data-lucide="sparkles"></i> Experimental <span
                             class="beta-tag">Coming Soon</span></a>
                 </div>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
-                    <i data-lucide="moon" id="moonIcon"></i>
-                    <i data-lucide="sun" id="sunIcon" style="display: none;"></i>
+                <button class="theme-toggle" id="settingsBtn" aria-label="Settings">
+                    <i data-lucide="settings"></i>
                 </button>
             </div>
         </div>
@@ -390,121 +70,79 @@
         </div>
     </footer>
 
+    <!-- Settings Modal -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-modal">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="close-btn" id="closeSettings"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="settings-body">
+                <!-- Appearance -->
+                <div class="settings-group">
+                    <h3>Appearance</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i data-lucide="moon" style="width: 18px;"></i>
+                            <span>Dark Mode</span>
+                        </div>
+                        <div class="toggle-switch" id="themeSwitch"></div>
+                    </div>
+                </div>
+
+                <!-- Privacy & Tools -->
+                <div class="settings-group">
+                    <h3>Privacy & Tools</h3>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i data-lucide="shield" style="width: 18px;"></i>
+                            <span>Tab Cloak</span>
+                        </div>
+                        <select class="select-input" id="cloakSelect">
+                            <option value="none">Default</option>
+                            <option value="google">Google</option>
+                            <option value="drive">Google Drive</option>
+                            <option value="classroom">Google Classroom</option>
+                            <option value="canvas">Canvas</option>
+                            <option value="schoology">Schoology</option>
+                            <option value="gmail">Gmail</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i data-lucide="external-link" style="width: 18px;"></i>
+                            <span>Open in about:blank</span>
+                        </div>
+                        <button class="action-btn" id="abBtn">Launch</button>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="settings-group">
+                    <h3>System</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i data-lucide="rotate-ccw" style="width: 18px;"></i>
+                            <span>Reset Settings</span>
+                        </div>
+                        <button class="action-btn" style="background: #ef4444;" id="resetBtn">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="js/settings.js"></script>
     <script>lucide.createIcons();</script>
+    <script src="js/index-settings.js"></script>
 
-    <script>
-        // Theme
-        const themeBtn = document.getElementById('themeToggle');
-        const sunIcon = document.getElementById('sunIcon');
-        const moonIcon = document.getElementById('moonIcon');
-        const html = document.documentElement;
 
-        const applyTheme = (theme) => {
-            html.setAttribute('data-theme', theme);
-            localStorage.setItem('gp-final-theme', theme);
-            sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
-            moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
-        };
+    <script src="js/index-announcements.js"></script>
 
-        themeBtn.addEventListener('click', () => {
-            applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-        });
-
-        applyTheme(localStorage.getItem('gp-final-theme') || 'dark');
-    </script>
-
-    <script>
-        // Announcements + Full Color System
-        (function () {
-            const ENDPOINT = 'https://sheets.googleapis.com/v4/spreadsheets/1nw0SDop0IeFr6q776thp_eSCZZulaxZBtM55ECrHD5A/values/home?key=AIzaSyBdnupZe6bJH43XE0Hj77n0AmlR3wVfN9M';
-            const container = document.getElementById('annContainer');
-
-            const ALLOWED_COLORS = new Set([
-                'black', 'white', 'gray', 'grey', 'silver', 'lightgray', 'darkgray',
-                'red', 'crimson', 'maroon', 'orange', 'coral', 'tomato',
-                'yellow', 'gold', 'khaki', 'green', 'lime', 'olive', 'seagreen', 'teal',
-                'blue', 'navy', 'royalblue', 'dodgerblue', 'deepskyblue', 'skyblue',
-                'indigo', 'violet', 'purple', 'magenta', 'fuchsia', 'pink', 'hotpink',
-                'cyan', 'aqua', 'turquoise'
-            ]);
-
-            function normalizeColor(c) {
-                if (!c) return null;
-                c = c.trim().toLowerCase();
-                if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c)) return c;
-                return ALLOWED_COLORS.has(c) ? c : null;
-            }
-
-            function parseMarkup(text) {
-                const frag = document.createDocumentFragment();
-                let i = 0, bold = false, color = null;
-                const colorStack = [];
-                let buf = '';
-
-                const flush = () => {
-                    if (!buf) return;
-                    let node;
-                    if (color || bold) {
-                        node = document.createElement(bold ? 'b' : 'span');
-                        if (color) node.style.color = color;
-                        node.textContent = buf;
-                    } else {
-                        node = document.createTextNode(buf);
-                    }
-                    frag.appendChild(node);
-                    buf = '';
-                };
-
-                while (i < text.length) {
-                    if (text.startsWith('**', i)) { flush(); bold = !bold; i += 2; continue; }
-                    if (text.startsWith('[b]', i)) { flush(); bold = true; i += 3; continue; }
-                    if (text.startsWith('[/b]', i)) { flush(); bold = false; i += 4; continue; }
-                    if (text.startsWith('[color=', i)) {
-                        const end = text.indexOf(']', i + 7);
-                        if (end !== -1) {
-                            flush();
-                            colorStack.push(color);
-                            const raw = text.slice(i + 7, end);
-                            const ok = normalizeColor(raw);
-                            color = ok || color;
-                            i = end + 1; continue;
-                        }
-                    }
-                    if (text.startsWith('[/color]', i)) { flush(); color = colorStack.pop() || null; i += 8; continue; }
-                    buf += text[i++];
-                }
-                flush();
-                return frag;
-            }
-
-            async function load() {
-                try {
-                    const res = await fetch(ENDPOINT + '&t=' + Date.now());
-                    const data = await res.json();
-                    const items = (data.values || []).map(r => r[0]).filter(v => v && !/^announcements?$/i.test(v));
-
-                    const ul = document.createElement('ul');
-                    ul.className = 'ann-list';
-                    items.forEach(t => {
-                        const li = document.createElement('li');
-                        li.appendChild(parseMarkup(t));
-                        ul.appendChild(li);
-                    });
-
-                    container.innerHTML = '';
-                    container.appendChild(ul);
-                } catch (e) {
-                    container.innerHTML = '<ul class="ann-list"><li>System offline. Retrying...</li></ul>';
-                }
-            }
-
-            load();
-            setInterval(load, 300000);
-        })();
-    </script>
 </body>
 
 </html>
-
-
