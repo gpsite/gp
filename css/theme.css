@@ -6,8 +6,8 @@
 
 :root {
     /* Theme Background Images */
-    --bg-dark: url("https://gpsite.github.io/gpmedia/gpjump/dark.png");
-    --bg-light: url("https://gpsite.github.io/gpmedia/gpjump/light.jpg");
+    --bg-dark: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/gpjump/dark.png");
+    --bg-light: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/gpjump/light.jpg");
 
     /* Glass Effects */
     --glass: rgba(255, 255, 255, 0.08);
@@ -83,4 +83,5 @@
 body {
     font-family: var(--font-family);
     color: var(--text-primary);
+
 }
