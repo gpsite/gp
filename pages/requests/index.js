@@ -1,0 +1,835 @@
+</script>
+
+  <!-- Shared Theme Variables -->
+  <link rel="stylesheet" href="../../css/theme.css">
+
+  <style>
+    :root {
+      /* Theme Config - Dark */
+      --bg-dark: url("https://gpsite.github.io/gpmedia/img/requests/requestdark.png");
+      --bg-light: url("https://gpsite.github.io/gpmedia/img/requests/requestlight.png");
+
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-strong: rgba(20, 20, 20, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent: #60a5fa;
+      --accent-glow: rgba(96, 165, 250, 0.4);
+      --danger: #ef4444;
+      --success: #10b981;
+
+      --pill-bg: rgba(255, 255, 255, 0.08);
+      --pill-hover: rgba(255, 255, 255, 0.15);
+      --pill-active: rgba(255, 255, 255, 0.2);
+
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
+
+      --transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+      /* Scalable Units */
+      --font-main: clamp(0.85rem, 1.2vw, 1.05rem);
+      --header-padding: clamp(15px, 2.5vw, 40px);
+    }
+
+    [data-theme="light"] {
+      --glass: rgba(255, 255, 255, 0.6);
+      --glass-strong: rgba(255, 255, 255, 0.9);
+      --glass-border: rgba(0, 0, 0, 0.06);
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --accent: #2563eb;
+      --accent-glow: rgba(37, 99, 235, 0.2);
+      --pill-bg: rgba(0, 0, 0, 0.05);
+      --pill-hover: rgba(0, 0, 0, 0.08);
+      --pill-active: rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #000;
+      color: var(--text-primary);
+    }
+
+    /* Dynamic Background Layer */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      z-index: -2;
+      transition: background-image 0.8s ease;
+    }
+
+    [data-theme="dark"] .bg-layer {
+      background-image: var(--bg-dark);
+    }
+
+    [data-theme="light"] .bg-layer {
+      background-image: var(--bg-light);
+    }
+
+    /* --- NAVIGATION --- */
+    header {
+      width: 100%;
+      padding: var(--header-padding);
+      padding-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      z-index: 100;
+      position: relative;
+    }
+
+    /* Unified Navbar Pill */
+    .nav-pill {
+      display: flex;
+      align-items: center;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      padding: 6px;
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 900px;
+      gap: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 100px;
+      transition: var(--transition);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: var(--pill-hover);
+    }
+
+    .nav-item i {
+      width: 18px;
+      height: 18px;
+    }
+
+    .search-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--pill-bg);
+      border-radius: 100px;
+      padding: 2px;
+      transition: var(--transition);
+    }
+
+    .search-container:focus-within {
+      background: var(--pill-hover);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    .search-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 10px 16px;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    /* Nav Dropdown Wrapper for positioning */
+    .nav-dropdown-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Filter Dropdown */
+    /* Filter Dropdown (Positioned via JS or relative to header?)
+       Games page is relative to header. But user wants under button.
+       We will position via JS or use absolute logic. 
+       Let's use JS for perfect alignment. 
+       Games page uses absolute but maybe centered? 
+       Actually Games page filter is absolute inside header, so it's centered to header?
+       "Simple Filter Dropdown of Games page" is specific.
+       I will set it to be absolute.
+    */
+    .filter-modal {
+      position: absolute;
+      top: 100%;
+      /* Removed left/transform centering */
+      background: var(--glass-strong);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      padding: 16px;
+      border-radius: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 200px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+
+      /* Scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: var(--glass-border) transparent;
+    }
+
+    .filter-modal::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .filter-modal::-webkit-scrollbar-thumb {
+      background: var(--glass-border);
+      border-radius: 4px;
+    }
+
+    .filter-modal.active {
+      display: flex;
+    }
+
+    .filter-option {
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: var(--transition);
+    }
+
+    .filter-option:hover {
+      background: var(--pill-bg);
+    }
+
+
+    /* --- SETTINGS BUTTON (Separate top right) --- */
+    .settings-float {
+      position: absolute;
+      top: var(--header-padding);
+      right: var(--header-padding);
+      z-index: 101;
+    }
+
+    .theme-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      color: var(--text-primary);
+    }
+
+    .theme-toggle:hover {
+      background: var(--pill-bg);
+      transform: rotate(15deg);
+    }
+
+
+    /* --- MAIN CONTENT (SPLIT VIEW) --- */
+    main {
+      flex: 1;
+      padding: 0 var(--header-padding) var(--header-padding);
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+      /* container handles scroll */
+    }
+
+    .content-wrap {
+      width: 100%;
+      max-width: 1600px;
+      /* Wider to match screenshot spaciousness */
+      display: grid;
+      grid-template-columns: 450px 1fr;
+      /* Fixed left, flex right */
+      gap: 24px;
+      height: 100%;
+    }
+
+    /* Panels */
+    .glass-panel {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      /* slightly squarer corners per ref? */
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Left Panel Specifics - White BG for form area */
+    .form-panel {
+      background: #fff;
+      padding: 0;
+      /* Flush iframe */
+      border-radius: 20px;
+    }
+
+    .panel-header {
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .form-panel .panel-header {
+      display: none;
+      /* Hide header for pure iframe look if desired, or keep it */
+    }
+
+    /* --- REQUEST LIST --- */
+    .request-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Custom Scrollbar */
+    .request-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .request-list::-webkit-scrollbar-thumb {
+      background: var(--glass-border);
+      border-radius: 10px;
+    }
+
+    .request-card {
+      background: rgba(255, 255, 255, 0.8);
+      /* Light card default */
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+      transition: var(--transition);
+      display: flex;
+      gap: 16px;
+      color: #000;
+      /* Dark text for cards */
+    }
+
+    [data-theme="dark"] .request-card {
+      background: rgba(30, 41, 59, 0.6);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .request-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      line-height: 1.4;
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      opacity: 0.5;
+      margin-top: 8px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Discord-Style Reactions */
+    .reactions-container {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      min-height: 28px;
+      /* reserve space if empty */
+    }
+
+    .reaction-bubble {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      padding: 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    [data-theme="dark"] .reaction-bubble {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .reaction-bubble:hover {
+      background: rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .reaction-bubble:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .reaction-bubble.user-reacted {
+      background: #5865F2;
+      border-color: #5865F2;
+      color: #fff;
+    }
+
+    .reaction-bubble .emoji {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-pill.received {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+
+    .status-pill.completed {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .status-pill.working {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .status-pill.other {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .status-pill.terminated {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+
+    [data-theme="light"] .status-pill {
+      color: #fff;
+    }
+
+    /* Unified Expanding Reaction Button */
+    .reaction-pill {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      height: 36px;
+      min-width: 36px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      padding: 0 8px;
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] .reaction-pill {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .request-card:hover .reaction-pill {
+      opacity: 1;
+    }
+
+    /* When active, it stays visible */
+    .reaction-pill.active {
+      opacity: 1 !important;
+      padding: 0 6px;
+      min-width: 180px;
+      /* Expand to fit emojis */
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    [data-theme="dark"] .reaction-pill.active {
+      background: #1e293b;
+    }
+
+    .pill-icon-layer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      transition: opacity 0.2s;
+    }
+
+    .reaction-pill.active .pill-icon-layer {
+      display: none;
+      /* Hide + when open */
+    }
+
+    .pill-options-layer {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      opacity: 0;
+      transform: translateX(10px);
+      transition: all 0.3s ease;
+    }
+
+    .reaction-pill.active .pill-options-layer {
+      display: flex;
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .emoji-opt {
+      background: transparent;
+      border: none;
+      font-size: 1.25rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .emoji-opt:hover {
+      background: rgba(0, 0, 0, 0.05);
+      transform: scale(1.25);
+    }
+
+    [data-theme="dark"] .emoji-opt:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+
+    .emoji-picker.active {
+      display: flex;
+    }
+
+    .emoji-picker button {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .emoji-picker button:hover {
+      background: var(--pill-hover);
+      transform: scale(1.2);
+    }
+
+    /* --- IFRAME --- */
+    .iframe-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      border: none;
+      background: #fff;
+    }
+
+    /* --- SETTINGS MODAL (Reused) --- */
+    .settings-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .settings-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .settings-modal {
+      width: 100%;
+      max-width: 500px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px) scale(0.95);
+      transition: var(--transition);
+      color: var(--text-primary);
+    }
+
+    .settings-overlay.active .settings-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .settings-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .settings-group {
+      margin-bottom: 24px;
+    }
+
+    .settings-group h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      opacity: 0.7;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--pill-bg);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .toggle-switch.active {
+      background: var(--accent);
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+
+    .select-input {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .action-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 900px) {
+      .content-wrap {
+        grid-template-columns: 1fr;
+        grid-template-rows: 500px 1fr;
+      }
+
+      .nav-pill {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-layer"></div>
+
+  <header id="mainHeader">
+    <div class="nav-pill">
+      <a href="../../index.html" class="nav-item">
+        <i data-lucide="home"></i> Home
+      </a>
+
+      <div class="nav-item" id="filterBtn">
+        <i data-lucide="filter"></i> Filter
+      </div>
+
+      <div class="nav-item" id="sortBtn">
+        <i data-lucide="arrow-up-down"></i> Sort
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search requests...">
+      </div>
+    </div>
+
+    <!-- Filter Dropdown -->
+    <div class="filter-modal" id="filterMenu">
+      <div class="filter-option" onclick="setFilter('All')">All</div>
+      <div class="filter-option" onclick="setFilter('Game')">Game</div>
+      <div class="filter-option" onclick="setFilter('Glitch')">Glitch</div>
+      <div class="filter-option" onclick="setFilter('Other')">Other</div>
+    </div>
+
+    <!-- Sort Dropdown -->
+    <div class="filter-modal" id="sortMenu">
+      <div class="filter-option" onclick="setSort('Newest')">Newest</div>
+      <div class="filter-option" onclick="setSort('Oldest')">Oldest</div>
+      <div class="filter-option" onclick="setSort('Most Liked')">Most Liked</div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="content-wrap">
+      <!-- Left: Google Form Iframe -->
+      <section class="form-panel">
+        <iframe src="https://forms.gle/cVCC9Mzd8VZ3jjsMA" title="Request form" class="iframe-container"></iframe>
+      </section>
+
+      <!-- Right: Requests List -->
+      <section class="glass-panel">
+        <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 id="listTitle">Requests</h2>
+          <div style="font-size:0.9rem; opacity:0.6;" id="listCount">Loading...</div>
+        </div>
+
+        <div id="requestsList" class="request-list">
+          <!-- Loading state -->
+          <div style="text-align:center; padding:40px; opacity:0.6;">
+            <i data-lucide="loader-2" class="animate-spin" style="width:24px; height:24px;"></i>
+            <p style="margin-top:10px;">Syncing with Backend...</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-modal">
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button class="close-btn" id="closeSettings"><i data-lucide="x"></i></button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-group">
+          <h3>Appearance</h3>
+          <div class="setting-item">
+            <div class="setting-label"><i data-lucide="moon" style="width: 18px;"></i><span>Dark Mode</span></div>
+            <div class="toggle-switch" id="themeSwitch"></div>
+          </div>
+        </div>
+        <!-- ... other settings per previous implementation ... -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Logic -->
+  <script src="../../js/settings.js">
