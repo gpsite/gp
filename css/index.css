@@ -1,7 +1,7 @@
 :root {
     /* Page-specific Background Images (override theme defaults) */
-    --bg-dark: url("https://gpsite.github.io/gpmedia/gpjump/dark.png");
-    --bg-light: url("https://gpsite.github.io/gpmedia/gpjump/light.jpg");
+    --bg-dark: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/gpjump/dark.png");
+    --bg-light: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/gpjump/light.jpg");
 }
 
 
@@ -51,11 +51,11 @@ body {
 }
 
 [data-theme="dark"] .jump-layer {
-    background-image: url("https://gpsite.github.io/gpmedia/gpjump/jumpdark.png");
+    background-image: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/gpjump/jumpdark.png");
 }
 
 [data-theme="light"] .jump-layer {
-    background-image: url("https://gpsite.github.io/gpmedia/gpjump/jumplight.png");
+    background-image: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/gpjump/jumplight.png");
 }
 
 .vignette {
@@ -445,4 +445,5 @@ footer {
 
 [data-theme="light"] .select-input {
     background: rgba(255, 255, 255, 0.5);
+
 }
