@@ -1,7 +1,7 @@
 :root {
       /* Theme Config - Dark */
-      --bg-dark: url("https://gpsite.github.io/gpmedia/img/catalog/darkcatalog.png");
-      --bg-light: url("https://gpsite.github.io/gpmedia/img/catalog/lightcatalog.png");
+      --bg-dark: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/img/catalog/darkcatalog.png");
+      --bg-light: url("https://ec2-3-92-139-4.compute-1.amazonaws.com/gpmedia/img/catalog/lightcatalog.png");
 
       --glass: rgba(255, 255, 255, 0.08);
       --glass-strong: rgba(20, 20, 20, 0.6);
@@ -661,4 +661,5 @@
 
     .fav-item-remove:hover {
       opacity: 1;
+
     }
